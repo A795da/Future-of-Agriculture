@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { cachedExplanation, explain } from "../../explain/ai.js";
 import { cacheKey } from "../../explain/payload.js";
+import Icon from "./Icon.jsx";
 
 const TEXT = {
   en: {
@@ -59,7 +60,7 @@ export default function AiSummary({ kind, facts, lang = "en" }) {
       <div className="ai-summary" lang={lang}>
         <p>{state.text}</p>
         <span className="ai-label">
-          ✦ {t.label}
+          {t.label}
           {state.source === "cache" ? ` · ${t.cached}` : ""}
         </span>
       </div>
@@ -68,7 +69,7 @@ export default function AiSummary({ kind, facts, lang = "en" }) {
   return (
     <div className="ai-ask">
       <button className="link" onClick={ask} disabled={state.status === "busy"}>
-        ✦ {state.status === "busy" ? t.busy : t.ask}
+        {state.status === "busy" ? t.busy : t.ask}
       </button>
       {state.status === "error" && <p className="note">{t.errors[state.error] ?? t.errors.default}</p>}
     </div>

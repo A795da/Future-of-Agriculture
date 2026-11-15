@@ -6,6 +6,8 @@ import { loadForecast } from "../../data/forecast.js";
 import { guessCropNow, runToday, todaySummary } from "../../scoring/today.js";
 import { shortName } from "../../scoring/names.js";
 import AiSummary from "../components/AiSummary.jsx";
+import Icon from "../components/Icon.jsx";
+import HourlyStrip, { skyIcon } from "./HourlyStrip.jsx";
 import { GlossaryText } from "../components/Glossary.jsx";
 import { todayFacts } from "../../explain/payload.js";
 import { useLang } from "../../i18n/LangContext.jsx";
@@ -33,10 +35,12 @@ export default function TodayTab({ tables, features, inputs, lat, lon, provinceI
 
   const today = fc.data?.days[0]?.date;
   const guess = useMemo(
-    () => (features && today ? guessCropNow(inputs.current, cropsById, features, today) : null),
-    [features, today, inputs.current, cropsById]
+    () => (features && today ? guessCropNow([...inputs.current, ...Object.values(inputs.second ?? {})], cropsById, features, today) : null),
+    [features, today, inputs.current, inputs.second, cropsById]
   );
   const [picked, setPicked] = useState(null);
+  const [dayIdx, setDayIdx] = useState(0);
+  useEffect(() => setDayIdx(0), [fc.data]);
   useEffect(() => setPicked(null), [inputs.current, provinceId]); // new rotation or place: guess again
   const cropNow = picked ?? guess;
 
@@ -59,9 +63,13 @@ export default function TodayTab({ tables, features, inputs, lat, lon, provinceI
   if (!result) return null;
   if (result.error) return <p className="warn">{t("today_failed", { e: result.error })}</p>;
 
-  const rotationCrops = [...new Set(inputs.current.filter((id) => id !== "fallow"))];
+  const rotationCrops = [...new Set([...inputs.current, ...Object.values(inputs.second ?? {})].filter((id) => id !== "fallow"))];
   const others = crops.filter((c) => !rotationCrops.includes(c.id));
   const cropTr = label(cropNow).toLocaleLowerCase("tr");
+  // One temperature scale for the whole week, so the bars compare day to day.
+  const lo = Math.min(...result.days.map((d) => d.tmin)) - 1;
+  const span = Math.max(...result.days.map((d) => d.tmax)) + 1 - lo;
+  const maxRain = Math.max(10, ...result.days.map((d) => d.rain));
 
   return (
     <div className="today">
@@ -97,23 +105,49 @@ export default function TodayTab({ tables, features, inputs, lat, lon, provinceI
         </p>
       )}
 
-      <ol className="days" aria-label={t("forecast_7")}>
-        {result.days.map((d) => {
-          const dl = dayLabel(d.date, lang);
-          return (
-            <li key={d.date} className={`day d-${d.status}`}>
-              <span className="day-name">
-                {dl.day} {dl.date.split(" ")[0]}
-              </span>
-              <span className="day-dot" aria-label={d.status} />
-              <span className="day-t">
-                <b>{Math.round(d.tmax)}°</b> / {Math.round(d.tmin)}°
-              </span>
-              <span className="day-rain">{d.rain >= 0.5 ? `${Math.round(d.rain)} mm` : "–"}</span>
-            </li>
-          );
-        })}
-      </ol>
+      <section className="week">
+        <header className="week-head">
+          <h3>{t("forecast_7")}</h3>
+          <span>°C · mm</span>
+        </header>
+        <ol className="days" aria-label={t("forecast_7")}>
+          {result.days.map((d, i) => {
+            const dl = dayLabel(d.date, lang);
+            const pos = (v) => ((v - lo) / span) * 100;
+            return (
+              <li key={d.date} className={`day d-${d.status}${i === dayIdx ? " is-sel" : ""}`}>
+                <button type="button" className="day-btn" aria-pressed={i === dayIdx} onClick={() => setDayIdx(i)}>
+                <span className="day-name">
+                  {dl.day} {dl.date.split(" ")[0]}
+                </span>
+                {d.sky && (
+                  <span
+                    className={`day-sky sky-${d.sky}`}
+                    title={d.rain_prob != null ? `${t(`sky_${d.sky}`)} · ${t("rain_chance", { p: d.rain_prob })}` : t(`sky_${d.sky}`)}
+                  >
+                    <Icon name={skyIcon(d.sky)} size="28" />
+                    <span className="day-sky-label">{t(`sky_${d.sky}`)}</span>
+                  </span>
+                )}
+                <span className="day-hi">{Math.round(d.tmax)}°</span>
+                <span className="day-range" aria-hidden="true">
+                  <i style={{ bottom: `${pos(d.tmin)}%`, top: `${100 - pos(d.tmax)}%` }} />
+                </span>
+                <span className="day-lo">{Math.round(d.tmin)}°</span>
+                <span className="day-rainbar" aria-hidden="true">
+                  {d.rain >= 0.5 && <i style={{ height: `${Math.max(8, (d.rain / maxRain) * 100)}%` }} />}
+                </span>
+                <span className="day-rain">{d.rain >= 0.5 ? `${Math.round(d.rain)} mm` : "–"}</span>
+                <span className="sr-only">{d.status}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+        {fc.data.days.some((d) => d.hours?.length) && <p className="note week-hint">{t("hourly_hint")}</p>}
+      </section>
+
+      <HourlyStrip days={result.days} index={dayIdx} />
 
       {result.alerts.length > 0 && (
         <div className="alerts">

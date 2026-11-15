@@ -3,6 +3,7 @@
 // farmer's input. Output is one RotationResult per card (scoring/contract.js):
 // the farmer's current rotation first, then the two best alternatives.
 
+import { SUPPORT_MAX_IN_A_ROW, SUPPORT_RULE_SOURCE, supportRuleBreach } from "./support.js";
 import { applyScenario } from "../features/scenario.js";
 import { validateResult } from "./contract.js";
 import { filterCrops } from "./filter.js";
@@ -10,6 +11,10 @@ import { labelOf, scoreRotation } from "./score.js";
 import { climateOutlook } from "./outlook.js";
 
 const sameSeq = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+const sameSecond = (a = {}, b = {}) => {
+  const k = (o) => JSON.stringify(Object.entries(o ?? {}).filter(([, v]) => v).map(([i, v]) => [String(i), v]).sort());
+  return k(a) === k(b);
+};
 const MAX_GENERATOR_CROPS = 8; // above this, only 2-year rotations are generated
 const MAX_GENERATOR_CROPS_2Y = 16; // keeps the 2-year search under ~300 sequences
 
@@ -59,13 +64,17 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
 
   // candidate templates
   const baselineSeq = (farmer.current_sequence ?? []).filter((id) => id === "fallow" || cropsById[id]);
+  // The farmer's own second crops (after the main harvest), by year index.
+  const baselineSecond = Object.fromEntries(
+    Object.entries(farmer.current_second ?? {}).filter(([i, id]) => id && cropsById[id] && baselineSeq[+i] && baselineSeq[+i] !== "fallow")
+  );
   const irrigationOk = (r) =>
     r.irrigation === "either" || r.irrigation === farmer.irrigation || (farmer.irrigation === "irrigated" && r.irrigation === "rainfed");
   const usable = (r) =>
     irrigationOk(r) &&
     r.sequence.every((id) => id === "fallow" || okCrop.has(id)) &&
     Object.values(r.second_crops ?? {}).every((id) => okCrop.has(id)) &&
-    !sameSeq(r.sequence, baselineSeq);
+    !(sameSeq(r.sequence, baselineSeq) && sameSecond(r.second_crops, baselineSecond));
 
   let candidates = rotationTable.rotations.filter((r) => usable(r) && r.regions.includes(farmer.region));
   const regional = candidates.length >= 2;
@@ -128,8 +137,11 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
     gaps.push("weather data describes an area tens of km wide, not this field alone");
 
     const risks = [...scored.risks];
+    if (Object.values(rot.second_crops ?? {}).some(Boolean)) {
+      gaps.push("second crops are checked with their own usual sowing dates, not the exact date after your harvest");
+    }
     if (isBaseline) {
-      for (const id of rot.sequence) {
+      for (const id of [...rot.sequence, ...Object.values(rot.second_crops ?? {})]) {
         const c = removed.find((x) => x.id === id);
         if (c) risks.unshift(`${c.name} did not pass the checks: ${c.reasons.join("; ")}`);
       }
@@ -144,6 +156,13 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
       const o = climateOutlook(c, features);
       const lost = o.today.fit && o.warmer.find((w) => !w.fit);
       if (lost) risks.push(`${labelOf([id], cropsById)}: with +${lost.tempC} °C warming it may stop fitting here (heat at flowering in ${lost.heatYears} of ${lost.n} years; what-if, not a forecast)`);
+    }
+    // Ministry support rule: the same crop at most twice in a row (rice, perennials exempt).
+    const breach = supportRuleBreach(rot.sequence, cropsById);
+    if (breach) {
+      risks.push(
+        `${labelOf([breach], cropsById)} is grown more than ${SUPPORT_MAX_IN_A_ROW} years in a row: under the Ministry's support rules (${SUPPORT_RULE_SOURCE}) the third year gets no basic support (diesel and fertiliser) or other crop support payments`
+      );
     }
     if (rot.fromOtherRegion) risks.push("this rotation is common in another region of Turkey; check it with a local agronomist");
     if (rot.generated) {
@@ -201,7 +220,7 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
 
   const results = [];
   if (baselineSeq.length) {
-    const base = { id: "current", sequence: baselineSeq };
+    const base = { id: "current", sequence: baselineSeq, ...(Object.keys(baselineSecond).length ? { second_crops: baselineSecond } : {}) };
     results.push(finish(base, scoreRotation(base, ctx), true));
   }
   results.push(...ranked);

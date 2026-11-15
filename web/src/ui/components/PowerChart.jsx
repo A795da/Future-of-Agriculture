@@ -28,7 +28,7 @@ Chart.register(
 );
 
 // Monthly summary keeps the chart readable on a phone.
-function monthly(daily) {
+export function monthly(daily) {
   const by = new Map();
   daily.date.forEach((d, i) => {
     const m = d.slice(0, 7);
@@ -66,6 +66,7 @@ export default function PowerChart({ conditions }) {
             label: t("chart_rain"),
             data: m.rain,
             backgroundColor: c("--rain"),
+            borderRadius: 3,
             yAxisID: "rain",
             order: 2,
           },
@@ -73,8 +74,10 @@ export default function PowerChart({ conditions }) {
             type: "line",
             label: t("chart_tmax"),
             data: m.tmax,
-            borderColor: c("--hot"),
-            backgroundColor: c("--hot"),
+            borderColor: c("--accent"),
+            backgroundColor: c("--accent"),
+            borderWidth: 2,
+            pointRadius: 2,
             tension: 0.3,
             yAxisID: "temp",
             order: 1,
@@ -83,8 +86,11 @@ export default function PowerChart({ conditions }) {
             type: "line",
             label: t("chart_tmin"),
             data: m.tmin,
-            borderColor: c("--cold"),
-            backgroundColor: c("--cold"),
+            borderColor: c("--muted"),
+            backgroundColor: c("--muted"),
+            borderWidth: 2,
+            borderDash: [4, 4],
+            pointRadius: 0,
             tension: 0.3,
             yAxisID: "temp",
             order: 1,
@@ -95,21 +101,23 @@ export default function PowerChart({ conditions }) {
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: "index", intersect: false },
-        plugins: { legend: { position: "bottom", labels: { boxWidth: 12, color: c("--text") } } },
+        plugins: { legend: { position: "bottom", labels: { boxWidth: 8, boxHeight: 8, usePointStyle: true, pointStyle: "circle", color: c("--muted"), font: { family: c("--mono"), size: 12 } } } },
         scales: {
-          x: { ticks: { color: c("--muted") }, grid: { display: false } },
+          x: { ticks: { color: c("--muted"), font: { family: c("--mono"), size: 11 } }, grid: { display: false }, border: { display: false } },
           temp: {
             position: "left",
             title: { display: true, text: "°C", color: c("--muted") },
-            ticks: { color: c("--muted") },
+            ticks: { color: c("--muted"), font: { family: c("--mono"), size: 11 } },
             grid: { color: c("--grid") },
+            border: { display: false },
           },
           rain: {
             position: "right",
             beginAtZero: true,
             title: { display: true, text: "mm", color: c("--muted") },
-            ticks: { color: c("--muted") },
+            ticks: { color: c("--muted"), font: { family: c("--mono"), size: 11 } },
             grid: { display: false },
+            border: { display: false },
           },
         },
       },

@@ -1,11 +1,13 @@
 import { useLang } from "../../i18n/LangContext.jsx";
+import Icon from "../components/Icon.jsx";
 
 export const DASHBOARD_TABS = [
-  { id: "today", icon: "☀️", labelKey: "tab_today" },
-  { id: "plan", icon: "🌾", labelKey: "tab_plan" },
-  { id: "check", icon: "🔍", labelKey: "tab_check" },
-  { id: "field", icon: "🗺️", labelKey: "tab_field" },
-  { id: "climate", icon: "📊", labelKey: "tab_climate" },
+  { id: "overview", icon: "home", labelKey: "tab_overview" },
+  { id: "plan", icon: "rotate", labelKey: "tab_plan" },
+  { id: "check", icon: "search", labelKey: "tab_check" },
+  { id: "today", icon: "sun", labelKey: "tab_today" },
+  { id: "climate", icon: "chart", labelKey: "tab_climate" },
+  { id: "field", icon: "map", labelKey: "tab_field" },
 ];
 
 export default function DashboardNav({ tab, onSelect }) {
@@ -23,9 +25,7 @@ export default function DashboardNav({ tab, onSelect }) {
             className={`nav-item ${active ? "active" : ""}`}
             onClick={() => onSelect(id)}
           >
-            <span className="nav-icon" aria-hidden="true">
-              {icon}
-            </span>
+            <span className="nav-icon" aria-hidden="true"><Icon name={icon} /></span>
             <span className="nav-label">{t(labelKey)}</span>
           </button>
         );

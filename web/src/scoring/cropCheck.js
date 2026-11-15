@@ -7,6 +7,7 @@
 // Verdict: any blocker → not_reasonable; any caution → possible_with_care;
 // otherwise reasonable.
 
+import { SUPPORT_MAX_IN_A_ROW, SUPPORT_RULE_SOURCE, supportProduct } from "./support.js";
 import { round } from "../features/stats.js";
 import { climateHistory, describePaddySoil, dryYearCoverage, irrigationNeed } from "./agronomy.js";
 import { phenology, sowingDoy, zoneCalendar } from "./calendar.js";
@@ -19,6 +20,7 @@ import { yieldFor } from "./nutrients.js";
 import { localYield } from "./yields.js";
 import { climateOutlook, describeOutlook } from "./outlook.js";
 import { waterSupply } from "./waterSupply.js";
+import { METHOD_NOTE, amountText, coveredPct, peaksWords, waterData } from "./waterText.js";
 
 // ---- FROZEN OUTPUT (like the rotation contract; change only by agreement)
 export const VERDICTS = ["reasonable", "possible_with_care", "not_reasonable"];
@@ -173,7 +175,8 @@ function evaluate(crop, previous, ctx) {
         evidence:
           w.deficit < 20
             ? `in a normal year rain and stored soil water cover ${name}'s water need (~${round(w.need)} mm); little or no irrigation`
-            : `${name} needs about ${round(w.deficit)} mm of irrigation in a normal year (crop uses ~${round(w.need)} mm)`,
+            : irrigatedText(name, crop, f, w),
+        ...(w.deficit < 20 ? {} : { water: waterData("irrigate", crop, f, { need: w.need, mm: w.deficit, covered: coveredPct(w) }) }),
         ...POWER,
         effect: w.deficit < 150 ? "positive" : care ? "negative" : "neutral",
         level: care ? "caution" : "info",
@@ -194,6 +197,17 @@ function evaluate(crop, previous, ctx) {
       });
       if (ws.falling && thirsty) risks.push(`water stored underground and on land here has fallen about ${Math.abs(ws.trend)} cm a year (NASA GRACE): check that your well or water allocation will keep up`);
     }
+  } else if (!crop.rainfed_ok && !crop.paddy) {
+    // Rain-fed field, crop that needs irrigation: say how much water it would take.
+    const w = irrigationNeed(crop, f, afterFallow);
+    add({
+      type: "water",
+      evidence: `to grow ${name} you would need to irrigate: ${irrigatedText(name, crop, f, w)}`,
+      water: waterData("would_irrigate", crop, f, { need: w.need, mm: w.deficit, covered: coveredPct(w) }),
+      ...POWER,
+      effect: "neutral",
+      level: "info",
+    });
   } else if (crop.rainfed_ok && !site.details.some((d) => d.type === "water") && !softFailed("dry_year")) {
     // (a dry-year failure is already a blocker or caution from the site check above)
     const w = dryYearCoverage(crop, f, afterFallow);
@@ -201,7 +215,8 @@ function evaluate(crop, previous, ctx) {
     const care = w.coverage < WATER_CAUTION_COVERAGE;
     add({
       type: "water",
-      evidence: `in a dry year, rain and stored soil water cover ${Math.min(pct, 100)}% of ${name}'s water need (~${round(w.need)} mm)${afterFallow ? ", counting the water saved by last season's fallow" : ""}`,
+      evidence: `in a dry year, rain and stored soil water cover ${Math.min(pct, 100)}% of ${name}'s water need (~${round(w.need)} mm)${afterFallow ? ", counting the water saved by last season's fallow" : ""}${dryShortText(crop, f, w)}`,
+      ...(w.need - w.supply >= 20 ? { water: waterData("dry_short", crop, f, { need: w.need, mm: w.need - w.supply, covered: coveredPct(w), dry: true }) } : {}),
       ...POWER,
       effect: w.coverage >= WATER_GOOD_COVERAGE ? "positive" : care ? "negative" : "neutral",
       level: care ? "caution" : "info",
@@ -216,6 +231,20 @@ function evaluate(crop, previous, ctx) {
         kind: "NASA reanalysis",
         effect: "negative",
         level: "caution",
+      });
+    }
+  } else if (crop.rainfed_ok) {
+    // The dry-year water check failed above: add how much water would make up the gap.
+    const w = dryYearCoverage(crop, f, afterFallow);
+    const short = dryShortText(crop, f, w);
+    if (short) {
+      add({
+        type: "water",
+        evidence: `in a dry year ${name} uses ~${round(w.need)} mm and rain plus stored soil water cover about ${coveredPct(w)}%${short}`,
+        water: waterData("dry_short", crop, f, { need: w.need, mm: w.need - w.supply, covered: coveredPct(w), dry: true }),
+        ...POWER,
+        effect: "neutral",
+        level: "info",
       });
     }
   }
@@ -241,6 +270,18 @@ function evaluate(crop, previous, ctx) {
         `${name} needs ${gapRule.min_gap_years} years between crops; you entered ${previous.length} past season${previous.length === 1 ? "" : "s"}, so check it was not grown in the ${gapRule.min_gap_years - 1} seasons before`
       );
     }
+  }
+  // Ministry support rule: the same crop at most twice in a row (rice, perennials exempt).
+  const product = supportProduct(crop.id, cropsById);
+  if (product && previous.length >= SUPPORT_MAX_IN_A_ROW && previous.slice(0, SUPPORT_MAX_IN_A_ROW).every((id) => supportProduct(id, cropsById) === product)) {
+    add({
+      type: "income",
+      evidence: `${name} would be the third year in a row of the same crop: under the Ministry's support rules the third year gets no basic support (diesel and fertiliser) or other crop support payments`,
+      source: SUPPORT_RULE_SOURCE,
+      kind: "compiled rule",
+      effect: "negative",
+      level: "caution",
+    });
   }
   if (lastCrop) {
     const famRule = rules.find(
@@ -460,7 +501,7 @@ export function runCropCheck({ cropId, previous = [], features, cropTable, ruleT
     crop: crop.id,
     previous: prev,
     verdict: main.verdict,
-    reasons: main.reasons.map(({ type, evidence, source, kind, effect, level }) => ({ type, evidence, source, kind, effect, level })),
+    reasons: main.reasons.map(({ type, evidence, source, kind, effect, level, water }) => ({ type, evidence, source, kind, effect, level, ...(water ? { water } : {}) })),
     alternatives,
     risks: main.risks,
     gaps,
@@ -496,4 +537,18 @@ export function validateCheck(r) {
   need(blockers === (r?.verdict === "not_reasonable"), "verdict must be not_reasonable exactly when a blocker exists");
   need(blockers || cautions === (r?.verdict === "possible_with_care"), "verdict must follow the cautions");
   return errs;
+}
+
+/** "needs about 488 mm of irrigation in a normal year (488 m³ per dekar, ...): ..." for one crop. */
+function irrigatedText(name, crop, f, w) {
+  const peak = peaksWords(waterData("irrigate", crop, f, { need: w.need, mm: w.deficit, covered: 0 }).peaks);
+  return `${name} needs about ${amountText(w.deficit)} of irrigation in a normal year: the crop uses ~${round(w.need)} mm and rain plus stored soil water cover about ${coveredPct(w)}%${peak ? `; ${peak}` : ""}; ${METHOD_NOTE}`;
+}
+
+/** Rain-fed crop short of water in a dry year: how much, and when. "" when covered. */
+function dryShortText(crop, f, w) {
+  const short = w.need - w.supply;
+  if (short < 20) return "";
+  const peak = peaksWords(waterData("dry_short", crop, f, { need: w.need, mm: short, covered: 0, dry: true }).peaks);
+  return `; it is about ${amountText(short)} short${peak ? `, ${peak}` : ""}, which extra watering would make up`;
 }

@@ -32,3 +32,12 @@ onion,"Onions, dry","Onions and shallots, dry (excluding dehydrated)",
 watermelon,Watermelons,Watermelons,
 melon,"Melons, other (inc.cantaloupes)",Cantaloupes and other melons,
 rice,"Rice, paddy",Rice,paddy rice (rice in the husk)
+pepper,"Chillies and peppers, green","Chillies and peppers, green (Capsicum spp. and Pimenta spp.)",
+cucumber,Cucumbers and gherkins,Cucumbers and gherkins,FAOSTAT yield includes greenhouse cucumber
+eggplant,Eggplants (aubergines),Eggplants (aubergines),
+zucchini,"Pumpkins, squash and gourds","Pumpkins, squash and gourds",FAOSTAT groups all squash and pumpkin
+green_bean,String beans,"Other beans, green","yield from FAOSTAT Other beans, green (13.2 t/ha; String beans, 11.1 t/ha, is the alternative); nutrients from Ludemann String beans"
+cabbage,Cabbages and other brassicas,Cabbages,
+carrot,Carrots and turnips,Carrots and turnips,
+garlic,Garlic,Green garlic,"this FAOSTAT export has only Green garlic for Türkiye; the dry-bulb yield is likely lower, so removal is likely overstated"
+lettuce,Lettuce and chicory,Lettuce and chicory,

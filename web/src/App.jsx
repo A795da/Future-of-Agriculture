@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchPowerDaily } from "./data/power.js";
-import { loadPointFeatures, loadProvinceData, loadTables, loadTerrain, withSoilTexture, withSowingCalendar, withWaterStorage } from "./data/loader.js";
-import { runScoring } from "./scoring/index.js";
-import { localYields as buildLocalYields } from "./scoring/yields.js";
-import { DEFAULT_INPUTS, defaultRotation } from "./scoring/defaults.js";
+import { loadPointFeatures, loadProvinceData, loadTables, loadTerrain, withSowingCalendar } from "./data/loader.js";
+import { DEFAULT_FARM, defaultRotation, effectiveInputs, withNewPart } from "./scoring/defaults.js";
+import { partFeatures, scorePart } from "./scoring/parts.js";
+import PartsManager from "./ui/field/PartsManager.jsx";
+import PartSwitcher from "./ui/layout/PartSwitcher.jsx";
+import { forgetSaved, isFarm, isProvinceId, isScenario, loadSaved, saveLocal } from "./data/saved.js";
 import PowerChart from "./ui/components/PowerChart.jsx";
 import FieldMap from "./field/FieldMap.jsx";
 import FarmerInputs from "./ui/plan/FarmerInputs.jsx";
@@ -15,9 +17,13 @@ import { LangProvider } from "./i18n/LangContext.jsx";
 import { translate } from "./i18n/strings.js";
 import { formatArea, formatLatLon, nearestProvince } from "./field/geometry.js";
 import DashboardNav from "./ui/layout/DashboardNav.jsx";
+import Icon from "./ui/components/Icon.jsx";
+import FieldSidebar from "./ui/layout/FieldSidebar.jsx";
+import Overview from "./ui/overview/Overview.jsx";
+import ClimateView from "./ui/climate/ClimateView.jsx";
 
-const VALID_TABS = ["today", "plan", "check", "field", "climate"];
-const DEFAULT_TAB = "plan";
+const VALID_TABS = ["overview", "today", "plan", "check", "field", "climate"];
+const DEFAULT_TAB = "overview";
 
 function getInitialTab() {
   if (typeof window !== "undefined") {
@@ -29,10 +35,38 @@ function getInitialTab() {
 
 export default function App() {
   const [tables, setTables] = useState(null);
-  const [pointId, setPointId] = useState("konya");
+  // Choices are kept in this browser only (localStorage) and restored on the next visit.
+  const [pointId, setPointId] = useState(() => loadSaved("province", isProvinceId, "konya"));
   const [field, setField] = useState(null);
-  const [inputs, setInputs] = useState(DEFAULT_INPUTS);
-  const [scenario, setScenario] = useState({ rainPct: 0, tempC: 0 });
+  // Farm: farm-wide settings plus one or more field parts (each with its own
+  // rotation, second crops, water and soil). `inputs` is the active part, flat.
+  const [farm, setFarm] = useState(() => {
+    const saved = loadSaved("farm", isFarm, null);
+    return saved ? { ...DEFAULT_FARM, ...saved } : DEFAULT_FARM;
+  });
+  const inputs = useMemo(() => effectiveInputs(farm), [farm]);
+  // Older components hand back a whole flat inputs object: split it into part and farm fields.
+  const setInputs = (next) =>
+    setFarm((s) => ({
+      ...s,
+      priorities: next.priorities,
+      never: next.never,
+      ratings: next.ratings,
+      touched: next.touched ?? s.touched,
+      parts: s.parts.map((p) =>
+        p.id === s.activePart ? { ...p, irrigation: next.irrigation, soil: next.soil, current: next.current, second: next.second ?? p.second } : p
+      ),
+    }));
+  const pickPart = (id) => setFarm((s) => ({ ...s, activePart: id }));
+  const [scenario, setScenario] = useState(() => loadSaved("scenario", isScenario, { rainPct: 0, tempC: 0 }));
+  useEffect(() => saveLocal("farm", farm), [farm]);
+  useEffect(() => saveLocal("province", pointId), [pointId]);
+  useEffect(() => saveLocal("scenario", scenario.rainPct || scenario.tempC ? scenario : null), [scenario]);
+  const forgetChoices = () => {
+    if (!window.confirm(translate(lang, "forget_confirm"))) return;
+    forgetSaved();
+    window.location.reload();
+  };
   const [tab, setTabState] = useState(getInitialTab);
 
   const setTab = (nextTab) => {
@@ -87,6 +121,10 @@ export default function App() {
     [tables]
   );
   const point = provinces.find((p) => p.id === pointId);
+  // A saved province that no longer exists falls back to Konya.
+  useEffect(() => {
+    if (provinces.length && !point) setPointId("konya");
+  }, [provinces, point]);
   const onField = field?.valid === true;
 
   // Province: cached features; a region default rotation until the farmer edits it.
@@ -100,7 +138,7 @@ export default function App() {
         setProvinceData(d);
         setDataStatus("ready");
         const f = withSowingCalendar(d.features, point, tables.tagem, "rainfed");
-        setInputs((s) => (s.touched ? s : { ...s, current: defaultRotation(tables, point.region, f) }));
+        setFarm((s) => (s.touched ? s : { ...s, parts: s.parts.map((p, i) => (i === 0 ? { ...p, current: defaultRotation(tables, point.region, f) } : p)) }));
       })
       .catch(() => live && setDataStatus("error"));
     return () => (live = false);
@@ -134,53 +172,35 @@ export default function App() {
   // Which features drive the scoring right now.
   const usingField = onField && fieldFeatures && !fieldFeatures.error;
   const rawFeatures = usingField ? fieldFeatures : provinceData?.features;
-  // A drawn field uses its province's TAGEM climate zone for sowing dates.
-  // Soil texture: the farmer's choice, else NASA HWSD for the province (rice seepage).
-  const features = useMemo(
-    () =>
-      withWaterStorage(
-        withSoilTexture(withSowingCalendar(rawFeatures, point, tables?.tagem, inputs.irrigation), point, tables?.soilTexture, inputs.soil),
-        point,
-        tables?.waterStorage
-      ),
-    [rawFeatures, point, tables, inputs.irrigation, inputs.soil]
+  // A drawn field uses its province's TAGEM climate zone for sowing dates; soil texture
+  // is the part's own choice, else NASA HWSD (rice seepage). One code path for every part.
+  const scoreArgs = { farm, rawFeatures, point, tables, terrain: onField ? terrain : null, vegetation: provinceData?.vegetation ?? null, scenario };
+  const activePart = farm.parts.find((p) => p.id === farm.activePart) ?? farm.parts[0];
+  // Features change only with the place, the part's water and its soil (kept stable for Today and Crop check).
+  const activeFeatures = useMemo(
+    () => (rawFeatures && tables && point ? partFeatures(rawFeatures, point, tables, activePart) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rawFeatures, point, tables, activePart.irrigation, activePart.soil]
   );
+  const active = useMemo(
+    () => scorePart({ ...scoreArgs, part: activePart, features: activeFeatures }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [farm, activeFeatures, terrain, provinceData, scenario, onField]
+  );
+  const features = activeFeatures;
+  const localYields = active?.localYields ?? null;
+  const outcome = active?.outcome ?? null;
   const planStatus = dataStatus === "error" ? "error" : !features || (onField && !fieldFeatures) ? "loading" : "ready";
 
-  // TÜİK yields for this province and water regime (a drawn field uses its province).
-  const localYields = useMemo(
-    () => buildLocalYields(tables?.tuikYields, point?.id, inputs.irrigation),
-    [tables, point, inputs.irrigation]
+  // Every part, for the Overview summary (only when the field is split).
+  const partResults = useMemo(
+    () =>
+      farm.parts.length > 1
+        ? farm.parts.map((p) => ({ part: p, result: p.id === activePart.id ? active : scorePart({ ...scoreArgs, part: p }) }))
+        : null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [farm, active]
   );
-
-  const outcome = useMemo(() => {
-    if (!features || !tables || !point) return null;
-    try {
-      return runScoring({
-        features,
-        terrain: onField ? terrain : null,
-        vegetation: provinceData?.vegetation ?? null,
-        cropTable: tables.cropTable,
-        rotationTable: tables.rotationTable,
-        nutrientTable: tables.nutrientTable,
-        ruleTable: tables.ruleTable,
-        localYields,
-        farmer: {
-          region: point.region,
-          irrigation: inputs.irrigation,
-          current_sequence: inputs.current,
-          history: inputs.current,
-          priorities: inputs.priorities,
-          never_grow: inputs.never,
-          income_ratings: inputs.ratings ?? {},
-        },
-        scenario,
-        dataStatus: { power: true, soil: false },
-      });
-    } catch (e) {
-      return { error: e.message };
-    }
-  }, [features, terrain, provinceData, tables, point, inputs, scenario, onField, localYields]);
 
   // Crops worth rating: those that pass the checks here, plus the farmer's own rotation.
   const ratingCrops = useMemo(() => {
@@ -221,14 +241,19 @@ export default function App() {
     <div className="app">
       <header className="top">
         <div className="top-brand">
-          <h1>FieldShift</h1>
-          <p className="tag">{t("tagline")}</p>
+          <span className="brand-mark">
+            <Icon name="leaf" size="1.1em" />
+          </span>
+          <div>
+            <h1>FieldShift</h1>
+            <p className="tag">{t("tagline")}</p>
+          </div>
         </div>
+        <DashboardNav tab={tab} onSelect={setTab} />
         <div className="top-actions">
-          <button className="loc-pill-btn" onClick={() => setTab("field")} title={t("tab_field")}>
-            <span className="loc-icon" aria-hidden="true">📍</span>
-            <span className="loc-text">{locPill}</span>
-          </button>
+          <span className="data-status">
+            <span className="dot" /> {t("top_data")}
+          </span>
           <div className="lang" role="group" aria-label="Language / Dil">
             {[["en", "English"], ["tr", "Türkçe"]].map(([id, label]) => (
               <button key={id} className={lang === id ? "on" : ""} aria-pressed={lang === id} onClick={() => setLang(id)}>
@@ -239,13 +264,51 @@ export default function App() {
         </div>
       </header>
 
-      <DashboardNav tab={tab} onSelect={setTab} />
+      <div className="layout">
+      <FieldSidebar
+        provinces={provinces}
+        pointId={pointId}
+        onPoint={setPointId}
+        point={point}
+        field={field}
+        onField={onField}
+        inputs={inputs}
+        onInputs={setInputs}
+        farm={farm}
+        onPickPart={pickPart}
+        onAddPart={() => {
+          setFarm(withNewPart);
+          setTab("field");
+        }}
+        cropsById={cropsById}
+        locLabel={onField ? `${locPill}` : `${point?.name ?? "…"} · ${t("sb_province_centre")}`}
+        onEdit={() => setTab("field")}
+        onForget={forgetChoices}
+      />
 
       <main className="dashboard-content">
+        {["overview", "plan", "check", "today"].includes(tab) && <PartSwitcher farm={farm} onPick={pickPart} cropsById={cropsById} />}
+
+        {tab === "overview" && (
+          <Overview
+            outcome={outcome}
+            status={planStatus}
+            features={features}
+            shift={tables?.climateShift?.provinces?.[point?.id] ?? null}
+            water={tables?.waterStorage?.provinces?.[point?.id] ?? null}
+            place={place === t("your_field") ? (point?.name ?? "…") : place}
+            cropsById={cropsById}
+            onNavigate={setTab}
+            partResults={partResults}
+            farm={farm}
+            onPickPart={pickPart}
+          />
+        )}
+
         {/* 1. Plan View (Default) */}
         {tab === "plan" && (
           <section className="card view-plan">
-            <h2>{t("plan_h")} <span className="muted">({place})</span></h2>
+            <h2>{t("plan_h")} <span className="muted">{place}</span></h2>
             <PlanTab outcome={outcome} scenario={scenario} onScenario={setScenario} status={planStatus} cropsById={cropsById} shift={tables?.climateShift?.provinces?.[point?.id] ?? null} />
           </section>
         )}
@@ -253,7 +316,7 @@ export default function App() {
         {/* 2. Today View */}
         {tab === "today" && tables && (
           <section className="card view-today">
-            <h2>{t("today_h")} <span className="muted">({place})</span></h2>
+            <h2>{t("today_h")} <span className="muted">{place}</span></h2>
             <TodayTab tables={tables} features={features} inputs={inputs} lat={cLat} lon={cLon} provinceId={point?.id} place={place} status={planStatus} lang={lang} />
           </section>
         )}
@@ -261,24 +324,13 @@ export default function App() {
         {/* 3. Crop Check View */}
         {tab === "check" && tables && (
           <section className="card view-check">
-            <h2>{t("check_h")} <span className="muted">({place})</span></h2>
+            <h2>{t("check_h")} <span className="muted">{place}</span></h2>
             <CropCheck tables={tables} features={features} inputs={inputs} status={planStatus} place={place} lang={lang} localYields={localYields} />
           </section>
         )}
 
         {/* 4. Field & Farm Profile View (ALWAYS MOUNTED to preserve drawing & coordinates) */}
         <div className={`view-field-wrap ${tab !== "field" ? "view-hidden" : ""}`} aria-hidden={tab !== "field"}>
-          <section className="card">
-            <label className="field-label" htmlFor="point">{t("province")}</label>
-            <select id="point" value={pointId} onChange={(e) => setPointId(e.target.value)}>
-              {provinces.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {String(p.plate).padStart(2, "0")} · {p.name}
-                </option>
-              ))}
-            </select>
-          </section>
-
           {point && (
             <section className="card">
               <h2>{t("field_h")}</h2>
@@ -301,8 +353,16 @@ export default function App() {
 
           {tables && (
             <section className="card">
+              <h2>{t("parts_h")}</h2>
+              <PartsManager farm={farm} setFarm={setFarm} />
+              <FarmerInputs crops={tables.cropTable.crops} value={inputs} onChange={setInputs} ratingCrops={ratingCrops} section="part" />
+            </section>
+          )}
+          {tables && (
+            <section className="card">
               <h2>{t("farm_h")}</h2>
-              <FarmerInputs crops={tables.cropTable.crops} value={inputs} onChange={setInputs} ratingCrops={ratingCrops} />
+              <p className="note">{t("farm_wide_note")}</p>
+              <FarmerInputs crops={tables.cropTable.crops} value={inputs} onChange={setInputs} ratingCrops={ratingCrops} section="farm" />
             </section>
           )}
         </div>
@@ -310,6 +370,17 @@ export default function App() {
         {/* 5. Climate & Historical Trends View */}
         {tab === "climate" && (
           <div className="view-climate-wrap">
+            <ClimateView
+              features={features}
+              conditions={chart.conditions}
+              chartStatus={chart.status}
+              status={planStatus}
+              shift={tables?.climateShift?.provinces?.[point?.id] ?? null}
+              onApplyShift={(sc) => {
+                setScenario(sc);
+                setTab("plan");
+              }}
+              chart={
             <section className="card">
               <h2>{t("chart_h")} <span className="muted">({place})</span></h2>
               {chart.status === "loading" && <p className="muted">{t("chart_loading")}</p>}
@@ -324,6 +395,8 @@ export default function App() {
                 </>
               )}
             </section>
+              }
+            />
 
             <section className="card">
               <GlossaryList />
@@ -331,8 +404,8 @@ export default function App() {
           </div>
         )}
 
-        <p className="disclaimer">{t("disclaimer")}</p>
       </main>
+      </div>
     </div>
     </LangProvider>
   );

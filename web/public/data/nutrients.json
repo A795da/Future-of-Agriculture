@@ -489,6 +489,114 @@
     "K": 26.6,
     "HI": 0.408
    }
+  },
+  "pepper": {
+   "note": null,
+   "yield_t_ha": 38.49,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 2.22,
+    "P": 0.55,
+    "K": 2.2,
+    "HI": null
+   },
+   "residue": null
+  },
+  "cucumber": {
+   "note": "FAOSTAT yield includes greenhouse cucumber",
+   "yield_t_ha": 54.64,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 1.53,
+    "P": 0.46,
+    "K": 1.58,
+    "HI": null
+   },
+   "residue": null
+  },
+  "eggplant": {
+   "note": null,
+   "yield_t_ha": 48.26,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 2.81,
+    "P": 0.77,
+    "K": 2.9,
+    "HI": null
+   },
+   "residue": null
+  },
+  "zucchini": {
+   "note": "FAOSTAT groups all squash and pumpkin",
+   "yield_t_ha": 8.02,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 2.67,
+    "P": 0.44,
+    "K": 3.25,
+    "HI": null
+   },
+   "residue": null
+  },
+  "green_bean": {
+   "note": "yield from FAOSTAT Other beans, green (13.2 t/ha; String beans, 11.1 t/ha, is the alternative); nutrients from Ludemann String beans",
+   "yield_t_ha": 13.25,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 2.98,
+    "P": 0.75,
+    "K": 2.24,
+    "HI": null
+   },
+   "residue": null
+  },
+  "cabbage": {
+   "note": null,
+   "yield_t_ha": 40.81,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 3.79,
+    "P": 0.4,
+    "K": 2.99,
+    "HI": null
+   },
+   "residue": null
+  },
+  "carrot": {
+   "note": null,
+   "yield_t_ha": 57.31,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 2.16,
+    "P": 0.55,
+    "K": 2.2,
+    "HI": null
+   },
+   "residue": null
+  },
+  "garlic": {
+   "note": "this FAOSTAT export has only Green garlic for Türkiye; the dry-bulb yield is likely lower, so removal is likely overstated",
+   "yield_t_ha": 19.63,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 6.4,
+    "P": 0.88,
+    "K": 2.66,
+    "HI": null
+   },
+   "residue": null
+  },
+  "lettuce": {
+   "note": null,
+   "yield_t_ha": 25.95,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 2.41,
+    "P": 0.44,
+    "K": 2.93,
+    "HI": null
+   },
+   "residue": null
   }
  }
 }

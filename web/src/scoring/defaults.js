@@ -36,3 +36,52 @@ export function previousFromRotation(current, seasons = 3) {
   const n = current.length;
   return Array.from({ length: seasons }, (_, k) => current[(((n - 1 - k) % n) + n) % n] ?? "");
 }
+
+// ---- Field parts: a farm can split its field into parts, each with its own
+// rotation (with optional second crops), water and soil. Priorities, income
+// ratings and never-grow crops stay farm-wide.
+export const MAX_PARTS = 4;
+
+export function newPart(id, from = DEFAULT_INPUTS) {
+  return { id, name: "", area_ha: null, irrigation: from.irrigation, soil: from.soil ?? "unknown", current: [...from.current], second: {} };
+}
+
+export const DEFAULT_FARM = {
+  priorities: DEFAULT_INPUTS.priorities,
+  never: DEFAULT_INPUTS.never,
+  ratings: DEFAULT_INPUTS.ratings,
+  touched: false,
+  parts: [newPart("p1")],
+  activePart: "p1",
+};
+
+/** The active part as the flat inputs the engine and older components use.
+ * With one part and no second crop this equals DEFAULT_INPUTS-style inputs, so
+ * the cached AI explanations still match. */
+export function effectiveInputs(farm) {
+  const part = farm.parts.find((p) => p.id === farm.activePart) ?? farm.parts[0];
+  return {
+    irrigation: part.irrigation,
+    soil: part.soil,
+    current: part.current,
+    second: part.second ?? {},
+    priorities: farm.priorities,
+    never: farm.never,
+    ratings: farm.ratings,
+    touched: farm.touched,
+    partId: part.id,
+  };
+}
+
+/** Second crops as a clean { yearIndex: cropId } map (drops empty and fallow years). */
+export function cleanSecond(current, second = {}) {
+  return Object.fromEntries(Object.entries(second).filter(([i, id]) => id && current[+i] && current[+i] !== "fallow"));
+}
+
+/** Farm with one more part (a copy of the active part's water and soil) made active. */
+export function withNewPart(farm) {
+  if (farm.parts.length >= MAX_PARTS) return farm;
+  const id = `p${Math.max(0, ...farm.parts.map((p) => +p.id.slice(1) || 0)) + 1}`;
+  const from = farm.parts.find((p) => p.id === farm.activePart) ?? farm.parts[0];
+  return { ...farm, touched: true, parts: [...farm.parts, newPart(id, from)], activePart: id };
+}

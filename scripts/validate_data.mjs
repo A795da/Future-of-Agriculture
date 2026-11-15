@@ -49,7 +49,7 @@ for (const c of crops) {
   check(Array.isArray(c.sources) && c.sources.length > 0, `${at}: needs sources`);
   check(c.verified === false || c.verified === true, `${at}: verified flag missing`);
 }
-check(crops.length >= 12 && crops.length <= 40, `crop table has ${crops.length} rows (expected 12-40 field crops)`);
+check(crops.length >= 12 && crops.length <= 50, `crop table has ${crops.length} rows (expected 12-50 field and vegetable crops)`);
 
 // provinces and regions
 const provinces = read("web/public/data/provinces.json");

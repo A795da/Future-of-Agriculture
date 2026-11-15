@@ -4,7 +4,8 @@
 import { clamp, mean, round } from "../features/stats.js";
 import { climateHistory, describePaddySoil, dryYearCoverage, irrigationNeed } from "./agronomy.js";
 import { waterSupply } from "./waterSupply.js";
-import { bareStats, rotationTimeline, sowingDoy } from "./calendar.js";
+import { amountText, peaksWords, waterData } from "./waterText.js";
+import { bareStats, rotationTimeline, secondCropFit, sowingDoy } from "./calendar.js";
 import { heatUnits } from "./heat.js";
 import { nutrientBalance } from "./nutrients.js";
 import { applyRotationRules, shortSource } from "./rules.js";
@@ -52,19 +53,34 @@ export function scoreRotation(rot, ctx) {
   const reasons = [];
   const risks = [];
 
+  // Optional second crop sown after the main harvest in the same year (by year index).
+  const secondAt = (i) => {
+    const id = rot.second_crops?.[i] ?? rot.second_crops?.[String(i)];
+    return id && cropsById[id] && seq[i] !== "fallow" ? id : null;
+  };
+  const seconds = seq.map((_, i) => secondAt(i)).filter(Boolean);
+
   // ---- per crop-year water and climate
   const cropYears = seq
-    .map((id, i) => ({ id, i, afterFallow: seq[(i - 1 + seq.length) % seq.length] === "fallow" }))
+    .map((id, i) => ({ id, i, afterFallow: seq[(i - 1 + seq.length) % seq.length] === "fallow", second: secondAt(i) }))
     .filter((y) => y.id !== "fallow");
 
-  const water = cropYears.map(({ id, afterFallow }) => {
+  const water = cropYears.map(({ id, afterFallow, second }) => {
     const crop = cropsById[id];
     if (irrigated) {
       const w = irrigationNeed(crop, f, afterFallow);
-      return { id, score: clamp(100 - w.deficit / 7), deficit: w.deficit, need: w.need, paddy: w.paddy ?? null, w };
+      if (!second) return { id, score: clamp(100 - w.deficit / 7), deficit: w.deficit, need: w.need, paddy: w.paddy ?? null, w };
+      // The second crop starts after the harvest: no stored winter water left, so it adds its full irrigation need.
+      const w2 = irrigationNeed(cropsById[second], f, false);
+      const deficit = w.deficit + w2.deficit;
+      return { id, second, score: clamp(100 - deficit / 7), deficit, need: w.need + w2.need, paddy: w.paddy ?? null, w };
     }
     const w = dryYearCoverage(crop, f, afterFallow);
-    return { id, score: clamp(100 * Math.min(1, w.coverage)), coverage: w.coverage, need: w.need };
+    const main = { id, score: clamp(100 * Math.min(1, w.coverage)), coverage: w.coverage, need: w.need };
+    if (!second) return main;
+    const w2 = dryYearCoverage(cropsById[second], f, false);
+    const sc = { id: second, secondOf: id, score: clamp(100 * Math.min(1, w2.coverage)), coverage: w2.coverage, need: w2.need };
+    return sc.score < main.score ? sc : main; // the weaker crop limits the year
   });
   // Climate fit = share of past years without frost/heat damage at the sensitive
   // stage, reduced when the summer does not give enough heat units to mature.
@@ -73,6 +89,20 @@ export function scoreRotation(rot, ctx) {
     const hist = climateHistory(crop, f);
     const heat = heatUnits(crop, f, sowingDoy(crop, f));
     return { id, ...hist, heat, okShare: hist.okShare * (heat ? Math.min(1, heat.ratio) : 1) };
+  });
+  // Second crops use their own sowing calendar here (an approximation, listed as a gap),
+  // and must fit between the main harvest and the first autumn frost.
+  const seasonFits = [];
+  seq.forEach((mainId, i) => {
+    const id = secondAt(i);
+    if (!id) return;
+    const crop = cropsById[id];
+    const hist = climateHistory(crop, f);
+    const heat = heatUnits(crop, f, sowingDoy(crop, f));
+    const fit = secondCropFit(mainId, id, cropsById, f);
+    if (fit && !fit.official) seasonFits.push({ id, mainId, ...fit });
+    const seasonShare = fit && !fit.fits ? Math.max(0, fit.window / fit.need) : 1;
+    climate.push({ id, ...hist, heat, okShare: hist.okShare * (heat ? Math.min(1, heat.ratio) : 1) * seasonShare });
   });
 
   // ---- calendar: bare soil and erosion
@@ -84,31 +114,35 @@ export function scoreRotation(rot, ctx) {
   const erosionRisk = 100 * bare.rainOnBareShare * slopeFactor * (1 + heavy / 10);
 
   // ---- soil health per year
-  const soilYears = seq.map((id) => {
+  const soilYears = seq.map((id, i) => {
     if (id === "fallow") return 15;
     const c = cropsById[id];
     let s = 50;
     if (c.is_legume) s += 30;
     if (c.id === "alfalfa" || c.id === "vetch") s += 5;
     if (c.root_depth_m[1] >= 1.5) s += 5;
-    return s;
+    if (secondAt(i) && cropsById[secondAt(i)].is_legume) s += 10; // a legume second crop adds nitrogen too
+    return Math.min(100, s);
   });
   const soil = clamp(mean(soilYears) - 3 * bare.bareMonthsPerYear);
 
   // ---- pest-cycle break
-  const fams = seq.map((id) => familyOf(id, cropsById));
+  // Plantings in time order: each year's main crop, then its second crop if any.
+  const fams = seq.flatMap((id, i) => (secondAt(i) ? [familyOf(id, cropsById), familyOf(secondAt(i), cropsById)] : [familyOf(id, cropsById)]));
   const distinct = new Set(fams).size;
-  const sameFamilyPairs = seq.length === 1 ? 1 : pairs(fams).filter(([a, b]) => a === b && a !== "fallow").length;
+  const sameFamilyPairs = fams.length === 1 ? 1 : pairs(fams).filter(([a, b]) => a === b && a !== "fallow").length;
   const pest = clamp(30 + 70 * Math.min(1, (distinct - 1) / 2) - 25 * sameFamilyPairs);
 
   // ---- income: farmer's own rating per crop (no price data)
   const ratings = farmer.income_ratings ?? {};
-  const rated = seq.map((id) => (id === "fallow" ? 0 : ((ratings[id] ?? NEUTRAL_RATING) - 1) / 4));
+  const share = (id) => ((ratings[id] ?? NEUTRAL_RATING) - 1) / 4;
+  // A second crop adds half its rating to that year (it is smaller and later), capped at a full year.
+  const rated = seq.map((id, i) => (id === "fallow" ? 0 : Math.min(1, share(id) + (secondAt(i) ? 0.5 * share(secondAt(i)) : 0))));
   const income = clamp(100 * mean(rated));
 
   // ---- simplicity: new crops compared with what the farmer already grows
-  const known = new Set([...(farmer.current_sequence ?? []), ...(farmer.history ?? [])]);
-  const uniqueCrops = [...new Set(seq.filter((id) => id !== "fallow"))];
+  const known = new Set([...(farmer.current_sequence ?? []), ...(farmer.history ?? []), ...Object.values(farmer.current_second ?? {})]);
+  const uniqueCrops = [...new Set([...seq.filter((id) => id !== "fallow"), ...seconds])];
   const newCrops = uniqueCrops.filter((id) => !known.has(id));
   const simplicity = clamp(100 - 25 * newCrops.length - 5 * Math.max(0, uniqueCrops.length - 2));
 
@@ -143,13 +177,14 @@ export function scoreRotation(rot, ctx) {
   const period = f.monthly_rain_mm.period;
   if (water.length) {
     const worst = water.reduce((a, b) => (b.score < a.score ? b : a));
-    const n = nameOf(worst.id, cropsById);
+    const n = worst.second ? `${nameOf(worst.id, cropsById)} + second-crop ${nameOf(worst.second, cropsById)}` : nameOf(worst.id, cropsById);
     if (irrigated) {
       reasons.push({
         type: "water",
         evidence: worst.paddy
           ? `flooded ${n} needs about ${round(worst.deficit)} mm of irrigation in a normal year (about ${round(worst.deficit * 10)} m³ per hectare): the crop uses ~${round(worst.need)} mm and the basin loses ~${round(worst.paddy.total)} mm to soaking, the water layer and seepage; ${describePaddySoil(worst.w).text}`
-          : `${n} needs about ${round(worst.deficit)} mm of irrigation in a normal year (crop uses ~${round(worst.need)} mm)`,
+          : irrigatedCardText(n, worst, cropsById, f),
+        ...(worst.paddy || worst.deficit < 20 ? {} : { water: cardWater(worst, cropsById, f) }),
         source: worst.paddy ? describePaddySoil(worst.w).source : "NASA POWER",
         kind: "NASA reanalysis",
         effect: worst.deficit < 150 ? "positive" : worst.deficit > 400 ? "negative" : "neutral",
@@ -170,6 +205,9 @@ export function scoreRotation(rot, ctx) {
       }
     } else {
       const pct = round(worst.coverage * 100);
+      for (const id of seconds) {
+        risks.push(`second-crop ${nameOf(id, cropsById)} relies on summer rain on a rain-fed field; it usually needs irrigation`);
+      }
       reasons.push({
         type: "water",
         evidence: `in a dry year, rain and stored soil water cover ${Math.min(pct, 100)}% of ${n}'s water need (~${round(worst.need)} mm), ${period}`,
@@ -181,7 +219,7 @@ export function scoreRotation(rot, ctx) {
 
       // FAO EcoCrop's minimum annual rainfall for rain-fed growing, against a dry year here.
       const dryYear = f.annual_rain_dry_mm?.value;
-      for (const id of [...new Set(cropYears.map((y) => y.id))]) {
+      for (const id of [...new Set([...cropYears.map((y) => y.id), ...seconds])]) {
         const min = cropsById[id].rain_abs_mm?.[0];
         if (dryYear != null && min != null && dryYear < min) {
           const cn = nameOf(id, cropsById);
@@ -231,7 +269,24 @@ export function scoreRotation(rot, ctx) {
     }
   }
 
-  const legumes = seq.filter((id) => id !== "fallow" && cropsById[id].is_legume);
+  // Second crops that do not fit the season after the main harvest.
+  for (const s of seasonFits) {
+    const sn = nameOf(s.id, cropsById);
+    const mn = nameOf(s.mainId, cropsById);
+    const left = Math.max(0, s.window);
+    reasons.push({
+      type: "climate",
+      evidence: s.fits
+        ? `second-crop ${sn}: about ${left} days between the ${mn} harvest and the first autumn frost, enough for the ~${s.need} days it needs`
+        : `second-crop ${sn}: only about ${left} days between the ${mn} harvest and the first autumn frost, but it needs ~${s.need} days`,
+      source: "NASA POWER + crop calendar",
+      kind: "NASA reanalysis",
+      effect: s.fits ? "positive" : "negative",
+    });
+    if (!s.fits) risks.push(`the season is too short here for second-crop ${sn} after ${mn} (${left} of ~${s.need} days before the first autumn frost); it may not mature`);
+  }
+
+  const legumes = [...seq, ...seconds].filter((id) => id !== "fallow" && cropsById[id].is_legume);
   const fallows = seq.filter((id) => id === "fallow").length;
   reasons.push({
     type: "soil",
@@ -317,4 +372,18 @@ export function scoreRotation(rot, ctx) {
   }
 
   return { dimensions, sequence_adjustment: adj, score, reasons, risks, bare, water, climate, nutrients };
+}
+
+/** Irrigated card: amount per dekar and hectare, share covered by rain, and (single crop) the peak months. */
+function cardWater(worst, cropsById, f) {
+  const covered = worst.need > 0 ? Math.max(0, Math.min(100, round(((worst.need - worst.deficit) / worst.need) * 100))) : 100;
+  const d = waterData("irrigate", cropsById[worst.id], f, { need: worst.need, mm: worst.deficit, covered, peaks: !worst.second });
+  if (worst.second) d.crop_tr = `${d.crop_tr} + ${cropsById[worst.second].name_tr.split(" (")[0]}`;
+  return d;
+}
+
+function irrigatedCardText(n, worst, cropsById, f) {
+  const d = cardWater(worst, cropsById, f);
+  const peak = peaksWords(d.peaks);
+  return `${n} needs about ${amountText(worst.deficit)} of irrigation in a normal year: the crop uses ~${round(worst.need)} mm and rain plus stored soil water cover about ${d.covered}%${peak ? `; ${peak}` : ""}`;
 }

@@ -3,6 +3,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { fieldFromPin, fieldFromVertices, formatArea, formatLatLon, nearestProvince } from "./geometry.js";
 import { useLang } from "../i18n/LangContext.jsx";
+import { isFieldShape, loadSaved, saveLocal } from "../data/saved.js";
+import Icon from "../ui/components/Icon.jsx";
 
 // Satellite basemap: Esri World Imagery (attribution required; check the
 // terms before production use). NASA GIBS imagery is too coarse for field edges.
@@ -37,10 +39,15 @@ export default function FieldMap({ center, provinces, onChange, visible = true }
   const map = useRef(null);
   const layer = useRef(null);
   const hasFirstOpened = useRef(false);
-  const [mode, setMode] = useState("draw"); // "draw" | "pin"
-  const [verts, setVerts] = useState([]); // [[lat, lon], ...]
-  const [closed, setClosed] = useState(false);
-  const [pin, setPin] = useState(null);
+  // The drawn outline or pin is kept in this browser and restored on the next visit.
+  const [saved] = useState(() => loadSaved("field", isFieldShape, null));
+  const [mode, setMode] = useState(saved?.mode ?? "draw"); // "draw" | "pin"
+  const [verts, setVerts] = useState(saved?.verts ?? []); // [[lat, lon], ...]
+  const [closed, setClosed] = useState(saved?.closed ?? false);
+  const [pin, setPin] = useState(saved?.pin ?? null);
+  useEffect(() => {
+    saveLocal("field", verts.length || pin ? { mode, verts, closed, pin } : null);
+  }, [mode, verts, closed, pin]);
   const [field, setField] = useState(null);
   const [locMsg, setLocMsg] = useState(null);
 
@@ -211,7 +218,9 @@ export default function FieldMap({ center, provinces, onChange, visible = true }
       <div ref={el} className="map" />
 
       <div className="toolbar">
-        <button onClick={locate}>{t("my_location")}</button>
+        <button onClick={locate}>
+          <Icon name="locate" /> {t("my_location")}
+        </button>
         {mode === "draw" && (
           <>
             <button onClick={undo} disabled={verts.length === 0}>

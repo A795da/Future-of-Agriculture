@@ -123,7 +123,43 @@ melon,temp_opt_c,"[18,30]","[18,30]","FAO EcoCrop (Cucumis melo): TOPMN-TOPMX, m
 melon,temp_abs_c,"[9,35]","[9,35]","FAO EcoCrop (Cucumis melo): TMIN-TMAX, mean temperature"
 melon,soil_ph,"[5,8.7]","[5,8.7]",FAO EcoCrop (Cucumis melo): PHMIN-PHMAX (absolute range)
 melon,rain_abs_mm,"[900,2500]","[900,2500]","FAO EcoCrop (Cucumis melo): RMIN-RMAX, annual rainfall"
-rice,temp_opt_c,null,"[20,30]","FAO EcoCrop (Oryza sativa): TOPMN-TOPMX, mean temperature"
-rice,temp_abs_c,null,"[10,36]","FAO EcoCrop (Oryza sativa): TMIN-TMAX, mean temperature"
-rice,soil_ph,null,"[4.5,9]",FAO EcoCrop (Oryza sativa): PHMIN-PHMAX (absolute range)
-rice,rain_abs_mm,null,"[1000,4000]","FAO EcoCrop (Oryza sativa): RMIN-RMAX, annual rainfall"
+rice,temp_opt_c,"[20,30]","[20,30]","FAO EcoCrop (Oryza sativa): TOPMN-TOPMX, mean temperature"
+rice,temp_abs_c,"[10,36]","[10,36]","FAO EcoCrop (Oryza sativa): TMIN-TMAX, mean temperature"
+rice,soil_ph,"[4.5,9]","[4.5,9]",FAO EcoCrop (Oryza sativa): PHMIN-PHMAX (absolute range)
+rice,rain_abs_mm,"[1000,4000]","[1000,4000]","FAO EcoCrop (Oryza sativa): RMIN-RMAX, annual rainfall"
+pepper,temp_opt_c,"[0,1]","[17,30]","FAO EcoCrop (Capsicum annuum): TOPMN-TOPMX, mean temperature"
+pepper,temp_abs_c,"[0,1]","[8,35]","FAO EcoCrop (Capsicum annuum): TMIN-TMAX, mean temperature"
+pepper,soil_ph,"[0,1]","[4.5,7]",FAO EcoCrop (Capsicum annuum): PHMIN-PHMAX (absolute range)
+pepper,rain_abs_mm,"[0,1]","[500,1700]","FAO EcoCrop (Capsicum annuum): RMIN-RMAX, annual rainfall"
+cucumber,temp_opt_c,"[0,1]","[18,32]","FAO EcoCrop (Cucumis sativus): TOPMN-TOPMX, mean temperature"
+cucumber,temp_abs_c,"[0,1]","[6,38]","FAO EcoCrop (Cucumis sativus): TMIN-TMAX, mean temperature"
+cucumber,soil_ph,"[0,1]","[4.5,8.7]",FAO EcoCrop (Cucumis sativus): PHMIN-PHMAX (absolute range)
+cucumber,rain_abs_mm,"[0,1]","[400,4300]","FAO EcoCrop (Cucumis sativus): RMIN-RMAX, annual rainfall"
+eggplant,temp_opt_c,"[0,1]","[20,35]","FAO EcoCrop (Solanum melongena): TOPMN-TOPMX, mean temperature"
+eggplant,temp_abs_c,"[0,1]","[9,40]","FAO EcoCrop (Solanum melongena): TMIN-TMAX, mean temperature"
+eggplant,soil_ph,"[0,1]","[4.3,8.5]",FAO EcoCrop (Solanum melongena): PHMIN-PHMAX (absolute range)
+eggplant,rain_abs_mm,"[0,1]","[800,4000]","FAO EcoCrop (Solanum melongena): RMIN-RMAX, annual rainfall"
+zucchini,temp_opt_c,"[0,1]","[17,30]","FAO EcoCrop (Cucurbita pepo): TOPMN-TOPMX, mean temperature"
+zucchini,temp_abs_c,"[0,1]","[6,40]","FAO EcoCrop (Cucurbita pepo): TMIN-TMAX, mean temperature"
+zucchini,soil_ph,"[0,1]","[4.5,8.3]",FAO EcoCrop (Cucurbita pepo): PHMIN-PHMAX (absolute range)
+zucchini,rain_abs_mm,"[0,1]","[300,2800]","FAO EcoCrop (Cucurbita pepo): RMIN-RMAX, annual rainfall"
+green_bean,temp_opt_c,"[0,1]","[16,25]","FAO EcoCrop (Phaseolus vulgaris): TOPMN-TOPMX, mean temperature"
+green_bean,temp_abs_c,"[0,1]","[7,32]","FAO EcoCrop (Phaseolus vulgaris): TMIN-TMAX, mean temperature"
+green_bean,soil_ph,"[0,1]","[4,9]",FAO EcoCrop (Phaseolus vulgaris): PHMIN-PHMAX (absolute range)
+green_bean,rain_abs_mm,"[0,1]","[300,4300]","FAO EcoCrop (Phaseolus vulgaris): RMIN-RMAX, annual rainfall"
+cabbage,temp_opt_c,"[0,1]","[15,24]","FAO EcoCrop (Brassica oleracea var. capitata): TOPMN-TOPMX, mean temperature"
+cabbage,temp_abs_c,"[0,1]","[7,32]","FAO EcoCrop (Brassica oleracea var. capitata): TMIN-TMAX, mean temperature"
+cabbage,soil_ph,"[0,1]","[5,8.3]",FAO EcoCrop (Brassica oleracea var. capitata): PHMIN-PHMAX (absolute range)
+cabbage,rain_abs_mm,"[0,1]","[300,2500]","FAO EcoCrop (Brassica oleracea var. capitata): RMIN-RMAX, annual rainfall"
+carrot,temp_opt_c,"[0,1]","[15,24]","FAO EcoCrop (Daucus carota): TOPMN-TOPMX, mean temperature"
+carrot,temp_abs_c,"[0,1]","[3,30]","FAO EcoCrop (Daucus carota): TMIN-TMAX, mean temperature"
+carrot,soil_ph,"[0,1]","[4.2,8.7]",FAO EcoCrop (Daucus carota): PHMIN-PHMAX (absolute range)
+carrot,rain_abs_mm,"[0,1]","[400,4000]","FAO EcoCrop (Daucus carota): RMIN-RMAX, annual rainfall"
+garlic,temp_opt_c,"[0,1]","[18,30]","FAO EcoCrop (Allium sativum): TOPMN-TOPMX, mean temperature"
+garlic,temp_abs_c,"[0,1]","[7,35]","FAO EcoCrop (Allium sativum): TMIN-TMAX, mean temperature"
+garlic,soil_ph,"[0,1]","[5,8.5]",FAO EcoCrop (Allium sativum): PHMIN-PHMAX (absolute range)
+garlic,rain_abs_mm,"[0,1]","[500,2700]","FAO EcoCrop (Allium sativum): RMIN-RMAX, annual rainfall"
+lettuce,temp_opt_c,"[0,1]","[12,21]","FAO EcoCrop (Lactuca sativa var. capitata): TOPMN-TOPMX, mean temperature"
+lettuce,temp_abs_c,"[0,1]","[5,30]","FAO EcoCrop (Lactuca sativa var. capitata): TMIN-TMAX, mean temperature"
+lettuce,soil_ph,"[0,1]","[4.2,7.5]",FAO EcoCrop (Lactuca sativa var. capitata): PHMIN-PHMAX (absolute range)
+lettuce,rain_abs_mm,"[0,1]","[900,4100]","FAO EcoCrop (Lactuca sativa var. capitata): RMIN-RMAX, annual rainfall"

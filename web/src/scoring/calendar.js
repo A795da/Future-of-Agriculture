@@ -221,3 +221,80 @@ export function bareStats(timeline, f) {
     longestGapDays: longest,
   };
 }
+
+/**
+ * Does a summer second crop fit between the main harvest and the first autumn
+ * frost? Only checked for frost-sensitive (spring/summer) second crops; an
+ * official TAGEM-DSİ second-crop calendar for the zone counts as fitting.
+ * Returns null when not applicable.
+ */
+export function secondCropFit(mainId, secondId, cropsById, f) {
+  const main = cropsById[mainId];
+  const sc = cropsById[secondId];
+  if (!main || !sc || main.season === "perennial" || sc.season === "winter" || sc.season === "perennial") return null;
+  const frost = f.first_autumn_frost_doy?.value;
+  if (frost == null) return null;
+  if (zoneCalendar(`${secondId}_second`, f)) return { official: true, fits: true };
+  const ph = phenology(main, f);
+  const harvestDoy = ((ph.start - 1 + ph.season) % 365) + 1;
+  // Same sowing rule as rotationTimeline: its own date if close after the harvest, else harvest + 7 days.
+  const own = sowingDoy(sc, f);
+  const start = (own - harvestDoy + 365) % 365 < 60 ? own : harvestDoy + 7;
+  const need = phenology(sc, f).season;
+  const window = frost - start;
+  return { official: false, harvestDoy, start, need, window, frost, fits: window >= need };
+}
+
+/**
+ * Crop calendar for a rotation, for display: every planting (main and second
+ * crops) with sowing, flowering and harvest day of year and days in the field,
+ * plus the bare gaps between them. Same placement as rotationTimeline, so it
+ * matches the bare-soil and erosion scores. Offsets count days from 1 July of
+ * rotation year 1 (the rotation year runs July to June).
+ */
+export function rotationCalendar(sequence, secondCrops, cropsById, f) {
+  const tl = rotationTimeline(sequence, secondCrops, cropsById, f);
+  const plantings = tl.plantings
+    .map((p) => {
+      const crop = p.crop;
+      const len = p.end - p.offset;
+      const ph = phenology(crop, f);
+      const perennial = crop.season === "perennial";
+      const flowerDas = ph.sensitiveDas == null || perennial ? null : Math.round((ph.sensitiveDas * len) / Math.max(1, ph.season));
+      const second = Boolean(secondCrops?.[p.year] === crop.id || secondCrops?.[String(p.year)] === crop.id) && sequence[p.year] !== crop.id;
+      return {
+        id: crop.id,
+        year: p.year,
+        second,
+        offset: p.offset,
+        days: len,
+        sowDoy: p.startDoy,
+        flowerDoy: flowerDas == null ? null : doyAfter(p.startDoy, flowerDas),
+        harvestDoy: perennial ? null : doyAfter(p.startDoy, len),
+        perennial,
+        calendar: second && zoneCalendar(`${crop.id}_second`, f) ? "TAGEM-DSİ 2017" : ph.calendar,
+        thermal: ph.thermal,
+      };
+    })
+    .sort((a, b) => a.offset - b.offset);
+
+  // Bare runs of 20+ days on the cyclic timeline (where nothing grows).
+  const gaps = [];
+  const { total, covered } = tl;
+  const first = covered.indexOf(1);
+  if (first >= 0) {
+    let run = 0;
+    let runStart = 0;
+    for (let k = 1; k <= total; k++) {
+      const i = (first + k) % total;
+      if (!covered[i]) {
+        if (run === 0) runStart = i;
+        run++;
+      } else if (run) {
+        if (run >= 20) gaps.push({ offset: runStart, days: run, fromDoy: ((JUL1 - 1 + runStart) % 365) + 1, toDoy: ((JUL1 - 1 + runStart + run - 1) % 365) + 1 });
+        run = 0;
+      }
+    }
+  }
+  return { years: tl.years, total, plantings, gaps };
+}

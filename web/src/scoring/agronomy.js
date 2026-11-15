@@ -117,6 +117,27 @@ export function irrigationNeed(crop, f, afterFallow = false) {
   return { ...w, stored, supply, deficit: Math.max(0, w.need - supply) };
 }
 
+/**
+ * Split a season's irrigation total by calendar month, in the crop's season order.
+ * Each month's share follows its gap between crop use (kc × ET0) and effective rain,
+ * so the months add up to `total` (the stored-soil-water credit is spread with them).
+ * @returns {{ month: number, mm: number }[]} month is 0-11
+ */
+export function monthlyIrrigation(crop, f, total, { dry = false } = {}) {
+  if (!(total > 0)) return [];
+  const et0 = f.monthly_et0_mm.value;
+  const rain = (dry ? f.monthly_rain_dry_mm : f.monthly_rain_mm).value;
+  const gap = new Map();
+  for (const { month, kc } of seasonDays(crop, f)) {
+    const d = MONTH_DAYS[month];
+    gap.set(month, (gap.get(month) ?? 0) + (kc * (et0[month] ?? 0) - EFFECTIVE_RAIN * (rain[month] ?? 0)) / d);
+  }
+  const pos = [...gap].map(([month, g]) => [month, Math.max(0, g)]);
+  const sum = pos.reduce((a, [, g]) => a + g, 0);
+  if (!sum) return [];
+  return pos.map(([month, g]) => ({ month, mm: (total * g) / sum })).filter((x) => x.mm >= 1);
+}
+
 /** Count past years with damaging frost or heat at the sensitive stage, or a winter colder than the crop survives. */
 export function climateHistory(crop, f) {
   const years = f.dekad_extremes_by_year.value;

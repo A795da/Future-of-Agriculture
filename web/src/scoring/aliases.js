@@ -35,6 +35,15 @@ export const ALIASES = {
   onion: ["soğan", "kuru soğan", "onions"],
   watermelon: ["karpuz"],
   melon: ["kavun", "cantaloupe", "sweet melon"],
+  pepper: ["biber", "sivri biber", "dolmalık biber", "salçalık biber", "peppers", "bell pepper", "sweet pepper"],
+  cucumber: ["hıyar", "salatalık", "cucumbers"],
+  eggplant: ["patlıcan", "aubergine", "eggplants"],
+  zucchini: ["kabak", "sakız kabak", "dolmalık kabak", "courgette", "squash", "summer squash"],
+  green_bean: ["taze fasulye", "fasulye taze", "green beans", "string bean", "string beans", "snap bean"],
+  cabbage: ["lahana", "beyaz lahana", "cabbages"],
+  carrot: ["havuç", "carrots"],
+  garlic: ["sarımsak"],
+  lettuce: ["marul", "kıvırcık", "göbek marul", "lettuces"],
   rice: ["çeltik", "celtik", "pirinç", "paddy", "paddy rice", "rice"],
 };
 

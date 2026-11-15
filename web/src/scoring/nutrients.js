@@ -27,6 +27,7 @@ export function nutrientBalance(sequence, secondCrops, nutrientTable, local = nu
   const localIds = new Set();
   const mixedIds = new Set();
   const nationalIds = new Set();
+  const perCrop = []; // one entry per planting, kg/ha for that harvest (not averaged per year)
   const add = (id, asSecond) => {
     if (id === "fallow") return;
     const c = nutrientTable.crops[id];
@@ -38,10 +39,24 @@ export function nutrientBalance(sequence, secondCrops, nutrientTable, local = nu
       (y.source === "local" ? localIds : nationalIds).add(id);
       if (y.mixed) mixedIds.add(id);
     } else missing.push(id);
+    let fx = 0;
     if (c?.fixed_kg_n_ha) {
       // Herridge method is proportional to yield: scale the national figure to the local yield.
       const scale = y && c.yield_t_ha ? y.t_ha / c.yield_t_ha : 1;
-      fixed += c.fixation_method === "grain_legume" ? c.fixed_kg_n_ha * scale : c.fixed_kg_n_ha;
+      fx = c.fixation_method === "grain_legume" ? c.fixed_kg_n_ha * scale : c.fixed_kg_n_ha;
+      fixed += fx;
+    }
+    if (c?.product && y) {
+      perCrop.push({
+        id,
+        second: asSecond,
+        yield_t_ha: round(y.t_ha, 1),
+        yield_source: y.source,
+        n: round(y.t_ha * c.product.N),
+        p2o5: round(y.t_ha * c.product.P * P_TO_P2O5),
+        k2o: round(y.t_ha * c.product.K * K_TO_K2O),
+        n_fixed: round(fx),
+      });
     }
   };
   sequence.forEach((id, i) => {
@@ -61,5 +76,6 @@ export function nutrientBalance(sequence, secondCrops, nutrientTable, local = nu
     yields_national: [...nationalIds],
     yields_mixed: [...mixedIds], // subset of yields_local: TÜİK rain-fed and irrigated together
     per: "kg/ha per year",
+    per_crop: perCrop, // kg/ha per harvest, for the crop calendar (not part of the AI facts)
   };
 }

@@ -165,6 +165,17 @@
    "reason": "melon and watermelon share soilborne diseases and pests; rotate with non-cucurbit crops for three to four years",
    "source": "Oklahoma State University Extension, Watermelon diseases",
    "url": "https://extension.okstate.edu/fact-sheets/watermelon-diseases"
+  },
+  {
+   "id": "allium_repeat",
+   "type": "family_repeat",
+   "target": "amaryllidaceae",
+   "previous": "amaryllidaceae",
+   "min_gap_years": null,
+   "points": -6,
+   "reason": "white rot (Sclerotium cepivorum) and pink root attack both onion and garlic and survive in soil for years; no Allium after Allium",
+   "source": "AUSVEG, Onions soil-borne diseases fact sheet; UC IPM onion and garlic white rot guidelines",
+   "url": "https://ausveg.com.au/app/uploads/2025/08/Onions-soil-borne-diseases-fact-sheet.pdf"
   }
  ]
 }

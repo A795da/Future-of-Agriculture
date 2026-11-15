@@ -114,3 +114,27 @@ export function todaySummaryTr(r, nameTr) {
   const more = r.alerts.length > 1 ? ` Aşağıda ${r.alerts.length - 1} not daha var.` : "";
   return `${TYPE_WORD[top.type]} ${LEVEL_WORD[top.level]}: ${alertEvidenceTr(top, n.toLocaleLowerCase("tr"))}.${more}`;
 }
+
+// ---- water amounts (from the `water` numbers on a reason; 1 mm = 1 m³ per dekar)
+const numTr = (x) => x.toLocaleString("tr-TR");
+function peaksTr(peaks) {
+  if (!peaks?.length) return "";
+  const parts = peaks.map((m) => `${MONTHS_FULL[m.month]} (~${m.mm} mm)`);
+  const list = parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(", ")} ve ${parts.at(-1)}`;
+  return `; en çok ${list} aylarında`;
+}
+const METHOD_TR = "Gerçek miktar sulama yöntemine bağlıdır: damla sulama, salma ve yağmurlamaya göre daha az su kaybettirir.";
+
+/** Turkish water line from `reason.water`. */
+export function waterEvidenceTr(w) {
+  const crop = w.crop_tr ?? "Bu ürün";
+  const amount = `yaklaşık ${numTr(w.mm)} mm (dekara ${numTr(w.mm)} m³, hektara ${numTr(w.mm * 10)} m³)`;
+  const peaks = peaksTr(w.peaks);
+  // "karşılanan pay: %30" avoids the number-dependent suffix (%30'unu / %40'ını).
+  const share = `yağmur ve topraktaki suyla karşılanan pay yaklaşık %${w.covered}`;
+  if (w.mode === "dry_short") {
+    return `Kurak bir yılda ${crop.toLocaleLowerCase("tr")} ~${numTr(w.need)} mm su kullanır; ${share}. Eksik kalan su ${amount}${peaks}; ek sulama bu açığı kapatır.`;
+  }
+  const lead = w.mode === "would_irrigate" ? `${crop} için sulama gerekir: ` : `${crop}: `;
+  return `${lead}normal bir yılda ${amount} sulama suyu gerekir; bitki ~${numTr(w.need)} mm su kullanır, ${share}${peaks}. ${METHOD_TR}`;
+}

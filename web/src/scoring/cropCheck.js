@@ -143,7 +143,7 @@ function evaluate(crop, previous, ctx) {
     add({
       type: "climate",
       evidence: describeOutlook(name, o) + extra,
-      source: "NASA POWER + FieldShift what-if",
+      source: "NASA POWER + Geleceğin Tarımı what-if",
       kind: "NASA reanalysis",
       effect: o.today.fit && !o.changes ? "positive" : "neutral",
       level: "info",

@@ -1,8 +1,13 @@
-# FieldShift
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="web/public/brand/logo-paper.png">
+    <img src="web/public/brand/logo-ink.png" alt="Geleceğin Tarımı" height="64">
+  </picture>
+</h1>
 
 **Crop rotation decisions for Turkish farmers, built on NASA Earth data.**
 
-FieldShift is a web app for farmers in Türkiye. You mark your field on a satellite map, say what you grow and what matters to you (saving water, soil health, income, simplicity), and FieldShift:
+Geleceğin Tarımı is a web app for farmers in Türkiye. You mark your field on a satellite map, say what you grow and what matters to you (saving water, soil health, income, simplicity), and Geleceğin Tarımı:
 
 - compares your current rotation with two alternatives, with the evidence, tradeoffs, risks and what it does not know;
 - tells you whether a crop you are considering would work on your field ("Would this crop work here?");
@@ -15,7 +20,7 @@ Built for **NASA Space Apps Challenge 2026**, challenge *"Field Shift: Adapting 
 
 ---
 
-## What makes FieldShift different
+## What makes Geleceğin Tarımı different
 
 **We tested the model against real farming, and fixed what didn't hold up.**
 - **Official statistics overrule the model.** Our climate checks first ruled out 130 of the 537 rain-fed crop-and-province combinations that TÜİK statistics show farmers actually growing. Now, where TÜİK reports a crop on at least 1,000 ha in a province, a failed water or warmth check becomes a warning instead of a removal. That brought false removals down to 101, and most of those left are one known data mismatch: TÜİK counts winter and spring wheat together.
@@ -40,7 +45,7 @@ Built for **NASA Space Apps Challenge 2026**, challenge *"Field Shift: Adapting 
 
 ## Contents
 
-- [What makes FieldShift different](#what-makes-fieldshift-different)
+- [What makes Geleceğin Tarımı different](#what-makes-geleceğin-tarımı-different)
 - [What it does](#what-it-does)
 - [How decisions are made](#how-decisions-are-made)
 - [Data](#data)
@@ -251,4 +256,4 @@ Python scripts need `xlrd` (TÜİK) or `netCDF4` and `numpy` (HWSD, GRACE). NASA
 
 Data from NASA POWER (*"These data were obtained from the NASA Langley Research Center (LaRC) POWER Project funded through the NASA Earth Science/Applied Science Program."*), ORNL DAAC (MODIS NDVI; HWSD v1.2, Wieder et al. 2014), NASA JPL (GRACE/GRACE-FO mascons, Wiese et al. 2016; Watkins et al. 2015) and SRTM via OpenTopoData. Weather data by [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0). Satellite imagery © Esri, Maxar, Earthstar Geographics. Crop statistics: TÜİK. Calendars: TAGEM-DSİ 2017. FAO-56, FAO EcoCrop, FAOSTAT (© FAO, CC BY 4.0), Ludemann et al. 2023 (CC0), Herridge, Peoples & Boddey 2008, FAO AquaCrop parameters via AquaCrop-OSPy. Map library: Leaflet. The same credits appear at the bottom of every page of the app; the full list is in [kaynakca.md](kaynakca.md).
 
-FieldShift is a decision-support prototype. Check any change to your farming with a local agronomist or extension officer.
+Geleceğin Tarımı is a decision-support prototype. Check any change to your farming with a local agronomist or extension officer.

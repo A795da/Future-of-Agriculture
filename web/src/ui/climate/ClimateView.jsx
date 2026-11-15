@@ -6,6 +6,7 @@
 import { useLang } from "../../i18n/LangContext.jsx";
 import { shiftScenario } from "../../features/shift.js";
 import Icon from "../components/Icon.jsx";
+import SatelliteMap from "./SatelliteMap.jsx";
 
 const MONTHS = {
   en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -379,12 +380,13 @@ function ShiftBars({ shift, onApply }) {
   );
 }
 
-export default function ClimateView({ features, conditions, chartStatus, chart, shift, onApplyShift, status }) {
+export default function ClimateView({ features, conditions, chartStatus, chart, shift, onApplyShift, status, lat, lon, place }) {
   const { lang, t } = useLang();
   if (status === "loading" || !features) return <p className="muted">{t("loading_climate")}</p>;
   if (status === "error") return <p className="warn">{t("climate_error")}</p>;
   return (
     <div className="cv">
+      <SatelliteMap lat={lat} lon={lon} place={place} />
       {chart}
       {conditions && chartStatus === "ready" ? (
         <Anomalies conditions={conditions} features={features} lang={lang} />

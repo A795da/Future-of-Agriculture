@@ -1,6 +1,6 @@
 # Kaynakça (data sources)
 
-Every dataset, API, table or compiled value used by FieldShift is listed here. **Add an entry in the same change whenever new data is added.**
+Every dataset, API, table or compiled value used by Geleceğin Tarımı is listed here. **Add an entry in the same change whenever new data is added.**
 
 Status values: **used** (in the app or scoring now) · **planned** (not yet integrated) · **compiled, unverified** (values written by the team without a line-by-line source check).
 Kind values match the labels shown in the app: NASA observation · NASA reanalysis · NASA model estimate · model estimate · farmer input · compiled rule.
@@ -40,6 +40,14 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 
 ### NASA GIBS: MODIS_Terra_NDVI_8Day tiles (tested, not used)
 - Tested 2026-11-14. The layer only has data from 2025-02 onwards, and tiles are images, not numbers, so they cannot drive scoring. Possible later use: map overlay only.
+
+### NASA GIBS (Global Imagery Browse Services) WMTS tiles: satellite map in Climate & trends
+- **Used for:** the "Field signals" map (`web/src/ui/climate/SatelliteMap.jsx`), display only, never scored. Tiles are fetched live by the browser from `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/<layer>/default/<date>/GoogleMapsCompatible_Level<N>/{z}/{y}/{x}`; no key, no backend.
+- **Layers (tested 2026-11-15):** `MODIS_Terra_CorrectedReflectance_TrueColor` (base, jpg); `VIIRS_NOAA21_NDVI_8Day` (vegetation vigor, 500 m); `SMAP_L4_Analyzed_Root_Zone_Soil_Moisture` (soil wetness, 9 km); `VIIRS_NOAA21_Land_Surface_Temp_Day` (ground heat, 750 m).
+- **Date:** today minus a few days (3-6, processing delay), so the map follows the latest pass. **Kind:** NASA observation (SMAP L4 is a model assimilating SMAP observations). **Status:** used.
+- **License / terms:** NASA open data; cite NASA GIBS / EOSDIS (the card footer names layer, instrument and date).
+- **Click-to-read:** clicking the map reads the colour of that pixel in the same GIBS tile and converts it back to a value with the GIBS colormap (`web/src/data/gibsPalettes.js`, generated from the colormap XML files above; NDVI as is, SMAP m³/m³, land temperature kelvin → °C). The band words (bare soil, sparse, moderate, dense; dry, moist, wet) are team-chosen thresholds (NDVI 0.2 / 0.4 / 0.6, soil 0.15 / 0.3 m³/m³), not NASA classes. The value is one satellite pixel, not the whole field.
+- **Limits:** coarse pixels (a small field blends with neighbours; SMAP shows the whole area); clouds leave gaps; the legend colours and end values come from the official GIBS colormaps (`https://gibs.earthdata.nasa.gov/colormaps/v1.3/<palette>.xml`: MODIS_NDVI 0–1, SMAP_Analyzed_Soil_Moisture 0–0.7+ m³/m³, MODIS_Land_Surface_Temp 200–350 K = −73 to 77 °C); the gradient is sampled from those, so intermediate shades are approximate. The tiles are shown with 80% opacity over the base, so on screen they look slightly paler than the legend.
 
 ### NASA ORNL DAAC: Regridded Harmonized World Soil Database v1.2 (Wieder, Boehnert, Bonan & Langseth 2014), doi:10.3334/ORNLDAAC/1247
 - **URL:** https://www.earthdata.nasa.gov/data/catalog/ornl-cloud-hwsd-1247-1; files `https://data.ornldaac.earthdata.nasa.gov/protected/global_soil/HWSD/data/T_CLAY.nc4` and `T_SAND.nc4` (NASA Earthdata login needed; the old daac.ornl.gov guide URL now redirects to the PDF guide).
@@ -174,7 +182,7 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 
 ### FAO Irrigation Water Management Training Manual 3, *Irrigation Water Needs* (Brouwer & Heibloem 1986), section 4.4 "Irrigation water need of rice"
 - **URL:** https://www.fao.org/4/s2022e/s2022e08.htm (accessed 2026-11-15).
-- **For:** water a flooded paddy needs beyond crop water use: 200 mm to saturate the root zone before planting, a 100 mm standing water layer, and percolation and seepage of 4 mm/day (heavy clay) to 8 mm/day (sandy soil), 6 mm/day average. FieldShift adds these to FAO-56 crop water use for rice (`paddyLosses` in `web/src/scoring/agronomy.js`), gives no stored-soil-water credit (saturation counts it), and shows the heavy-clay to sandy range. Rice irrigation comes out at about 1,600 mm (Samsun) to 2,200 mm (Adana), 16,000-22,000 m³ per hectare. The Today tab's weekly irrigation note adds the daily seepage.
+- **For:** water a flooded paddy needs beyond crop water use: 200 mm to saturate the root zone before planting, a 100 mm standing water layer, and percolation and seepage of 4 mm/day (heavy clay) to 8 mm/day (sandy soil), 6 mm/day average. Geleceğin Tarımı adds these to FAO-56 crop water use for rice (`paddyLosses` in `web/src/scoring/agronomy.js`), gives no stored-soil-water credit (saturation counts it), and shows the heavy-clay to sandy range. Rice irrigation comes out at about 1,600 mm (Samsun) to 2,200 mm (Adana), 16,000-22,000 m³ per hectare. The Today tab's weekly irrigation note adds the daily seepage.
 - **Why needed:** TAGEM-DSİ 2017, Note 2 (PDF p. 21): the guide's rice water use excludes open-water evaporation and deep percolation, and users must add both for their soil and climate.
 
 ### Dok, Şahin, Sürmen & Sezer 2016, *Çeltik tarlalarında değişik baklagil yem bitkilerinin kışlık ara ürün olarak yetiştirme imkânlarının araştırılması*, Tarla Bitkileri Merkez Araştırma Enstitüsü Dergisi 25 (Özel sayı-1): 105-109, doi:10.21566/tarbitderg.280279

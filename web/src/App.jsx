@@ -242,13 +242,12 @@ export default function App() {
     <div className="app">
       <header className="top">
         <div className="top-brand">
-          <span className="brand-mark">
-            <Icon name="leaf" size="1.1em" />
-          </span>
-          <div>
-            <h1>FieldShift</h1>
-            <p className="tag">{t("tagline")}</p>
-          </div>
+          <h1 className="brand">
+            <span className="brand-logo" aria-hidden="true" />
+            <span className="brand-icon" aria-hidden="true" />
+            <span className="brand-name">Geleceğin Tarımı</span>
+          </h1>
+          <p className="tag">{t("tagline")}</p>
         </div>
         <DashboardNav tab={tab} onSelect={setTab} />
         <div className="top-actions">
@@ -376,6 +375,9 @@ export default function App() {
               conditions={chart.conditions}
               chartStatus={chart.status}
               status={planStatus}
+              lat={cLat}
+              lon={cLon}
+              place={place}
               shift={tables?.climateShift?.provinces?.[point?.id] ?? null}
               onApplyShift={(sc) => {
                 setScenario(sc);

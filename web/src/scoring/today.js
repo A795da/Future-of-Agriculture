@@ -42,7 +42,7 @@ const SOURCES = {
     source: "Univ. of Kentucky Grain Crops; UNL CropWatch",
     kind: "compiled rule",
   },
-  team: { source: "FieldShift rule (compiled, unverified)", kind: "compiled rule" },
+  team: { source: "Geleceğin Tarımı rule (compiled, unverified)", kind: "compiled rule" },
 };
 
 const DAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

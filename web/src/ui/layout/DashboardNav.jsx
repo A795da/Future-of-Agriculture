@@ -14,7 +14,7 @@ export default function DashboardNav({ tab, onSelect }) {
   const { t } = useLang();
 
   return (
-    <nav className="dashboard-nav" role="tablist" aria-label="FieldShift sections">
+    <nav className="dashboard-nav" role="tablist" aria-label="Geleceğin Tarımı sections">
       {DASHBOARD_TABS.map(({ id, icon, labelKey }) => {
         const active = tab === id;
         return (

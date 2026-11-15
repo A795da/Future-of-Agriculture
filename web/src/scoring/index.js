@@ -166,7 +166,7 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
     }
     if (rot.fromOtherRegion) risks.push("this rotation is common in another region of Turkey; check it with a local agronomist");
     if (rot.generated) {
-      risks.push("built by FieldShift from the crops that passed the checks; not a known local rotation, so check it with a local agronomist");
+      risks.push("built by Geleceğin Tarımı from the crops that passed the checks; not a known local rotation, so check it with a local agronomist");
     }
 
     const notInZone = [...new Set(rot.sequence.filter(unlisted))];

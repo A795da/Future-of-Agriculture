@@ -5,9 +5,9 @@
 export const GLOSSARY = [
   {
     id: "et",
-    tr: { term: "Evapotranspirasyon (su ihtiyacı)", text: "Tarladan buhar olarak çıkan su: topraktan buharlaşma ile bitkinin yapraklarından verdiği suyun toplamı. Bitkinin su tüketimidir. FieldShift buna ürünün su ihtiyacı der ve NASA hava verilerinden FAO-56 yöntemiyle hesaplar." },
+    tr: { term: "Evapotranspirasyon (su ihtiyacı)", text: "Tarladan buhar olarak çıkan su: topraktan buharlaşma ile bitkinin yapraklarından verdiği suyun toplamı. Bitkinin su tüketimidir. Geleceğin Tarımı buna ürünün su ihtiyacı der ve NASA hava verilerinden FAO-56 yöntemiyle hesaplar." },
     term: "Evapotranspiration (water need)",
-    text: "Water that leaves the field as vapour: evaporation from the soil plus the water the crop gives off through its leaves. It is the crop's water use. FieldShift calls it the crop's water need and works it out from NASA weather data with the FAO-56 method.",
+    text: "Water that leaves the field as vapour: evaporation from the soil plus the water the crop gives off through its leaves. It is the crop's water use. Geleceğin Tarımı calls it the crop's water need and works it out from NASA weather data with the FAO-56 method.",
     match: /\b(evapotranspiration|water need|ET0)\b/i,
   },
   {
@@ -54,9 +54,9 @@ export const GLOSSARY = [
   },
   {
     id: "official-stats",
-    tr: { term: "Resmî istatistik (TÜİK)", text: "Türkiye İstatistik Kurumu'nun il bazında ekilen alan ve verim verileri (2020-2024 ortalaması). FieldShift bunları yerel verim ve bir ürünün o ilde gerçekten yetiştirilip yetiştirilmediği için kullanır." },
+    tr: { term: "Resmî istatistik (TÜİK)", text: "Türkiye İstatistik Kurumu'nun il bazında ekilen alan ve verim verileri (2020-2024 ortalaması). Geleceğin Tarımı bunları yerel verim ve bir ürünün o ilde gerçekten yetiştirilip yetiştirilmediği için kullanır." },
     term: "Official statistics (TÜİK)",
-    text: "Planted area and yield per province from the Turkish Statistical Institute (2020-2024 average). FieldShift uses them for local yields and to show whether a crop is actually grown in the province.",
+    text: "Planted area and yield per province from the Turkish Statistical Institute (2020-2024 average). Geleceğin Tarımı uses them for local yields and to show whether a crop is actually grown in the province.",
     match: /official statistics/i,
   },
   {
@@ -68,9 +68,9 @@ export const GLOSSARY = [
   },
   {
     id: "flowering",
-    tr: { term: "Hassas dönem (çiçeklenme)", text: "Don ya da aşırı sıcağın ürüne en çok zarar verdiği ve verimi en çok düşürdüğü, çiçeklenme çevresindeki birkaç hafta. FieldShift son 20 yılın her biri için bu dönemdeki don ve sıcaklığı kontrol eder." },
+    tr: { term: "Hassas dönem (çiçeklenme)", text: "Don ya da aşırı sıcağın ürüne en çok zarar verdiği ve verimi en çok düşürdüğü, çiçeklenme çevresindeki birkaç hafta. Geleceğin Tarımı son 20 yılın her biri için bu dönemdeki don ve sıcaklığı kontrol eder." },
     term: "Sensitive stage (flowering)",
-    text: "The few weeks around flowering when frost or heat damage the crop most and cut the yield the hardest. FieldShift checks frost and heat in this window for each of the last 20 years.",
+    text: "The few weeks around flowering when frost or heat damage the crop most and cut the yield the hardest. Geleceğin Tarımı checks frost and heat in this window for each of the last 20 years.",
     match: /\b(at flowering|sensitive stage)\b/i,
   },
   {
@@ -110,9 +110,9 @@ export const GLOSSARY = [
   },
   {
     id: "confidence",
-    tr: { term: "Güven düzeyi", text: "Bir sonuca ne kadar güvenilebileceği. Ürün tablosu yerel bir uzman tarafından kontrol edilmedikçe asla yüksek olmaz; veri eksikse, ekim nöbeti başka bir bölgedense ya da FieldShift kendisi oluşturduysa düşüktür." },
+    tr: { term: "Güven düzeyi", text: "Bir sonuca ne kadar güvenilebileceği. Ürün tablosu yerel bir uzman tarafından kontrol edilmedikçe asla yüksek olmaz; veri eksikse, ekim nöbeti başka bir bölgedense ya da Geleceğin Tarımı kendisi oluşturduysa düşüktür." },
     term: "Confidence",
-    text: "How much to trust a result. It is never high while the crop table is not checked by a local expert; it is low when data is missing, the rotation comes from another region, or FieldShift built it itself.",
+    text: "How much to trust a result. It is never high while the crop table is not checked by a local expert; it is low when data is missing, the rotation comes from another region, or Geleceğin Tarımı built it itself.",
     match: /\bconfidence\b/i,
   },
   {

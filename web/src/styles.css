@@ -103,12 +103,13 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .top-brand { display: flex; align-items: center; gap: 12px; flex: none; }
-.brand-mark {
-  display: grid; place-items: center;
-  width: 36px; height: 36px; border-radius: 50%;
-  background: var(--brand); color: var(--brand-ink);
-}
-.top-brand h1 { margin: 0; font: 500 1.375rem/1.1 var(--serif); color: var(--text); }
+/* Brand: the logo and icon are black PNGs used as masks, so the theme text colour tints them in light and dark mode. */
+.brand { margin: 0; display: flex; align-items: center; gap: 10px; line-height: 1; }
+.brand-logo, .brand-icon { display: block; flex: none; background: var(--text); mask-repeat: no-repeat; mask-position: center; mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; }
+.brand-logo { height: 38px; aspect-ratio: 508 / 124; -webkit-mask-image: url("/brand/logo.png"); mask-image: url("/brand/logo.png"); }
+.brand-icon { display: none; height: 34px; aspect-ratio: 95 / 226; -webkit-mask-image: url("/brand/icon.png"); mask-image: url("/brand/icon.png"); }
+/* PC: only the logo is seen; the name stays in the page for screen readers. */
+.brand-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; font: 500 1.25rem/1.1 var(--serif); color: var(--text); }
 .top-brand .tag { display: none; }
 .top-actions { display: flex; align-items: center; gap: 16px; margin-left: auto; flex: none; }
 .data-status { display: inline-flex; align-items: center; gap: 8px; font-size: 0.875rem; color: var(--muted); white-space: nowrap; }
@@ -281,6 +282,10 @@ button.link-arrow { display: inline-flex; align-items: center; gap: 8px; border:
   .dashboard-content { order: 1; padding: 20px 16px 32px; }
   .top { padding: 0 16px; backdrop-filter: none; background: var(--surface); } /* a blurred header would trap the fixed bottom bar inside it */
   .app { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+  /* Phone and tablet: the icon with the name in plain text beside it */
+  .brand-logo { display: none; }
+  .brand-icon { display: block; }
+  .brand-name { position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: nowrap; }
   .dashboard-nav {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 1100;
     display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px;
@@ -702,6 +707,28 @@ button .icon { margin-right: 2px; }
 .lvl-possible .zfill { background: var(--accent); opacity: 0.75; }
 .lvl-clear .zfill { background: var(--warn); opacity: 1; }
 .cv-block .shift-btn { align-self: flex-start; margin: 12px 0 0; }
+
+/* ---- Satellite map (NASA GIBS tiles) */
+.sat .panel-head { align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.sat-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.sat-tab { border: 1px solid var(--line, #d9d6c8); background: transparent; color: inherit; font: inherit; font-size: 0.85rem; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+.sat-tab.on { background: #26402f; border-color: #26402f; color: #fff; }
+.sat .panel-head { margin-bottom: 18px; }
+.sat > .sat-map { margin-left: 24px; margin-right: 24px; }
+.sat > .sat-result, .sat > .note { padding-left: 24px; padding-right: 24px; }
+.sat-map { position: relative; height: 380px; overflow: hidden; border-radius: 0; background: #2b3a30; isolation: isolate; }
+.sat-map .leaflet-bar, .sat-map .leaflet-bar a { border-radius: 0 !important; }
+.sat-leaflet { position: absolute; inset: 0; z-index: 0; background: #2b3a30; }
+.sat-map .leaflet-control-attribution { font-size: 10px; }
+.sat-recenter { position: absolute; right: 10px; top: 92px; z-index: 500; width: 34px; height: 34px; padding: 0; border-radius: 0; border: 2px solid rgba(0,0,0,.2); background: #fff; color: #26402f; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.sat-recenter .icon { margin: 0; vertical-align: 0; width: 18px; height: 18px; }
+.sat-result { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-top: 18px; font-size: 0.95rem; min-height: 1.5em; }
+.sat-coords { font-size: 0.8rem; color: var(--muted, #6b6f66); font-variant-numeric: tabular-nums; }
+.sat-val { font-family: var(--font-display, inherit); font-size: 1.25rem; }
+.sat-chip { z-index: 500; position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 0; background: rgba(34, 48, 38, .88); color: #fff; font-size: 0.85rem; }
+.sat-legend { z-index: 500; position: absolute; right: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 0; background: rgba(34, 48, 38, .88); color: #fff; font-size: 0.75rem; }
+.sat-legend i { display: block; width: 110px; height: 8px; border-radius: 0; }
+@media (max-width: 640px) { .sat-map { height: 300px; } }
 
 @media (max-width: 1100px) {
   .cv-grid, .cv-grid-b { grid-template-columns: 1fr; }

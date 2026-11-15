@@ -1,4 +1,4 @@
-// Serverless function (Vercel/Netlify style) that turns a computed FieldShift
+// Serverless function (Vercel/Netlify style) that turns a computed Geleceğin Tarımı
 // result into 2-3 plain sentences with an AI model. API keys live only on the
 // server (host environment variables; web/.env.local in development).
 //
@@ -31,7 +31,7 @@ const STATUS_OF = { rate_limited: 429, ai_unavailable: 503 };
 
 export function systemPrompt(lang) {
   return [
-    "You explain results from FieldShift, a decision-support tool for farmers in Turkey.",
+    "You explain results from Geleceğin Tarımı, a decision-support tool for farmers in Turkey.",
     "A rule-based engine has already computed the result from NASA data, a crop table and published rotation rules. Your job is only to explain it in plain words to a farmer with little time; you do not judge, re-score or change it.",
     "",
     "Rules:",

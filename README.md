@@ -1,11 +1,30 @@
-<h1>
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="web/public/brand/logo-paper.png">
-    <img src="web/public/brand/logo-ink.png" alt="Geleceğin Tarımı" height="64">
-  </picture>
-</h1>
+<div align="center">
 
-**Crop rotation decisions for Turkish farmers, built on NASA Earth data.**
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="web/public/brand/logo-paper.png">
+  <img src="web/public/brand/logo-ink.png" alt="Geleceğin Tarımı" height="110">
+</picture>
+
+*Crop rotation decisions for Turkish farmers, built on NASA Earth data.*
+
+![React](https://img.shields.io/badge/React-18-20232a?logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES%20modules-F7DF1E?logo=javascript&logoColor=black)
+![Leaflet](https://img.shields.io/badge/Leaflet-satellite%20map-199900?logo=leaflet&logoColor=white)
+![Chart.js](https://img.shields.io/badge/Chart.js-4-FF6384?logo=chartdotjs&logoColor=white)
+
+![Python](https://img.shields.io/badge/Python-data%20prep-3776AB?logo=python&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-scripts%20%2B%20tests-339933?logo=nodedotjs&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini-AI%20wording-8E75B2?logo=googlegemini&logoColor=white)
+![Claude](https://img.shields.io/badge/Claude-AI%20wording-D97757?logo=anthropic&logoColor=white)
+![Rule engine](https://img.shields.io/badge/Rule%20engine-auditable-555555?logo=checkmarx&logoColor=white)
+
+![NASA](https://img.shields.io/badge/NASA-POWER%20%C2%B7%20GRACE-0B3D91?logo=nasa&logoColor=white)
+![i18n](https://img.shields.io/badge/i18n-TR%20%7C%20EN-c62828?logo=googletranslate&logoColor=white)
+![status](https://img.shields.io/badge/status-hackathon%20demo-e0b43a?logo=github&logoColor=black)
+![NASA Space Apps](https://img.shields.io/badge/NASA%20Space%20Apps-2026-0B3D91?logo=nasa&logoColor=white)
+
+</div>
 
 Geleceğin Tarımı is a web app for farmers in Türkiye. You mark your field on a satellite map, say what you grow and what matters to you (saving water, soil health, income, simplicity), and Geleceğin Tarımı:
 

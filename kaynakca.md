@@ -67,6 +67,13 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 ### Today tab thresholds (compiled, unverified)
 - Yellow within 2 °C of a crop's frost-damage limit, red below it; winter crops in Oct-Feb use winter hardiness (3 °C snow margin); heat watch 2 °C below the flowering heat limit; heavy rain ≥ 20 mm/day (≥ 40 red); dry week < 5 mm rain while the crop uses ≥ 15 mm (FAO-56 kc × forecast ET0). Crop limits come from `crops.json`. Erosion, sowing-on-wet-soil and harvest-before-rain notes are team rules. **Files:** `web/src/scoring/today.js` (named constants). **Status:** compiled, unverified.
 
+### TÜİK crop production bulletin 2025 (national production, tonnes)
+- **For:** choosing which crops to add (national 2025 production: watermelon 3.41 Mt, dry onion 2.89 Mt, melon 1.43 Mt, rice 1.00 Mt, groundnut 0.19 Mt, tobacco 0.11 Mt, sesame 0.015 Mt; poppy, anise and cumin under 0.01 Mt). Not used in scores.
+- **Files:** `data/sources/tuik/tuik_2025_bulletin_t1_field_crops.xls` (cereals and other field crops), `tuik_2025_bulletin_t2_vegetables.xls`; 2024 final and 2025 provisional values. No area or province data.
+- **Source:** Türkiye İstatistik Kurumu (TÜİK), Bitkisel Üretim İstatistikleri 2025 bulletin tables, provided by the team 2026-11-15.
+- **Planned:** province-level area and production (rain-fed / irrigated, first / second crop) from TÜİK MEDAS; export steps in `data/sources/tuik/README.md`.
+- **Status:** used for crop selection only.
+
 ### SoilGrids (ISRIC)
 - **For:** topsoil clay, organic carbon, pH (modeled). Tested 2026-11-14: **timed out** (30 s and 90 s).
 - **Access:** `https://rest.isric.org/soilgrids/v2.0/properties/query`. **Kind:** model estimate. **License:** CC BY 4.0. **Status:** planned; unavailable at test time.
@@ -100,13 +107,14 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 - **Status:** used.
 
 ### Crop table (`web/public/data/crops.json`)
+- **32 crops.** Second addition (2026-11-15): sesame, groundnut, tobacco, dry onion, watermelon, melon, chosen with the TÜİK 2025 production bulletin (see below). kc, stages and root depth from FAO-56 Tables 11, 12 and 22 (checked against the FAO page 2026-11-15: sesame June/China, groundnut May-June/Mediterranean, onion April/Mediterranean, watermelon April/Italy, sweet melon May/Mediterranean; Kc_ini image cells use group values: oil crops 0.35, legumes 0.40, small vegetables 0.7, sweet melons 0.5). Tobacco is not in FAO-56: stages 20/30/30/30 days from transplanting and kc 0.5/1.1/0.8 from FAO Land & Water crop information, tobacco (https://www.fao.org/land-water/databases-and-software/crop-information/tobacco/en). Temperatures, pH and rainfall from EcoCrop; sowing calendars (including sesame and groundnut second crops) from TAGEM-DSİ; yields and nutrients from FAOSTAT and Ludemann. Frost and heat thresholds, sensitive stage, sowing months and rain-fed yes/no are team-compiled. Known limits: EcoCrop's minimum annual rain for melon (900 mm) reflects humid regions, so rain-fed melon always gets a dry-year warning; no FAO AquaCrop heat units for any of the six, so a warmth check (warmest month of the season against EcoCrop TOPMN) rules them out in cool summers instead.
 - **26 crops** (2026-11-15: added oats, rye, triticale, pea, faba bean, soybean, sainfoin, silage maize, sorghum). For the new crops: kc and stage lengths transcribed from FAO-56 Tables 11-12 (http://www.fao.org/4/x0490e/x0490e0b.htm, checked 2026-11-15; Kc_ini cells that are images on that page use the table's group values, cereals 0.3 and legumes 0.4); rye uses the wheat/small-grain rows and sainfoin the alfalfa-hay row as proxies (neither is in FAO-56); triticale is not in EcoCrop, so its temperature ranges are compiled from wheat and rye. Sowing dates from TAGEM-DSİ (pea and faba bean from the guide's fresh pea and fresh faba bean rows); EcoCrop, AquaCrop (soybean, sorghum), FAOSTAT, Ludemann and Herridge via the same scripts and mapping files. Frost, hardiness and flowering values compiled by the team (`verified: false`).
 - Sourced fields: temperature ranges, pH and annual rainfall from FAO EcoCrop; heat units from FAO AquaCrop; sowing dates and stages from TAGEM-DSİ per zone (see `field_sources` in each row). The remaining fields below are team-compiled.
 - 17 crops (spring wheat and spring barley added 2026-11-15 for cold plateaus; their default calendars are overridden by TAGEM-DSİ per zone); fields combine FAO-56, EcoCrop and general agronomy. Sowing months, Turkey notes, frost/heat thresholds at the sensitive stage, `sensitive_das` and thermal-time (`phenology`) parameters were set by the team (Claude), some adjusted after testing against NASA POWER data (barley and vetch hardiness −12 → −15 °C; cotton heat limit 38 → 40 °C; winter crop seasons lengthened).
 - **Status:** compiled, unverified; every row has `verified: false` until an agronomy-aware reviewer checks it.
 
 ### Rotation templates (`web/public/data/rotations.json`)
-- 23 common Turkish rotation patterns by region, compiled by the team from general agronomy knowledge (2026-11-15 additions: spring wheat-fallow, sainfoin x3-spring wheat, rye-fallow, spring wheat-pea, alfalfa x3-spring wheat for the eastern plateaus; wheat-pea; wheat-faba bean; wheat + second-crop soybean-maize; silage maize-wheat-vetch). **Status:** compiled, unverified.
+- 31 rotation patterns (2026-11-15, second addition: wheat + second-crop groundnut-cotton and groundnut-wheat-maize for Çukurova/Osmaniye; wheat + second-crop sesame-cotton and wheat-sesame; tobacco-wheat-chickpea; onion-wheat-sugar beet-wheat; melon-wheat-chickpea; a 5-year watermelon rotation). Earlier: 23 common Turkish rotation patterns by region, compiled by the team from general agronomy knowledge (2026-11-15 additions: spring wheat-fallow, sainfoin x3-spring wheat, rye-fallow, spring wheat-pea, alfalfa x3-spring wheat for the eastern plateaus; wheat-pea; wheat-faba bean; wheat + second-crop soybean-maize; silage maize-wheat-vetch). **Status:** compiled, unverified.
 
 ### Province coordinates and regions (`web/public/data/provinces.json`)
 - 81 province centre coordinates (approximate, written from general knowledge; city centres, not farmland) and the official 7 geographic regions of Turkey.
@@ -150,6 +158,7 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 - **File:** `data/sources/raw/HerridgePeoplesBoddey2008.pdf` (not committed; journal copyright).
 - **Added later the same day:** pea (63% group), faba bean (75%, shoot N 2.2%), soybean (68%, harvest index 0.4, shoot N 3.0%, below-ground factor 1.5; gives 321 kg N/ha at the Türkiye yield of 4.2 t/ha, within the paper's range for high-yielding soybean, but irrigated Turkish soybean often receives N fertilizer, which lowers fixation), sainfoin (100 kg N/ha/yr, "other forages" value from Smil 1999 as cited).
 - **Transcribed (2026-11-15):** `data/sources/fixation.csv` with page and table references: fixed N = Türkiye yield / 0.35 × 2.0% shoot N × below-ground factor (2.0 chickpea, 1.4 others) × %Ndfa (63% chickpea, lentil, vetch; 40% common bean); alfalfa 200 kg N/ha/yr. Results with FAOSTAT yields: chickpea 86, lentil 69, dry bean 90, vetch 72 kg N/ha. Vetch is not named in the paper; the pulse group is an approximation (noted in the file).
+- **Groundnut (added 2026-11-15):** %Ndfa 68% (Table 2 p.7, soybean and groundnut group), harvest index 0.4 and shoot N 2.3% (Table 4 footnotes p.9), below-ground factor 1.4. Gives 223 kg N/ha at the FAOSTAT in-shell yield of 4.07 t/ha; the paper's harvest index refers to grain, so this likely overstates fixation by about 30% (noted in `fixation.csv`).
 - **Obtained:** by the team, 2026-11-15. **Status:** used.
 
 ### Nutrient balance (derived, `web/src/scoring/nutrients.js`)
@@ -178,9 +187,15 @@ Compiled by the team on 2026-11-15 from the sources below (found by web search; 
 | Potato and tomato back to back | −6 | compiled rule (shared soilborne hosts), **needs expert check** |
 | Legume before a cereal | +5 | Zhao et al. 2022, Nature Communications 13:4926 ([link](https://link.springer.com/10.1038/s41467-022-32464-0)): about +20% yield on average, 462 studies |
 | Brassica (canola) before potato | +3 | AAFC research (R. Peters) reported by Top Crop Manager ([link](https://www.topcropmanager.com/rotational-options-being-studied-5060/)) |
+| Groundnut at most every 3 years (leaf spot, white mold) | −6 | Alabama Cooperative Extension System ([link](https://www.aces.edu/?p=111803)): 3-4 years between peanut crops; UF/IFAS 3-4 years; University of Georgia minimum 2 |
+| Tobacco at most every 3 years (black shank) | −6 | University of Kentucky / University of Tennessee, disease management ID-160 ([PDF](https://burleytobaccoextension.ca.uky.edu/files/disease_management_id160_2019.pdf)): out of tobacco for at least 3 years |
+| Watermelon at most every 5 years (Fusarium wilt) | −8 | Michigan State University Extension ([link](https://www.canr.msu.edu/news/managing_diseases_caused_by_fusarium_the_case_of_watermelon_wilt)): 5-7 years; Purdue 6+, UC IPM up to 10 |
+| Onion at most every 4 years (pink root, white rot) | −6 | AUSVEG onion soil-borne diseases fact sheet ([PDF](https://ausveg.com.au/app/uploads/2025/08/Onions-soil-borne-diseases-fact-sheet.pdf)): 4-6 years for pink root; UC IPM ([link](https://ipm.ucanr.edu/agriculture/onion-and-garlic/white-rot/)): white rot sclerotia survive 20+ years, so rotation slows but does not stop it |
+| Melon or watermelon after a cucurbit | −6 | Oklahoma State University Extension, Watermelon diseases ([link](https://extension.okstate.edu/fact-sheets/watermelon-diseases)): 3-4 years with non-cucurbit crops |
 
 - **Point values** (−8, −6, −5, +5, +3) are the team's weighting, not from the sources. Two legumes or other same-family pairs without a specific rule keep a generic −5.
-- **Status:** used (rotation cards); planned for the crop check tab.
+- **Not added:** a sesame interval. The only figure found (5 years, icipe/Infonet sesame guide) applies to strongly infested fields; sesame after sesame still gets the generic same-family penalty.
+- **Status:** used (rotation cards and crop check tab).
 
 ## Planned data (found, not yet integrated)
 

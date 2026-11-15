@@ -9,6 +9,9 @@ import FarmerInputs from "./ui/plan/FarmerInputs.jsx";
 import PlanTab from "./ui/plan/PlanTab.jsx";
 import CropCheck from "./ui/check/CropCheck.jsx";
 import TodayTab from "./ui/today/TodayTab.jsx";
+import GlossaryList from "./ui/components/Glossary.jsx";
+import { LangProvider } from "./i18n/LangContext.jsx";
+import { translate } from "./i18n/strings.js";
 import { formatArea } from "./field/geometry.js";
 
 export default function App() {
@@ -18,7 +21,23 @@ export default function App() {
   const [inputs, setInputs] = useState(DEFAULT_INPUTS);
   const [scenario, setScenario] = useState({ rainPct: 0, tempC: 0 });
   const [tab, setTab] = useState("plan");
-  const [lang, setLang] = useState("en"); // language of the plain-word (AI) explanations
+  const [lang, setLang] = useState(() => {
+    try {
+      return localStorage.getItem("fieldshift-lang") === "tr" ? "tr" : "en";
+    } catch {
+      return "en";
+    }
+  });
+  const t = (key, vars) => translate(lang, key, vars);
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    try {
+      localStorage.setItem("fieldshift-lang", lang);
+    } catch {
+      /* private mode: keep it for this visit only */
+    }
+  }, [lang]);
+  const cropsById = useMemo(() => (tables ? Object.fromEntries(tables.cropTable.crops.map((c) => [c.id, c])) : null), [tables]);
 
   const [provinceData, setProvinceData] = useState(null);
   const [fieldFeatures, setFieldFeatures] = useState(null);
@@ -108,6 +127,7 @@ export default function App() {
           history: inputs.current,
           priorities: inputs.priorities,
           never_grow: inputs.never,
+          income_ratings: inputs.ratings ?? {},
         },
         scenario,
         dataStatus: { power: true, soil: false },
@@ -116,6 +136,13 @@ export default function App() {
       return { error: e.message };
     }
   }, [features, terrain, provinceData, tables, point, inputs, scenario, onField]);
+
+  // Crops worth rating: those that pass the checks here, plus the farmer's own rotation.
+  const ratingCrops = useMemo(() => {
+    if (!tables) return [];
+    const removed = new Set((outcome?.removed ?? []).map((r) => r.id));
+    return tables.cropTable.crops.filter((c) => !removed.has(c.id) || inputs.current.includes(c.id));
+  }, [tables, outcome, inputs.current]);
 
   // Last 12 months chart (live POWER) for the field or province.
   const cLat = onField ? +field.centroid[1].toFixed(2) : point?.lat;
@@ -133,15 +160,16 @@ export default function App() {
     return () => ctrl.abort();
   }, [cLat, cLon]);
 
-  const place = usingField ? "your field" : point?.name ?? "…";
+  const place = usingField ? t("your_field") : point?.name ?? "…";
 
   return (
+    <LangProvider lang={lang}>
     <div className="app">
       <header className="top">
         <h1>FieldShift</h1>
-        <p className="tag">Compare crop rotations for your field, using NASA data</p>
-        <div className="lang" role="group" aria-label="Explanation language">
-          <span className="muted">Explanations:</span>
+        <p className="tag">{t("tagline")}</p>
+        <div className="lang" role="group" aria-label="Language / Dil">
+          <span className="muted">{t("language")}</span>
           {[["en", "English"], ["tr", "Türkçe"]].map(([id, label]) => (
             <button key={id} className={lang === id ? "on" : ""} aria-pressed={lang === id} onClick={() => setLang(id)}>
               {label}
@@ -152,7 +180,7 @@ export default function App() {
 
       <main>
         <section className="card">
-          <label className="field-label" htmlFor="point">Province</label>
+          <label className="field-label" htmlFor="point">{t("province")}</label>
           <select id="point" value={pointId} onChange={(e) => setPointId(e.target.value)}>
             {provinces.map((p) => (
               <option key={p.id} value={p.id}>
@@ -164,29 +192,28 @@ export default function App() {
 
         {point && (
           <section className="card">
-            <h2>1. Your field</h2>
+            <h2>{t("field_h")}</h2>
             <FieldMap center={point} onChange={setField} />
             <p className="note">
-              Optional: without a field, the province centre is used. Only terrain varies inside your field; weather,
-              soil and vegetation data describe the area around it.
-              {onField && terrain && ` Slope from NASA SRTM: ${terrain.mean_slope_pct.value}%.`}
-              {onField && field.area_ha && ` Area: ${formatArea(field.area_ha)}.`}
+              {t("field_note")}
+              {onField && terrain && ` ${t("slope_note", { v: terrain.mean_slope_pct.value })}`}
+              {onField && field.area_ha && ` ${t("area_note", { v: formatArea(field.area_ha) })}`}
             </p>
           </section>
         )}
 
         {tables && (
           <section className="card">
-            <h2>2. Your farm</h2>
-            <FarmerInputs crops={tables.cropTable.crops} value={inputs} onChange={setInputs} />
+            <h2>{t("farm_h")}</h2>
+            <FarmerInputs crops={tables.cropTable.crops} value={inputs} onChange={setInputs} ratingCrops={ratingCrops} />
           </section>
         )}
 
         <nav className="tabs" role="tablist" aria-label="FieldShift tools">
           {[
-            ["today", "Today"],
-            ["plan", "Compare rotations"],
-            ["check", "Crop check"],
+            ["today", t("tab_today")],
+            ["plan", t("tab_plan")],
+            ["check", t("tab_check")],
           ].map(([id, label]) => (
             <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? "on" : ""} onClick={() => setTab(id)}>
               {label}
@@ -196,45 +223,47 @@ export default function App() {
 
         {tab === "plan" && (
           <section className="card">
-            <h2>3. Compare rotations <span className="muted">({place})</span></h2>
-            <PlanTab outcome={outcome} scenario={scenario} onScenario={setScenario} status={planStatus} lang={lang} />
+            <h2>{t("plan_h")} <span className="muted">({place})</span></h2>
+            <PlanTab outcome={outcome} scenario={scenario} onScenario={setScenario} status={planStatus} cropsById={cropsById} />
           </section>
         )}
 
         {tab === "today" && tables && (
           <section className="card">
-            <h2>3. Next 7 days for your crop <span className="muted">({place})</span></h2>
+            <h2>{t("today_h")} <span className="muted">({place})</span></h2>
             <TodayTab tables={tables} features={features} inputs={inputs} lat={cLat} lon={cLon} provinceId={point?.id} place={place} status={planStatus} lang={lang} />
           </section>
         )}
 
         {tab === "check" && tables && (
           <section className="card">
-            <h2>3. Would this crop work here? <span className="muted">({place})</span></h2>
+            <h2>{t("check_h")} <span className="muted">({place})</span></h2>
             <CropCheck tables={tables} features={features} inputs={inputs} status={planStatus} place={place} lang={lang} />
           </section>
         )}
 
         <section className="card">
-          <h2>Last 12 months: rain and temperature <span className="muted">({place})</span></h2>
-          {chart.status === "loading" && <p className="muted">Loading NASA POWER data…</p>}
-          {chart.status === "error" && <p className="warn">Limited data: NASA POWER did not respond. Try again later.</p>}
+          <h2>{t("chart_h")} <span className="muted">({place})</span></h2>
+          {chart.status === "loading" && <p className="muted">{t("chart_loading")}</p>}
+          {chart.status === "error" && <p className="warn">{t("chart_error")}</p>}
           {chart.conditions && chart.status === "ready" && (
             <>
               <PowerChart conditions={chart.conditions} />
               <p className="source">
                 <span className="chip nasa">NASA POWER</span>
-                {chart.conditions.period.start} to {chart.conditions.period.end} · {chart.conditions.resolution}
+                {chart.conditions.period.start} {t("to")} {chart.conditions.period.end} · {chart.conditions.resolution}
               </p>
             </>
           )}
         </section>
 
-        <p className="disclaimer">
-          FieldShift supports your judgment; it does not replace local expertise. Check any change with a local
-          agronomist.
-        </p>
+        <section className="card">
+          <GlossaryList />
+        </section>
+
+        <p className="disclaimer">{t("disclaimer")}</p>
       </main>
     </div>
+    </LangProvider>
   );
 }

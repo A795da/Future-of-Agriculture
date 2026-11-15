@@ -1,18 +1,16 @@
 // Farmer input: irrigation, current rotation (one crop per year), priorities
 // and crops they will never grow. Pure UI; the parent owns the state.
 
-import { displayName as cropName } from "../../scoring/names.js";
+import { useLang } from "../../i18n/LangContext.jsx";
+import { cropLabel } from "../../i18n/strings.js";
 
 const MAX_YEARS = 4;
 
-const PRIORITIES = [
-  { key: "water", label: "Save water" },
-  { key: "soil", label: "Soil health" },
-  { key: "income", label: "Income" },
-  { key: "simplicity", label: "Keep it simple" },
-];
+const PRIORITIES = ["water", "soil", "income", "simplicity"];
 
-export default function FarmerInputs({ crops, value, onChange }) {
+export default function FarmerInputs({ crops, value, onChange, ratingCrops = [] }) {
+  const { lang, t } = useLang();
+  const cropName = (c) => cropLabel(c, null, lang);
   const set = (patch) => onChange({ ...value, ...patch, touched: true });
   const seq = value.current;
 
@@ -22,35 +20,42 @@ export default function FarmerInputs({ crops, value, onChange }) {
     else next[i] = id;
     set({ current: next.length ? next : ["wheat"] });
   };
+  const ratings = value.ratings ?? {};
+  const rate = (id, n) => {
+    const next = { ...ratings };
+    if (next[id] === n) delete next[id]; // tap the same value again to clear it
+    else next[id] = n;
+    set({ ratings: next });
+  };
   const toggleNever = (id) =>
     set({ never: value.never.includes(id) ? value.never.filter((x) => x !== id) : [...value.never, id] });
 
   return (
     <div className="inputs">
       <fieldset>
-        <legend>Water</legend>
+        <legend>{t("water")}</legend>
         <div className="seg">
           <button className={value.irrigation === "rainfed" ? "on" : ""} onClick={() => set({ irrigation: "rainfed" })}>
-            Rain-fed
+            {t("rainfed")}
           </button>
           <button className={value.irrigation === "irrigated" ? "on" : ""} onClick={() => set({ irrigation: "irrigated" })}>
-            Irrigated
+            {t("irrigated")}
           </button>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>Your current rotation (one main crop per year)</legend>
+        <legend>{t("rotation_legend")}</legend>
         <div className="years">
           {seq.map((id, i) => (
             <label key={i} className="year">
-              <span>Year {i + 1}</span>
+              <span>{t("year_n", { n: i + 1 })}</span>
               <select value={id} onChange={(e) => setYear(i, e.target.value)}>
-                {i > 0 && <option value="">— remove year —</option>}
-                <option value="fallow">Fallow (nadas)</option>
+                {i > 0 && <option value="">{t("remove_year")}</option>}
+                <option value="fallow">{t("fallow_opt")}</option>
                 {crops.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {cropName(c)} · {c.name_tr}
+                    {cropName(c)}
                   </option>
                 ))}
               </select>
@@ -58,32 +63,54 @@ export default function FarmerInputs({ crops, value, onChange }) {
           ))}
           {seq.length < MAX_YEARS && (
             <button className="add-year" onClick={() => set({ current: [...seq, "fallow"] })}>
-              + Add a year
+              {t("add_year")}
             </button>
           )}
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>What matters most to you?</legend>
-        {PRIORITIES.map((p) => (
-          <label key={p.key} className="slider">
-            <span>{p.label}</span>
+        <legend>{t("priorities")}</legend>
+        {PRIORITIES.map((key) => (
+          <label key={key} className="slider">
+            <span>{t(`p_${key}`)}</span>
             <input
               type="range"
               min="0"
               max="100"
               step="5"
-              value={value.priorities[p.key]}
-              onChange={(e) => set({ priorities: { ...value.priorities, [p.key]: +e.target.value } })}
+              value={value.priorities[key]}
+              onChange={(e) => set({ priorities: { ...value.priorities, [key]: +e.target.value } })}
             />
-            <output>{value.priorities[p.key]}</output>
+            <output>{value.priorities[key]}</output>
           </label>
         ))}
       </fieldset>
 
+      <details className="ratings" open={Object.keys(ratings).length > 0}>
+        <summary>{t("ratings_h")}</summary>
+        <p className="note">{t("ratings_note")}</p>
+        {ratingCrops.map((c) => (
+          <div key={c.id} className="rating-row">
+            <span>{cropName(c)}</span>
+            <span className="rating-btns" role="group" aria-label={t("rating_for", { crop: cropName(c) })}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  className={ratings[c.id] === n ? "on" : ""}
+                  aria-pressed={ratings[c.id] === n}
+                  onClick={() => rate(c.id, n)}
+                >
+                  {n}
+                </button>
+              ))}
+            </span>
+          </div>
+        ))}
+      </details>
+
       <fieldset>
-        <legend>Crops you will never grow</legend>
+        <legend>{t("never")}</legend>
         <div className="chips">
           {crops.map((c) => (
             <button

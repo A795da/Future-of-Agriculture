@@ -28,3 +28,11 @@ silage_maize,mısır (silajlık),full,silage maize (main crop)
 silage_maize_second,"mısır (silajlık, 2. ürün)",full,silage maize as a second crop after a winter cereal
 sorghum,sorgum (dane),full,grain sorghum
 sainfoin,korunga,none,perennial forage; calendar not used
+sesame,susam,full,sesame as a main crop
+sesame_second,susam (2. ürün),full,sesame as a second crop after a winter cereal
+groundnut,yerfıstığı,full,groundnut as a main crop
+groundnut_second,yerfıstığı (2. ürün),full,groundnut as a second crop after a winter cereal
+tobacco,tütün,full,transplanting date and stages
+onion,soğan (kuru),full,dry-bulb onion
+watermelon,karpuz,full,
+melon,kavun,full,

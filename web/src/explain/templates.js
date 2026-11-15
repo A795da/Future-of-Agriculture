@@ -33,16 +33,6 @@ export function cardSummary(result, baseline) {
   return parts.join(" ");
 }
 
-export const GLOSSARY = {
-  NDVI: "A satellite measure of how green and dense the plants are, from 0 (bare soil) to about 0.9 (thick green crop).",
-  evapotranspiration:
-    "Water that leaves the field as vapour: evaporation from the soil plus water the crop releases through its leaves. It is the crop's water use.",
-  "dry year": "A year as dry as the driest quarter of the last 20 years (the 25th percentile).",
-  "NASA reanalysis":
-    "Weather reconstructed by a NASA model that is constantly corrected with real observations. It covers every place on Earth, but on a coarse grid.",
-  "what-if": "A scenario where rainfall or temperature is changed on purpose to see how the options would hold up. It is not a forecast.",
-};
-
 export const VERDICT_LABELS = {
   reasonable: { en: "Reasonable", tr: "Mantıklı" },
   possible_with_care: { en: "Possible with care", tr: "Dikkatle olabilir" },

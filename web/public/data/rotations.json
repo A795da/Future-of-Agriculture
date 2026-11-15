@@ -171,6 +171,68 @@
       "regions": ["east-anatolia"],
       "irrigation": "irrigated",
       "notes": "Irrigated cold plateaus with livestock: three years of alfalfa for hay, then spring wheat on the improved soil."
+    },
+    {
+      "id": "wheat-groundnut2-cotton",
+      "sequence": ["wheat", "cotton"],
+      "second_crops": {
+        "0": "groundnut"
+      },
+      "regions": ["mediterranean"],
+      "irrigation": "irrigated",
+      "notes": "Osmaniye and Çukurova pattern: wheat, then second-crop groundnut in summer, then cotton. The legume second crop adds nitrogen; groundnut comes back every 2 years, so watch for leaf spot and white mold."
+    },
+    {
+      "id": "groundnut-wheat-maize",
+      "sequence": ["groundnut", "wheat", "maize"],
+      "regions": ["mediterranean", "aegean"],
+      "irrigation": "irrigated",
+      "notes": "Main-crop groundnut every third year, with wheat and maize between; keeps the 3-year break advised for groundnut diseases."
+    },
+    {
+      "id": "wheat-sesame2-cotton",
+      "sequence": ["wheat", "cotton"],
+      "second_crops": {
+        "0": "sesame"
+      },
+      "regions": ["mediterranean", "southeast-anatolia"],
+      "irrigation": "irrigated",
+      "notes": "Wheat, then second-crop sesame in summer, then cotton; sesame needs less water than second-crop maize."
+    },
+    {
+      "id": "wheat-sesame",
+      "sequence": ["wheat", "sesame"],
+      "regions": ["aegean", "mediterranean", "southeast-anatolia"],
+      "irrigation": "either",
+      "notes": "Wheat followed by main-crop sesame, a drought-tolerant summer oilseed."
+    },
+    {
+      "id": "tobacco-wheat-chickpea",
+      "sequence": ["tobacco", "wheat", "chickpea"],
+      "regions": ["aegean", "southeast-anatolia", "black-sea"],
+      "irrigation": "rainfed",
+      "notes": "Oriental tobacco every third year with wheat and chickpea between, keeping the 3-year break advised for black shank."
+    },
+    {
+      "id": "onion-wheat-sugarbeet-wheat",
+      "sequence": ["onion", "wheat", "sugar_beet", "wheat"],
+      "regions": ["central-anatolia", "black-sea", "marmara"],
+      "irrigation": "irrigated",
+      "notes": "Irrigated onion every fourth year (Amasya, Ankara, Eskişehir), with sugar beet and cereals between; long breaks limit pink root and white rot."
+    },
+    {
+      "id": "melon-wheat-chickpea",
+      "sequence": ["melon", "wheat", "chickpea"],
+      "regions": ["aegean", "central-anatolia"],
+      "irrigation": "either",
+      "notes": "Melon every third year with wheat and chickpea between (Manisa, Konya); melons are often grown on stored soil water."
+    },
+    {
+      "id": "watermelon-wheat-chickpea-wheat-barley",
+      "sequence": ["watermelon", "wheat", "chickpea", "wheat", "barley"],
+      "regions": ["southeast-anatolia", "mediterranean", "aegean"],
+      "irrigation": "either",
+      "notes": "Fusarium wilt calls for 5 or more years between watermelon crops, so watermelon moves to a new field each year; here it returns every fifth year."
     }
   ]
 }

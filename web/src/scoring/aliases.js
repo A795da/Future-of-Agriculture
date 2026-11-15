@@ -29,6 +29,12 @@ export const ALIASES = {
   alfalfa: ["yonca", "lucerne", "kaba yonca"],
   sainfoin: ["korunga"],
   vetch: ["fiğ", "adi fiğ", "macar fiğ"],
+  sesame: ["susam"],
+  groundnut: ["yerfıstığı", "yer fıstığı", "fıstık", "peanut", "peanuts"],
+  tobacco: ["tütün"],
+  onion: ["soğan", "kuru soğan", "onions"],
+  watermelon: ["karpuz"],
+  melon: ["kavun", "cantaloupe", "sweet melon"],
 };
 
 const TR = { ı: "i", İ: "i", ğ: "g", ş: "s", ç: "c", ö: "o", ü: "u", â: "a", î: "i", û: "u" };

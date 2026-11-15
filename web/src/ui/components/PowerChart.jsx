@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useLang } from "../../i18n/LangContext.jsx";
 import {
   Chart,
   BarController,
@@ -48,6 +49,7 @@ function monthly(daily) {
 }
 
 export default function PowerChart({ conditions }) {
+  const { t } = useLang();
   const canvas = useRef(null);
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export default function PowerChart({ conditions }) {
         datasets: [
           {
             type: "bar",
-            label: "Rain (mm/month)",
+            label: t("chart_rain"),
             data: m.rain,
             backgroundColor: c("--rain"),
             yAxisID: "rain",
@@ -69,7 +71,7 @@ export default function PowerChart({ conditions }) {
           },
           {
             type: "line",
-            label: "Avg max temp (°C)",
+            label: t("chart_tmax"),
             data: m.tmax,
             borderColor: c("--hot"),
             backgroundColor: c("--hot"),
@@ -79,7 +81,7 @@ export default function PowerChart({ conditions }) {
           },
           {
             type: "line",
-            label: "Avg min temp (°C)",
+            label: t("chart_tmin"),
             data: m.tmin,
             borderColor: c("--cold"),
             backgroundColor: c("--cold"),
@@ -113,7 +115,8 @@ export default function PowerChart({ conditions }) {
       },
     });
     return () => chart.destroy();
-  }, [conditions]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conditions, t]);
 
   return (
     <div className="chart-box">

@@ -286,3 +286,21 @@ button.link { border: none; background: none; color: var(--brand); padding: 4px 
 .ai-label { font-size: 0.75rem; color: var(--muted); }
 .ai-ask { margin: -4px 0 8px; }
 .ai-ask .note { margin: 2px 0 0; }
+
+/* Glossary */
+button.term { display: inline; min-height: 0; padding: 0; border: none; background: none; font: inherit; color: inherit; text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+button.term[aria-expanded="true"] { color: var(--brand); text-decoration-style: solid; }
+.term-def { display: block; margin: 4px 0; padding: 6px 8px; border-radius: 6px; background: var(--grid); color: var(--text); font-size: 0.82rem; font-weight: 400; line-height: 1.4; text-align: left; white-space: normal; }
+.src .term-def, .conf .term-def { position: relative; }
+.glossary summary { cursor: pointer; font-weight: 600; }
+.glossary dl { margin: 10px 0 0; display: flex; flex-direction: column; gap: 8px; }
+.glossary dt { font-weight: 700; font-size: 0.9rem; }
+.glossary dd { margin: 2px 0 0; font-size: 0.86rem; color: var(--muted); }
+
+/* Income ratings */
+.ratings summary { cursor: pointer; font-weight: 600; }
+.ratings .note { margin: 6px 0 8px; }
+.rating-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 3px 0; font-size: 0.9rem; }
+.rating-btns { display: flex; gap: 4px; }
+.rating-btns button { min-height: 32px; min-width: 32px; padding: 2px 0; font-size: 0.82rem; }
+.rating-btns button.on { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700; }

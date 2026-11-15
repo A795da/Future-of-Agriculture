@@ -1,0 +1,391 @@
+// Interface text in English and Turkish. Pure module (no React), so tests and
+// templates can use it. Engine evidence, risks and gaps are still generated in
+// English; in Turkish mode the AI summary (cached for the demo) explains them.
+
+export const LANGS = ["en", "tr"];
+
+export const STR = {
+  en: {
+    tagline: "Compare crop rotations for your field, using NASA data",
+    language: "Language:",
+    province: "Province",
+    field_h: "1. Your field",
+    field_note: "Optional: without a field, the province centre is used. Only terrain varies inside your field; weather, soil and vegetation data describe the area around it.",
+    slope_note: "Slope from NASA SRTM: {v}%.",
+    area_note: "Area: {v}.",
+    farm_h: "2. Your farm",
+    tab_today: "Today",
+    tab_plan: "Compare rotations",
+    tab_check: "Crop check",
+    today_h: "3. Next 7 days for your crop",
+    plan_h: "3. Compare rotations",
+    check_h: "3. Would this crop work here?",
+    chart_h: "Last 12 months: rain and temperature",
+    chart_loading: "Loading NASA POWER data…",
+    chart_error: "Limited data: NASA POWER did not respond. Try again later.",
+    chart_rain: "Rain (mm/month)",
+    chart_tmax: "Avg max temp (°C)",
+    chart_tmin: "Avg min temp (°C)",
+    to: "to",
+    your_field: "your field",
+    disclaimer: "FieldShift supports your judgment; it does not replace local expertise. Check any change with a local agronomist.",
+    english_note: "",
+
+    // field map
+    draw_field: "Draw field",
+    drop_pin: "Drop a pin",
+    my_location: "📍 My location",
+    undo: "Undo",
+    close_field: "Close field",
+    clear: "Clear",
+    map_hint_draw: "Zoom in to your field and tap its corners.",
+    map_hint_pin: "Tap your field to drop a pin.",
+    map_more_corners: "Tap {n} more corner(s).",
+    map_close_hint: "Tap the first corner (large dot) or press Close field.",
+    map_need3: "Tap at least 3 corners.",
+    map_crossing: "The edges cross each other. Drag a corner or undo.",
+    map_pin_set: "Pin set at {lat}, {lon}. Draw the field outline for its area and a more precise slope.",
+    map_field: "Field: {area} · {n} terrain sample points",
+    loc_none: "Location is not available on this device.",
+    loc_finding: "Finding your location…",
+    loc_failed: "Could not get your location. Pick a province and zoom in instead.",
+
+    // farm inputs
+    water: "Water",
+    rainfed: "Rain-fed",
+    irrigated: "Irrigated",
+    rotation_legend: "Your current rotation (one main crop per year)",
+    year_n: "Year {n}",
+    remove_year: "— remove year —",
+    fallow_opt: "Fallow (nadas)",
+    add_year: "+ Add a year",
+    priorities: "What matters most to you?",
+    p_water: "Save water",
+    p_soil: "Soil health",
+    p_income: "Income",
+    p_simplicity: "Keep it simple",
+    ratings_h: "How much does each crop earn for you? (optional)",
+    ratings_note: "FieldShift has no market prices. Rate the crops from your own experience (1 = very low, 5 = very good); unrated crops count as 3. This only changes the Income score.",
+    rating_for: "Income rating for {crop}",
+    never: "Crops you will never grow",
+
+    // plan tab
+    loading_climate: "Loading 20 years of NASA climate data…",
+    climate_error: "Could not load climate data for this place. Try again, or pick a province.",
+    scoring_failed: "Scoring failed: {e}",
+    what_if: "What if…",
+    rainfall: "Rainfall",
+    temperature: "Temperature",
+    back_today: "Back to today's climate",
+    no_alternative: "No alternative rotation passed the checks for this place. This usually means our crop list is missing crops that suit it (for example spring-sown wheat in very cold areas).",
+    why_not: "Why not other crops? ({n} ruled out)",
+
+    // rotation card
+    current_rotation: "Your current rotation",
+    option_n: "Option {n}",
+    confidence_word: "confidence",
+    conf_high: "high",
+    conf_medium: "medium",
+    conf_low: "low",
+    trust_title: "How much to trust this result",
+    what_if_tag: "What-if scenario",
+    not_forecast: ", not a forecast",
+    rules_line: "Rotation rules: {v} points (legume before a cereal, same family back to back, long bare gaps)",
+    evidence: "Evidence",
+    risks: "Risks to check locally",
+    gaps: "What we don't know ({n})",
+    d_water: "Water fit",
+    d_climate: "Climate fit",
+    d_soil: "Soil health",
+    d_erosion: "Erosion protection",
+    d_pest: "Pest-cycle break",
+    d_income: "Income (your ratings)",
+    d_simplicity: "Simplicity",
+    nutrients_h: "Nutrients per hectare, per year",
+    nitrogen: "Nitrogen (N)",
+    phosphate: "Phosphate (P₂O₅)",
+    potash: "Potash (K₂O)",
+    removed: "removed",
+    fixed_by_legumes: "fixed by legumes",
+    nutrient_note: "Only legumes add nitrogen. Phosphate and potash can only come back through fertilizer or manure; a soil test tells how much. FieldShift gives no doses. Source: FAOSTAT yields, Ludemann et al. 2023, Herridge et al. 2008.",
+    blocks: "blocks",
+    caution: "caution",
+
+    // crop check
+    which_crop: "Which crop are you thinking of?",
+    tr_or_en: "(Turkish or English)",
+    crop_placeholder: "e.g. nohut, ayçiçek, wheat",
+    try: "Try:",
+    before_legend: "What was in the field before?",
+    last_season: "Last season",
+    seasons_ago: "{n} seasons ago",
+    dont_know: "— don't know —",
+    refill: "Fill from my current rotation again",
+    prefilled: "Filled from your current rotation (assuming it repeats). Change it if it was different.",
+    did_you_mean: "Did you mean:",
+    not_in_list: "\"{q}\" is not in our crop list yet. These are the crops we can check:",
+    check_failed: "Crop check failed: {e}",
+    climate_error_short: "Could not load climate data for this place.",
+    better_after: "Better after {crop}",
+    other_fits: "Other crops that fit here",
+    no_better: "No crop on our list does clearly better here after that season.",
+    verdict_note: "The verdict comes from fixed rules and NASA data, not from AI. A local agronomist should confirm it.",
+    v_reasonable: "Reasonable",
+    v_possible_with_care: "Possible with care",
+    v_not_reasonable: "Not reasonable",
+
+    // today tab
+    loading_forecast: "Loading the 7-day forecast…",
+    forecast_error: "The forecast service did not respond and no saved forecast exists for this place. Try again later.",
+    today_failed: "Today check failed: {e}",
+    in_field_now: "In your field now",
+    your_rotation: "Your rotation",
+    other_crops: "Other crops",
+    fallow_empty: "Fallow (nadas) / empty",
+    guess_note: "Our guess from your rotation and the usual sowing dates here. Change it if it is wrong.",
+    s_green: "All clear",
+    s_yellow: "Watch",
+    s_red: "Act now",
+    l_red: "Act now",
+    l_yellow: "Watch",
+    l_info: "Plan",
+    t_frost: "Frost",
+    t_heat: "Heat",
+    t_rain: "Heavy rain",
+    t_water: "Water",
+    stage_estimated: " (estimated from the {cal} calendar for this place)",
+    forecast_7: "7-day forecast",
+    what_to_do: "What to do:",
+    forecast_src: "Weather forecast,",
+    not_nasa: "not NASA data",
+    saved_on: " · saved on {d} (live forecast unavailable)",
+    no_doses: "Reminders never include fertilizer or spray doses. Check with a local agronomist before acting.",
+    st_not_in_field: "not in the field now",
+    st_before_sowing: "sowing time is near",
+    st_establishment: "young plants",
+    st_winter_rest: "winter rest",
+    st_growing: "growing",
+    st_flowering: "flowering (most sensitive)",
+    st_ripening: "ripening",
+    st_fallow: "fallow (no crop)",
+
+    // glossary
+    glossary_h: "Glossary: what the terms mean ({n})",
+  },
+
+  tr: {
+    tagline: "Tarlanız için ekim nöbetlerini NASA verileriyle karşılaştırın",
+    language: "Dil:",
+    province: "İl",
+    field_h: "1. Tarlanız",
+    field_note: "İsteğe bağlı: tarla çizmezseniz il merkezi kullanılır. Tarlanın içinde yalnızca arazi eğimi değişir; hava, toprak ve bitki örtüsü verileri çevredeki geniş bir alanı anlatır.",
+    slope_note: "NASA SRTM'ye göre eğim: %{v}.",
+    area_note: "Alan: {v}.",
+    farm_h: "2. İşletmeniz",
+    tab_today: "Bugün",
+    tab_plan: "Ekim nöbetleri",
+    tab_check: "Ürün kontrolü",
+    today_h: "3. Ürününüz için önümüzdeki 7 gün",
+    plan_h: "3. Ekim nöbetlerini karşılaştırın",
+    check_h: "3. Bu ürün burada olur mu?",
+    chart_h: "Son 12 ay: yağış ve sıcaklık",
+    chart_loading: "NASA POWER verileri yükleniyor…",
+    chart_error: "Veri sınırlı: NASA POWER yanıt vermedi. Daha sonra tekrar deneyin.",
+    chart_rain: "Yağış (mm/ay)",
+    chart_tmax: "Ort. en yüksek sıcaklık (°C)",
+    chart_tmin: "Ort. en düşük sıcaklık (°C)",
+    to: "–",
+    your_field: "tarlanız",
+    disclaimer: "FieldShift kararınıza destek olur; yerel uzmanlığın yerini tutmaz. Her değişikliği yerel bir ziraat mühendisiyle konuşun.",
+    english_note: "Kanıt satırları, riskler ve eksik bilgiler şimdilik İngilizcedir. Türkçe özet için “Sade dille anlat”a dokunun.",
+
+    draw_field: "Tarlayı çiz",
+    drop_pin: "İğne bırak",
+    my_location: "📍 Konumum",
+    undo: "Geri al",
+    close_field: "Tarlayı kapat",
+    clear: "Temizle",
+    map_hint_draw: "Tarlanıza yakınlaşın ve köşelerine dokunun.",
+    map_hint_pin: "İğne bırakmak için tarlanıza dokunun.",
+    map_more_corners: "{n} köşe daha işaretleyin.",
+    map_close_hint: "İlk köşeye (büyük nokta) dokunun ya da Tarlayı kapat'a basın.",
+    map_need3: "En az 3 köşe işaretleyin.",
+    map_crossing: "Kenarlar birbirini kesiyor. Bir köşeyi sürükleyin ya da geri alın.",
+    map_pin_set: "İğne {lat}, {lon} konumunda. Alanı ve daha doğru eğimi görmek için tarlanın sınırını çizin.",
+    map_field: "Tarla: {area} · {n} arazi örnek noktası",
+    loc_none: "Bu cihazda konum kullanılamıyor.",
+    loc_finding: "Konumunuz bulunuyor…",
+    loc_failed: "Konumunuz alınamadı. Bir il seçip yakınlaştırın.",
+
+    water: "Su",
+    rainfed: "Kuru (yağmurla)",
+    irrigated: "Sulu",
+    rotation_legend: "Şu anki ekim nöbetiniz (her yıl bir ana ürün)",
+    year_n: "{n}. yıl",
+    remove_year: "— yılı çıkar —",
+    fallow_opt: "Nadas",
+    add_year: "+ Yıl ekle",
+    priorities: "Sizin için en önemli olan ne?",
+    p_water: "Su tasarrufu",
+    p_soil: "Toprak sağlığı",
+    p_income: "Gelir",
+    p_simplicity: "Basit olsun",
+    ratings_h: "Her ürün size ne kadar kazandırıyor? (isteğe bağlı)",
+    ratings_note: "FieldShift'te piyasa fiyatı yok. Ürünleri kendi deneyiminize göre puanlayın (1 = çok düşük, 5 = çok iyi); puan vermediğiniz ürünler 3 sayılır. Bu yalnızca Gelir puanını değiştirir.",
+    rating_for: "{crop} için gelir puanı",
+    never: "Asla ekmeyeceğiniz ürünler",
+
+    loading_climate: "20 yıllık NASA iklim verisi yükleniyor…",
+    climate_error: "Bu yer için iklim verisi yüklenemedi. Tekrar deneyin ya da bir il seçin.",
+    scoring_failed: "Puanlama başarısız: {e}",
+    what_if: "Ya şöyle olursa…",
+    rainfall: "Yağış",
+    temperature: "Sıcaklık",
+    back_today: "Bugünkü iklime dön",
+    no_alternative: "Bu yer için hiçbir alternatif ekim nöbeti kontrolleri geçemedi. Bu genellikle listemizde buraya uygun ürünlerin eksik olduğu anlamına gelir (örneğin çok soğuk yerlerde yazlık buğday).",
+    why_not: "Neden diğer ürünler değil? ({n} ürün elendi)",
+
+    current_rotation: "Şu anki ekim nöbetiniz",
+    option_n: "Seçenek {n}",
+    confidence_word: "güven",
+    conf_high: "yüksek",
+    conf_medium: "orta",
+    conf_low: "düşük",
+    trust_title: "Bu sonuca ne kadar güvenilebilir",
+    what_if_tag: "Senaryo",
+    not_forecast: ", tahmin değildir",
+    rules_line: "Ekim nöbeti kuralları: {v} puan (tahıldan önce baklagil, aynı familya arka arkaya, uzun çıplak dönemler)",
+    evidence: "Kanıtlar",
+    risks: "Yerinde kontrol edilmesi gereken riskler",
+    gaps: "Bilmediklerimiz ({n})",
+    d_water: "Su uyumu",
+    d_climate: "İklim uyumu",
+    d_soil: "Toprak sağlığı",
+    d_erosion: "Erozyon koruması",
+    d_pest: "Zararlı döngüsünü kırma",
+    d_income: "Gelir (sizin puanlarınız)",
+    d_simplicity: "Kolaylık",
+    nutrients_h: "Hektar başına, yıllık besin maddeleri",
+    nitrogen: "Azot (N)",
+    phosphate: "Fosfor (P₂O₅)",
+    potash: "Potasyum (K₂O)",
+    removed: "kaldırılan",
+    fixed_by_legumes: "baklagillerin bağladığı",
+    nutrient_note: "Toprağa yalnızca baklagiller azot ekler. Fosfor ve potasyum ancak gübre ya da hayvan gübresiyle geri gelir; ne kadar gerektiğini toprak analizi söyler. FieldShift doz vermez. Kaynak: FAOSTAT verimleri, Ludemann ve ark. 2023, Herridge ve ark. 2008.",
+    blocks: "engel",
+    caution: "dikkat",
+
+    which_crop: "Hangi ürünü düşünüyorsunuz?",
+    tr_or_en: "(Türkçe ya da İngilizce)",
+    crop_placeholder: "örn. nohut, ayçiçeği, buğday",
+    try: "Deneyin:",
+    before_legend: "Tarlada daha önce ne vardı?",
+    last_season: "Geçen sezon",
+    seasons_ago: "{n} sezon önce",
+    dont_know: "— bilmiyorum —",
+    refill: "Şu anki ekim nöbetimden yeniden doldur",
+    prefilled: "Şu anki ekim nöbetinizden dolduruldu (her yıl tekrarladığı varsayılarak). Farklıysa değiştirin.",
+    did_you_mean: "Bunu mu demek istediniz:",
+    not_in_list: "“{q}” henüz ürün listemizde yok. Kontrol edebildiğimiz ürünler:",
+    check_failed: "Ürün kontrolü başarısız: {e}",
+    climate_error_short: "Bu yer için iklim verisi yüklenemedi.",
+    better_after: "{crop} sonrası daha iyi seçenekler",
+    other_fits: "Burada uyan diğer ürünler",
+    no_better: "Listemizde o sezondan sonra burada açıkça daha iyi olan bir ürün yok.",
+    verdict_note: "Karar yapay zekâdan değil, sabit kurallardan ve NASA verilerinden gelir. Yerel bir ziraat mühendisi onaylamalıdır.",
+    v_reasonable: "Mantıklı",
+    v_possible_with_care: "Dikkatle olabilir",
+    v_not_reasonable: "Mantıklı değil",
+
+    loading_forecast: "7 günlük hava tahmini yükleniyor…",
+    forecast_error: "Hava tahmini servisi yanıt vermedi ve bu yer için kayıtlı tahmin yok. Daha sonra tekrar deneyin.",
+    today_failed: "Bugün kontrolü başarısız: {e}",
+    in_field_now: "Şu an tarlanızda",
+    your_rotation: "Ekim nöbetiniz",
+    other_crops: "Diğer ürünler",
+    fallow_empty: "Nadas / boş",
+    guess_note: "Ekim nöbetinize ve buradaki olağan ekim tarihlerine göre tahminimiz. Yanlışsa değiştirin.",
+    s_green: "Sorun yok",
+    s_yellow: "Takip edin",
+    s_red: "Hemen önlem",
+    l_red: "Hemen önlem",
+    l_yellow: "Takip edin",
+    l_info: "Planlayın",
+    t_frost: "Don",
+    t_heat: "Sıcaklık",
+    t_rain: "Şiddetli yağış",
+    t_water: "Su",
+    stage_estimated: " (buradaki {cal} takvimine göre tahmin)",
+    forecast_7: "7 günlük tahmin",
+    what_to_do: "Ne yapmalı:",
+    forecast_src: "Hava tahmini,",
+    not_nasa: "NASA verisi değildir",
+    saved_on: " · {d} tarihinde kaydedildi (canlı tahmin alınamadı)",
+    no_doses: "Hatırlatmalar asla gübre ya da ilaç dozu içermez. Uygulamadan önce yerel bir ziraat mühendisine danışın.",
+    st_not_in_field: "şu an tarlada değil",
+    st_before_sowing: "ekim zamanı yaklaşıyor",
+    st_establishment: "genç bitki",
+    st_winter_rest: "kış dinlenmesi",
+    st_growing: "gelişiyor",
+    st_flowering: "çiçeklenme (en hassas dönem)",
+    st_ripening: "olgunlaşıyor",
+    st_fallow: "nadas (ürün yok)",
+
+    glossary_h: "Sözlük: terimlerin anlamı ({n})",
+  },
+};
+
+/** t("year_n", {n: 2}) → "Year 2" / "2. yıl". Missing Turkish keys fall back to English. */
+export function translate(lang, key, vars = {}) {
+  const s = STR[lang]?.[key] ?? STR.en[key] ?? key;
+  return s.replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? `{${k}}`));
+}
+
+// ---- crop names
+const KEEP_TR = ["yazlık", "silajlık"];
+
+/** Short Turkish crop name: "Buğday (kışlık)" → "Buğday", "Buğday (yazlık)" → "Yazlık buğday". */
+export function shortNameTr(crop) {
+  const m = crop.name_tr.match(/^(.*?) \(([^)]+)\)$/);
+  if (!m) return crop.name_tr;
+  if (KEEP_TR.includes(m[2].toLocaleLowerCase("tr"))) {
+    const q = m[2].toLocaleLowerCase("tr");
+    return q.charAt(0).toLocaleUpperCase("tr") + q.slice(1) + " " + m[1].toLocaleLowerCase("tr");
+  }
+  return m[1];
+}
+
+/** Crop name for display in the chosen language (fallow included). */
+export function cropLabel(idOrCrop, cropsById, lang) {
+  const id = typeof idOrCrop === "string" ? idOrCrop : idOrCrop.id;
+  if (id === "fallow") return lang === "tr" ? "Nadas" : "Fallow";
+  const c = typeof idOrCrop === "string" ? cropsById[id] : idOrCrop;
+  if (!c) return id;
+  if (lang === "tr") return shortNameTr(c);
+  const m = c.name_en.match(/^(.*?) \(([^)]+)\)$/);
+  if (m && ["spring", "silage"].includes(m[2].toLowerCase())) return `${m[2].charAt(0).toUpperCase()}${m[2].slice(1).toLowerCase()} ${m[1].toLowerCase()}`;
+  return m ? m[1] : c.name_en;
+}
+
+/** Rotation title: "Buğday > Nadas". */
+export function rotationLabel(sequence, cropsById, lang, second = {}) {
+  return sequence
+    .map((id, i) => {
+      const s = second?.[i] ?? second?.[String(i)];
+      return cropLabel(id, cropsById, lang) + (s ? ` + ${cropLabel(s, cropsById, lang)}` : "");
+    })
+    .join(" > ");
+}
+
+// ---- dates
+const DAYS = { en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], tr: ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"] };
+const MONTHS = {
+  en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  tr: ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"],
+};
+/** "2026-11-18" → { day: "Wed", date: "18 Nov" } / { day: "Çar", date: "18 Kas" } */
+export function dayLabel(iso, lang) {
+  const d = new Date(`${iso}T12:00:00Z`);
+  const L = DAYS[lang] ? lang : "en";
+  return { day: DAYS[L][d.getUTCDay()], date: `${d.getUTCDate()} ${MONTHS[L][d.getUTCMonth()]}` };
+}

@@ -3,7 +3,7 @@
 
 import { MONTH_NAMES, round } from "../features/stats.js";
 import { SNOW_MARGIN_C, dryYearCoverage } from "./agronomy.js";
-import { phenology, sensitiveMonths, sowingDoy, zoneCalendar } from "./calendar.js";
+import { phenology, seasonDays, sensitiveMonths, sowingDoy, zoneCalendar } from "./calendar.js";
 import { HEAT_FAIL_RATIO, heatUnits } from "./heat.js";
 
 export const MIN_RAINFED_COVERAGE = 0.35; // below this, a rain-fed crop fails in most dry years
@@ -60,6 +60,26 @@ export function checkCrop(crop, f, farmer) {
     if (mean > crop.temp_abs_c[1]) {
       add(`the typical ${MONTH_NAMES[m]} mean temperature of ${mean} °C at flowering is above its ${crop.temp_abs_c[1]} °C limit`, "climate", "NASA POWER + FAO EcoCrop", "NASA reanalysis");
       break;
+    }
+  }
+
+  // Warmth check for summer crops without FAO AquaCrop heat units (sesame, groundnut,
+  // melons, ...): if even the warmest month of the season stays below the mean
+  // temperature at which the crop starts to grow well (FAO EcoCrop TOPMN), the summer
+  // is too cool. Skipped where the official calendar lists the crop for this zone.
+  if (crop.season === "summer" && !crop.heat_units && !official) {
+    const tmin = f.monthly_tmin_c.value;
+    const tmax = f.monthly_tmax_c.value;
+    const months = [...new Set([...seasonDays(crop, f)].map((d) => d.month))].filter((m) => tmin[m] != null && tmax[m] != null);
+    if (months.length) {
+      const warmest = months.reduce((a, m) => ((tmin[m] + tmax[m]) / 2 > (tmin[a] + tmax[a]) / 2 ? m : a));
+      const mean = Math.round(((tmin[warmest] + tmax[warmest]) / 2) * 10) / 10;
+      if (mean < crop.temp_opt_c[0]) {
+        add(
+          `the summer is too cool: even ${MONTH_NAMES[warmest]}, the warmest month of its season, averages ${mean} °C, below the ${crop.temp_opt_c[0]} °C it needs to grow well (FAO EcoCrop)`,
+          "climate", "NASA POWER + FAO EcoCrop", "NASA reanalysis"
+        );
+      }
     }
   }
 

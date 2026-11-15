@@ -29,7 +29,7 @@ export function fieldFromPin([lat, lon]) {
 
 export function fieldFromVertices(vertices) {
   if (vertices.length < 3) {
-    return { kind: "polygon", valid: false, error: "Tap at least 3 corners." };
+    return { kind: "polygon", valid: false, error: "Tap at least 3 corners.", errorKey: "map_need3" };
   }
   const ring = vertices.map(([lat, lon]) => [lon, lat]);
   ring.push(ring[0]);
@@ -40,6 +40,7 @@ export function fieldFromVertices(vertices) {
       kind: "polygon",
       valid: false,
       error: "The edges cross each other. Drag a corner or undo.",
+      errorKey: "map_crossing",
     };
   }
 

@@ -45,6 +45,7 @@ export const DIMENSIONS = ["water", "climate", "soil", "erosion", "pest", "incom
  * @property {string[]} gaps        information the tool does not have
  * @property {string}   confidence  one of CONFIDENCE
  * @property {boolean}  what_if     true when a scenario (rain/temperature change) was applied
+ * @property {Object|null} [second_crops] optional: { yearIndex: cropId } summer crops after a winter crop
  * @property {Object|null} [nutrients] optional: kg/ha per year { n_removed, n_fixed, n_net,
  *                                  p2o5_removed, k2o_removed, missing[] } (information, not scored)
  */

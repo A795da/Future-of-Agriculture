@@ -110,6 +110,61 @@
    "reason": "brassicas such as canola before potato reduced Rhizoctonia disease in Canadian research",
    "source": "Agriculture and Agri-Food Canada research (R. Peters) reported by Top Crop Manager, rotational options being studied",
    "url": "https://www.topcropmanager.com/rotational-options-being-studied-5060/"
+  },
+  {
+   "id": "groundnut_gap",
+   "type": "min_gap",
+   "target": "groundnut",
+   "previous": null,
+   "min_gap_years": 3,
+   "points": -6,
+   "reason": "leaf spot and white mold (Sclerotium rolfsii) carry over on groundnut residue; extension services advise 3-4 years between groundnut crops",
+   "source": "Alabama Cooperative Extension System, peanut production (3-4 years between peanut crops); UF/IFAS (3-4 years)",
+   "url": "https://www.aces.edu/?p=111803"
+  },
+  {
+   "id": "tobacco_gap",
+   "type": "min_gap",
+   "target": "tobacco",
+   "previous": null,
+   "min_gap_years": 3,
+   "points": -6,
+   "reason": "black shank (Phytophthora nicotianae) builds up in fields kept in tobacco; plant on land out of tobacco for at least 3 years",
+   "source": "University of Kentucky and University of Tennessee, Burley and dark tobacco disease management (ID-160)",
+   "url": "https://burleytobaccoextension.ca.uky.edu/files/disease_management_id160_2019.pdf"
+  },
+  {
+   "id": "watermelon_gap",
+   "type": "min_gap",
+   "target": "watermelon",
+   "previous": null,
+   "min_gap_years": 5,
+   "points": -8,
+   "reason": "Fusarium wilt (Fusarium oxysporum f. sp. niveum) survives in soil for many years; rotate five to seven years away from watermelon",
+   "source": "Michigan State University Extension, Managing diseases caused by Fusarium: the case of watermelon wilt",
+   "url": "https://www.canr.msu.edu/news/managing_diseases_caused_by_fusarium_the_case_of_watermelon_wilt"
+  },
+  {
+   "id": "onion_gap",
+   "type": "min_gap",
+   "target": "onion",
+   "previous": null,
+   "min_gap_years": 4,
+   "points": -6,
+   "reason": "pink root and white rot (Sclerotium cepivorum) survive in soil for years; long rotations (4-6 years for pink root) with non-Allium crops, and no Allium after Allium",
+   "source": "AUSVEG, Onions soil-borne diseases fact sheet; UC IPM onion and garlic white rot guidelines",
+   "url": "https://ausveg.com.au/app/uploads/2025/08/Onions-soil-borne-diseases-fact-sheet.pdf"
+  },
+  {
+   "id": "cucurbit_repeat",
+   "type": "family_repeat",
+   "target": "cucurbitaceae",
+   "previous": "cucurbitaceae",
+   "min_gap_years": null,
+   "points": -6,
+   "reason": "melon and watermelon share soilborne diseases and pests; rotate with non-cucurbit crops for three to four years",
+   "source": "Oklahoma State University Extension, Watermelon diseases",
+   "url": "https://extension.okstate.edu/fact-sheets/watermelon-diseases"
   }
  ]
 }

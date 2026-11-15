@@ -128,6 +128,7 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
     const result = {
       id: isBaseline ? "current" : rot.id,
       sequence: rot.sequence,
+      second_crops: rot.second_crops ?? null, // optional: summer crops after a winter crop, by year index
       label: labelOf(rot.sequence, cropsById, rot.second_crops),
       is_baseline: isBaseline,
       score: scored.score,

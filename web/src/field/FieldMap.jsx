@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { fieldFromPin, fieldFromVertices, formatArea } from "./geometry.js";
+import { useLang } from "../i18n/LangContext.jsx";
 
 // Satellite basemap: Esri World Imagery (attribution required; check the
 // terms before production use). NASA GIBS imagery is too coarse for field edges.
@@ -16,6 +17,7 @@ const pinIcon = L.divIcon({ className: "pin", iconSize: [22, 22] });
 const shapeStyle = { color: "#facc15", weight: 3, fillColor: "#facc15", fillOpacity: 0.2 };
 
 export default function FieldMap({ center, onChange }) {
+  const { t } = useLang();
   const el = useRef(null);
   const map = useRef(null);
   const layer = useRef(null);
@@ -121,10 +123,9 @@ export default function FieldMap({ center, onChange }) {
         kind: "polygon",
         valid: false,
         drawing: true,
-        error:
-          verts.length < 3
-            ? `Tap ${3 - verts.length} more corner${verts.length === 2 ? "" : "s"}.`
-            : "Tap the first corner (large dot) or press Close field.",
+        error: verts.length < 3 ? `Tap ${3 - verts.length} more corner(s).` : "Tap the first corner (large dot) or press Close field.",
+        errorKey: verts.length < 3 ? "map_more_corners" : "map_close_hint",
+        errorVars: { n: 3 - verts.length },
       };
     }
     setField(f);
@@ -146,14 +147,14 @@ export default function FieldMap({ center, onChange }) {
     setMode(m);
   };
   const locate = () => {
-    if (!navigator.geolocation) return setLocMsg("Location is not available on this device.");
-    setLocMsg("Finding your location…");
+    if (!navigator.geolocation) return setLocMsg("loc_none");
+    setLocMsg("loc_finding");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         map.current.flyTo([pos.coords.latitude, pos.coords.longitude], 16, { duration: 0.8 });
         setLocMsg(null);
       },
-      () => setLocMsg("Could not get your location. Pick a province and zoom in instead."),
+      () => setLocMsg("loc_failed"),
       { enableHighAccuracy: true, timeout: 10000 }
     );
   };
@@ -162,43 +163,46 @@ export default function FieldMap({ center, onChange }) {
     <div className="field-map">
       <div className="seg" role="group" aria-label="How to mark your field">
         <button className={mode === "draw" ? "on" : ""} onClick={() => switchMode("draw")}>
-          Draw field
+          {t("draw_field")}
         </button>
         <button className={mode === "pin" ? "on" : ""} onClick={() => switchMode("pin")}>
-          Drop a pin
+          {t("drop_pin")}
         </button>
       </div>
 
       <div ref={el} className="map" />
 
       <div className="toolbar">
-        <button onClick={locate}>📍 My location</button>
+        <button onClick={locate}>{t("my_location")}</button>
         {mode === "draw" && (
           <>
             <button onClick={undo} disabled={verts.length === 0}>
-              Undo
+              {t("undo")}
             </button>
             <button onClick={() => setClosed(true)} disabled={closed || verts.length < 3}>
-              Close field
+              {t("close_field")}
             </button>
           </>
         )}
         <button onClick={clear} disabled={verts.length === 0 && !pin}>
-          Clear
+          {t("clear")}
         </button>
       </div>
 
       <p className="field-status" aria-live="polite">
-        {locMsg ??
-          (field == null
+        {locMsg
+          ? t(locMsg)
+          : field == null
             ? mode === "draw"
-              ? "Zoom in to your field and tap its corners."
-              : "Tap your field to drop a pin."
+              ? t("map_hint_draw")
+              : t("map_hint_pin")
             : field.valid
               ? field.kind === "pin"
-                ? `Pin set at ${field.centroid[1]}, ${field.centroid[0]}. Draw the field outline for its area and a more precise slope.`
-                : `Field: ${formatArea(field.area_ha)} · ${field.sample_points.length} terrain sample points`
-              : field.error)}
+                ? t("map_pin_set", { lat: field.centroid[1], lon: field.centroid[0] })
+                : t("map_field", { area: formatArea(field.area_ha), n: field.sample_points.length })
+              : field.errorKey
+                ? t(field.errorKey, field.errorVars)
+                : field.error}
       </p>
     </div>
   );

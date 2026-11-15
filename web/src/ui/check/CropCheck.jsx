@@ -5,19 +5,26 @@ import { useEffect, useMemo, useState } from "react";
 import { matchCrop } from "../../scoring/aliases.js";
 import { runCropCheck } from "../../scoring/cropCheck.js";
 import { displayName, shortName } from "../../scoring/names.js";
-import { VERDICT_LABELS, checkSummary } from "../../explain/templates.js";
+import { checkSummary } from "../../explain/templates.js";
 import EvidenceList from "../components/EvidenceList.jsx";
 import { previousFromRotation } from "../../scoring/defaults.js";
 import AiSummary from "../components/AiSummary.jsx";
 import { checkFacts } from "../../explain/payload.js";
+import { useLang } from "../../i18n/LangContext.jsx";
+import { cropLabel } from "../../i18n/strings.js";
+import { checkSummaryTr } from "../../i18n/summaries.js";
 
 const SEASONS = 3;
-const EXAMPLES = ["nohut", "ayçiçek", "mısır", "sugar beet"];
+const EXAMPLES = { en: ["nohut", "ayçiçek", "mısır", "sugar beet"], tr: ["nohut", "ayçiçeği", "mısır", "şeker pancarı"] };
 
-export default function CropCheck({ tables, features, inputs, status, place, lang }) {
+export default function CropCheck({ tables, features, inputs, status, place }) {
+  const { lang, t } = useLang();
   const crops = tables.cropTable.crops;
   const cropsById = useMemo(() => Object.fromEntries(crops.map((c) => [c.id, c])), [crops]);
-  const nameOf = (id) => (id === "fallow" ? "fallow" : shortName(cropsById[id]));
+  const nameOf = (id) => (id === "fallow" ? "fallow" : shortName(cropsById[id])); // English, for the AI facts
+  const label = (id) => cropLabel(id, cropsById, lang);
+  // Option text shows both names so either language matches; the matcher reads the part before " · ".
+  const pickText = (c) => (lang === "tr" ? `${cropLabel(c, cropsById, "tr")} · ${displayName(c)}` : `${displayName(c)} · ${c.name_tr}`);
 
   const [text, setText] = useState("");
   const [previous, setPrevious] = useState(() => previousFromRotation(inputs.current, SEASONS));
@@ -26,7 +33,7 @@ export default function CropCheck({ tables, features, inputs, status, place, lan
     if (!prevTouched) setPrevious(previousFromRotation(inputs.current, SEASONS));
   }, [inputs.current, prevTouched]);
 
-  const query = text.split(" · ")[0]; // a datalist pick reads "Sunflower · Ayçiçeği"
+  const query = text.split(" · ")[0];
   const { crop, matches } = useMemo(() => matchCrop(query, crops), [query, crops]);
 
   const result = useMemo(() => {
@@ -62,26 +69,26 @@ export default function CropCheck({ tables, features, inputs, status, place, lan
   return (
     <div className="check">
       <label className="field-label" htmlFor="crop-q">
-        Which crop are you thinking of? <span className="muted">(Turkish or English)</span>
+        {t("which_crop")} <span className="muted">{t("tr_or_en")}</span>
       </label>
       <input
         id="crop-q"
         className="crop-q"
         list="crop-names"
         value={text}
-        placeholder="e.g. nohut, ayçiçek, wheat"
+        placeholder={t("crop_placeholder")}
         autoComplete="off"
         onChange={(e) => setText(e.target.value)}
       />
       <datalist id="crop-names">
         {crops.map((c) => (
-          <option key={c.id} value={`${displayName(c)} · ${c.name_tr}`} />
+          <option key={c.id} value={pickText(c)} />
         ))}
       </datalist>
       {!text && (
         <div className="chips examples">
-          <span className="muted">Try:</span>
-          {EXAMPLES.map((x) => (
+          <span className="muted">{t("try")}</span>
+          {EXAMPLES[lang].map((x) => (
             <button key={x} className="chip-btn" onClick={() => setText(x)}>
               {x}
             </button>
@@ -90,17 +97,17 @@ export default function CropCheck({ tables, features, inputs, status, place, lan
       )}
 
       <fieldset className="prev">
-        <legend>What was in the field before?</legend>
+        <legend>{t("before_legend")}</legend>
         <div className="years">
           {previous.map((id, k) => (
             <label key={k} className="year">
-              <span>{k === 0 ? "Last season" : `${k + 1} seasons ago`}</span>
+              <span>{k === 0 ? t("last_season") : t("seasons_ago", { n: k + 1 })}</span>
               <select value={id} onChange={(e) => setSeason(k, e.target.value)}>
-                <option value="">— don't know —</option>
-                <option value="fallow">Fallow (nadas)</option>
+                <option value="">{t("dont_know")}</option>
+                <option value="fallow">{t("fallow_opt")}</option>
                 {crops.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {displayName(c)} · {c.name_tr}
+                    {pickText(c)}
                   </option>
                 ))}
               </select>
@@ -109,80 +116,75 @@ export default function CropCheck({ tables, features, inputs, status, place, lan
         </div>
         <p className="note">
           {prevTouched ? (
-            <button className="link" onClick={() => setPrevTouched(false)}>Fill from my current rotation again</button>
+            <button className="link" onClick={() => setPrevTouched(false)}>{t("refill")}</button>
           ) : (
-            "Filled from your current rotation (assuming it repeats). Change it if it was different."
+            t("prefilled")
           )}
         </p>
       </fieldset>
 
       {text && !crop && matches.length > 1 && (
         <div className="chips">
-          <span className="muted">Did you mean:</span>
+          <span className="muted">{t("did_you_mean")}</span>
           {matches.slice(0, 6).map((c) => (
-            <button key={c.id} className="chip-btn" onClick={() => setText(`${displayName(c)} · ${c.name_tr}`)}>
-              {displayName(c)} · {c.name_tr}
+            <button key={c.id} className="chip-btn" onClick={() => setText(pickText(c))}>
+              {pickText(c)}
             </button>
           ))}
         </div>
       )}
       {text && !crop && matches.length === 0 && (
         <div className="not-found">
-          <p>
-            <strong>"{query}"</strong> is not in our crop list yet. These are the crops we can check:
-          </p>
+          <p>{t("not_in_list", { q: query })}</p>
           <div className="chips">
             {crops.map((c) => (
-              <button key={c.id} className="chip-btn" onClick={() => setText(`${displayName(c)} · ${c.name_tr}`)}>
-                {displayName(c)}
+              <button key={c.id} className="chip-btn" onClick={() => setText(pickText(c))}>
+                {label(c.id)}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {crop && status === "loading" && <p className="muted">Loading 20 years of NASA climate data…</p>}
-      {crop && status === "error" && <p className="warn">Could not load climate data for this place.</p>}
-      {result?.error && <p className="warn">Crop check failed: {result.error}</p>}
+      {crop && status === "loading" && <p className="muted">{t("loading_climate")}</p>}
+      {crop && status === "error" && <p className="warn">{t("climate_error_short")}</p>}
+      {result?.error && <p className="warn">{t("check_failed", { e: result.error })}</p>}
       {result && !result.error && status === "ready" && (
         <article className={`verdict-card v-${result.verdict}`}>
           <header className="rot-head">
             <span className="rot-tag">
-              {displayName(crop)} · {place}
+              {label(crop.id)} · {place}
             </span>
-            <span className={`conf conf-${result.confidence}`} title="How much to trust this result">
-              {result.confidence} confidence
+            <span className={`conf conf-${result.confidence}`} title={t("trust_title")}>
+              {t(`conf_${result.confidence}`)} {t("confidence_word")}
             </span>
           </header>
           <div className="verdict">
-            <span className="verdict-badge">{VERDICT_LABELS[result.verdict].en}</span>
-            <span className="verdict-tr">{VERDICT_LABELS[result.verdict].tr}</span>
+            <span className="verdict-badge">{t(`v_${result.verdict}`)}</span>
           </div>
-          <p className="summary">{summary}</p>
+          <p className="summary">{lang === "tr" ? checkSummaryTr(result, label) : summary}</p>
           {facts && <AiSummary kind="check" facts={facts} lang={lang} />}
 
-          <h4>Evidence</h4>
+          <h4>{t("evidence")}</h4>
           <EvidenceList reasons={result.reasons} />
 
-          <h4>
-            {result.previous.length ? `Better after ${nameOf(result.previous[0])}` : "Other crops that fit here"}
-          </h4>
+          <h4>{result.previous.length ? t("better_after", { crop: label(result.previous[0]) }) : t("other_fits")}</h4>
           {result.alternatives.length ? (
             <div className="chips">
               {result.alternatives.map((id) => (
-                <button key={id} className="chip-btn alt" onClick={() => setText(`${displayName(cropsById[id])} · ${cropsById[id].name_tr}`)}>
-                  {displayName(cropsById[id])}
+                <button key={id} className="chip-btn alt" onClick={() => setText(pickText(cropsById[id]))}>
+                  {label(id)}
                 </button>
               ))}
             </div>
           ) : (
-            <p className="note">No crop on our list does clearly better here after that season.</p>
+            <p className="note">{t("no_better")}</p>
           )}
 
           {result.risks.length > 0 && (
             <>
-              <h4>Risks to check locally</h4>
-              <ul className="risks">
+              <h4>{t("risks")}</h4>
+              <ul className="risks" lang="en">
                 {result.risks.map((r, i) => (
                   <li key={i}>{r}</li>
                 ))}
@@ -190,14 +192,14 @@ export default function CropCheck({ tables, features, inputs, status, place, lan
             </>
           )}
           <details className="gaps">
-            <summary>What we don't know ({result.gaps.length})</summary>
-            <ul>
+            <summary>{t("gaps", { n: result.gaps.length })}</summary>
+            <ul lang="en">
               {result.gaps.map((g, i) => (
                 <li key={i}>{g}</li>
               ))}
             </ul>
           </details>
-          <p className="note">The verdict comes from fixed rules and NASA data, not from AI. A local agronomist should confirm it.</p>
+          <p className="note">{t("verdict_note")}</p>
         </article>
       )}
     </div>

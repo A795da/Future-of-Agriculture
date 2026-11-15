@@ -382,6 +382,96 @@
    "fixed_kg_n_ha": 100,
    "fixation_method": "per_year",
    "fixation_source": "Herridge et al. 2008 p.10, citing Smil (1999): 100 kg N/ha/yr for other forage legumes"
+  },
+  "sesame": {
+   "note": null,
+   "yield_t_ha": 0.72,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 25.74,
+    "P": 5.12,
+    "K": 9.67,
+    "HI": null
+   },
+   "residue": {
+    "N": 15,
+    "P": 5.4,
+    "K": 21.1,
+    "HI": null
+   }
+  },
+  "groundnut": {
+   "note": null,
+   "yield_t_ha": 4.07,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 34.04,
+    "P": 4.21,
+    "K": 7.63,
+    "HI": null
+   },
+   "residue": {
+    "N": 15.9,
+    "P": 2.4,
+    "K": 14.9,
+    "HI": 0.5
+   },
+   "fixed_kg_n_ha": 223,
+   "fixation_method": "grain_legume",
+   "fixation_source": "Herridge, Peoples & Boddey 2008, Plant Soil 311:1-18: Table 2 p.7 (%Ndfa 68% for soybean and groundnut); Table 4 footnotes p.9 (harvest index 0.4, shoot N 2.3% for groundnut, below-ground factor 1.4)"
+  },
+  "tobacco": {
+   "note": null,
+   "yield_t_ha": 1.04,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 41.75,
+    "P": 6.6,
+    "K": 47.75,
+    "HI": null
+   },
+   "residue": {
+    "N": 0.1,
+    "P": 0,
+    "K": 0.2,
+    "HI": null
+   }
+  },
+  "onion": {
+   "note": null,
+   "yield_t_ha": 38.58,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 2.59,
+    "P": 0.66,
+    "K": 2.16,
+    "HI": null
+   },
+   "residue": null
+  },
+  "watermelon": {
+   "note": null,
+   "yield_t_ha": 48.72,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 1.4,
+    "P": 0.22,
+    "K": 0.66,
+    "HI": null
+   },
+   "residue": null
+  },
+  "melon": {
+   "note": null,
+   "yield_t_ha": 25.31,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 2,
+    "P": 0.48,
+    "K": 1.49,
+    "HI": null
+   },
+   "residue": null
   }
  }
 }

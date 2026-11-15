@@ -92,15 +92,15 @@ function frostLimit(crop, stage, month) {
   const coldSeason = month >= 9 || month <= 1;
   if (crop.winter_hardiness_c != null && k !== "flowering" && k !== "ripening" && (k === "winter_rest" || coldSeason)) {
     const red = crop.winter_hardiness_c - SNOW_MARGIN_C;
-    return [red, crop.winter_hardiness_c + WINTER_WATCH_MARGIN_C, `hardened ${shortName(crop)} survives about ${crop.winter_hardiness_c} °C; snow cover protects it by a few degrees`];
+    return [red, crop.winter_hardiness_c + WINTER_WATCH_MARGIN_C, `hardened ${shortName(crop)} survives about ${crop.winter_hardiness_c} °C; snow cover protects it by a few degrees`, "hardiness", crop.winter_hardiness_c];
   }
   if (k === "flowering") {
-    return [crop.frost_damage_c, crop.frost_damage_c + FROST_WATCH_MARGIN_C, `${shortName(crop)} is damaged below ${crop.frost_damage_c} °C at flowering`];
+    return [crop.frost_damage_c, crop.frost_damage_c + FROST_WATCH_MARGIN_C, `${shortName(crop)} is damaged below ${crop.frost_damage_c} °C at flowering`, "flowering", crop.frost_damage_c];
   }
   if (crop.frost_tolerance === "low") {
-    return [0, FROST_WATCH_MARGIN_C, `${shortName(crop)} is frost-sensitive: any frost can damage it`];
+    return [0, FROST_WATCH_MARGIN_C, `${shortName(crop)} is frost-sensitive: any frost can damage it`, "sensitive", 0];
   }
-  return [crop.frost_damage_c, crop.frost_damage_c + FROST_WATCH_MARGIN_C, `${shortName(crop)} is damaged below about ${crop.frost_damage_c} °C`];
+  return [crop.frost_damage_c, crop.frost_damage_c + FROST_WATCH_MARGIN_C, `${shortName(crop)} is damaged below about ${crop.frost_damage_c} °C`, "general", crop.frost_damage_c];
 }
 
 /**
@@ -129,7 +129,7 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
 
   // ---- frost and winter cold
   if (growing) {
-    const [red, yellow, meaning] = frostLimit(crop, stage, monthOfDoy(doyOf(today)));
+    const [red, yellow, meaning, mode, limit] = frostLimit(crop, stage, monthOfDoy(doyOf(today)));
     const hardiness = meaning.startsWith("hardened");
     const hits = days.filter((d) => d.tmin != null && d.tmin < yellow);
     if (hits.length) {
@@ -148,6 +148,8 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
         dates: hits.map((d) => d.date),
         ...SOURCES.forecast,
         source: "Open-Meteo forecast + crop table",
+        // structured values so the interface can say the same thing in Turkish
+        data: { value: low.tmin, date: low.date, mode, limit, action: hardiness ? "snow" : level === "red" ? "protect" : "watch" },
       });
     }
   }
@@ -171,6 +173,7 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
         dates: hits.map((d) => d.date),
         source: "Open-Meteo forecast + crop table",
         kind: "model estimate",
+        data: { value: hot.tmax, date: hot.date, limit: crop.heat_stress_c, flowering: stage.key === "flowering", action: irrigation === "irrigated" ? "irrigate" : "note" },
       });
     }
   }
@@ -181,6 +184,11 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
     const top = wet.reduce((a, b) => (b.rain > a.rain ? b : a));
     const level = top.rain >= VERY_HEAVY_RAIN_MM ? "red" : "yellow";
     const actions = [];
+    const actionKeys = [];
+    if (growing) actionKeys.push("fertilizer");
+    if (stage.key === "before_sowing") actionKeys.push("drain");
+    if (stage.key === "ripening") actionKeys.push("harvest");
+    if (bare) actionKeys.push("topsoil");
     if (growing) actions.push("do not spread nitrogen fertilizer in the 2-3 days before it: heavy rain can wash surface fertilizer off the field or down past the roots");
     if (stage.key === "before_sowing") actions.push("wait for the soil to drain before sowing or driving machinery on it");
     if (stage.key === "ripening") actions.push("if the crop is ready, harvest before the rain");
@@ -192,6 +200,7 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
       action: actions.join("; ") || "check drainage",
       dates: wet.map((d) => d.date),
       ...(growing ? SOURCES.fertilizer : SOURCES.team),
+      data: { value: round(top.rain), date: top.date, days: wet.length, actions: actionKeys.length ? actionKeys : ["drainage"] },
     });
   }
 
@@ -213,6 +222,7 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
         dates: [],
         source: "Open-Meteo forecast + FAO-56",
         kind: "model estimate",
+        data: { use: round(use), rain: round(weekRain), need: round(use - weekRain), action: use - weekRain > 10 ? "plan" : "covered" },
       });
     } else if (weekRain < DRY_WEEK_RAIN_MM && use >= DRY_WEEK_USE_MM) {
       push({
@@ -223,6 +233,7 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
         dates: days.map((d) => d.date),
         source: "Open-Meteo forecast + FAO-56",
         kind: "model estimate",
+        data: { use: round(use), rain: round(weekRain), action: "stored" },
       });
     }
   }

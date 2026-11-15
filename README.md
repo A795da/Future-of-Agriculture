@@ -67,7 +67,7 @@ Built for **NASA Space Apps Challenge 2026**, challenge *"Field Shift: Adapting 
 - [What makes Geleceğin Tarımı different](#what-makes-geleceğin-tarımı-different)
 - [What it does](#what-it-does)
 - [How decisions are made](#how-decisions-are-made)
-- [Data](#data)
+- [Data](#data) ([pipeline and efficiency](#data-pipeline-and-efficiency))
 - [Run it locally](#run-it-locally)
 - [Tests and data checks](#tests-and-data-checks)
 - [Deploy](#deploy)
@@ -142,6 +142,52 @@ Every data source, with access details, licenses and dates, is listed in **[kayn
 ### Resolution
 
 NASA POWER describes an area tens of kilometres wide, GRACE about 300 km, HWSD about 5 km, MODIS NDVI 250 m and SRTM 30 m. Nearby fields share climate values; the app says so in its information gaps.
+
+### Data pipeline and efficiency
+
+The raw NASA data is large (20 years of daily values for 81 provinces is about 34 MB of JSON, plus GRACE and HWSD NetCDF files). The app never loads it. We reduce it once, offline, and ship only the results (all of `web/public/data/` is about 1.6 MB, of which the 81 provinces' cached features are about 1.1 MB).
+
+```mermaid
+flowchart LR
+  subgraph RAW["Raw sources (not committed, re-fetchable)"]
+    P["NASA POWER daily<br/>2005-2024 x 81 provinces<br/>~34 MB"]
+    G["GRACE / HWSD<br/>NetCDF files"]
+    N["MODIS NDVI<br/>SRTM, TÜİK, TAGEM-DSİ, FAO"]
+  end
+  subgraph BUILD["Build scripts (run once, offline)"]
+    S1["fetch_power_all.mjs<br/>retry, resume, features"]
+    S2["build_*.py / .mjs<br/>aggregate to province level"]
+  end
+  subgraph BUNDLE["web/public/data (~1.6 MB)"]
+    F["cache/&lt;province&gt;/features.json<br/>~10 KB each"]
+    J["crops, rotations, calendars,<br/>water storage, climate shift"]
+    E["explain_cache.json<br/>AI texts"]
+  end
+  subgraph APP["Browser"]
+    R["Rule engine<br/>filters, scores, water balance"]
+    A["AI wording only<br/>numbers checked"]
+  end
+  P --> S1 --> F
+  G --> S2
+  N --> S2
+  S2 --> J
+  F --> R
+  J --> R
+  R --> A
+  E -.-> A
+  L["Live APIs: Open-Meteo forecast,<br/>POWER for drawn fields"] -.-> R
+```
+
+| Choice | Why |
+|---|---|
+| **Compute features once, ship the small result** (`scripts/fetch_power_all.mjs`) | A province loads from one ~10 KB file instead of 7,305 days of data, so it is instant and works offline. Raw series stay in `data/power/` (not committed) and can be re-fetched. |
+| **Resumable, retrying fetch** | The script reuses raw files already downloaded and retries failed requests up to 3 times, so a flaky connection does not restart 81 downloads. |
+| **Heavy rasters become province tables offline** | GRACE (about 300 km) and HWSD (about 5 km) NetCDF grids are read once with Python and reduced to one value or trend per province (`water_storage.json`, `soil_texture.json`). The browser never touches a NetCDF file. |
+| **Live APIs only where bundling is impossible** | Forecasts and arbitrary drawn fields need live data. Responses are cached in memory per session, and saved forecast snapshots are the fallback when Open-Meteo is unreachable. |
+| **One set of climate features feeds everything** | Frost dates, dry years, evapotranspiration, the climate-shift test and forecast "how unusual" all come from the same 20-year features, so results agree across pages. |
+| **Pre-written AI texts for the demo provinces** | `explain_cache.json` holds 70 texts, so the demo needs no key and no network. Re-run `build_explain_cache.mjs` after any scoring change. |
+| **Rules decide, AI words** | Rules are auditable and every number traces to a source. AI text is rejected if it contains a number not in the result. |
+| **Observed data over models** | TÜİK statistics override failed model checks, and limits are calibrated on provinces that actually grow the crop (see "What makes Geleceğin Tarımı different"). |
 
 ---
 

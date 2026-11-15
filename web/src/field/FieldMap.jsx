@@ -85,7 +85,13 @@ export default function FieldMap({ center, provinces, onChange, visible = true }
     const key = `${center.lat},${center.lon}`;
     if (key === lastCenter.current) return;
     lastCenter.current = key;
-    map.current?.flyTo([center.lat, center.lon], 11, { duration: 0.8 });
+    const m = map.current;
+    if (!m) return;
+    // flyTo needs a real size: on a hidden tab the box is 0×0 and Leaflet throws
+    // "Invalid LatLng (NaN, NaN)", which blanks the whole app. Jump instead.
+    const size = m.getSize();
+    if (size.x > 0 && size.y > 0) m.flyTo([center.lat, center.lon], 11, { duration: 0.8 });
+    else m.setView([center.lat, center.lon], 11, { animate: false });
   }, [center.lat, center.lon]);
 
   // Re-centre once when the map first opens/becomes visible.

@@ -9,3 +9,6 @@ data/sources/raw/
 .env
 .env*.local
 FieldShift Master Plan (NASA Space Apps 2026).md
+
+# Claude Code local config
+.claude/

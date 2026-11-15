@@ -16,6 +16,7 @@ import GlossaryList from "./ui/components/Glossary.jsx";
 import { LangProvider } from "./i18n/LangContext.jsx";
 import { translate } from "./i18n/strings.js";
 import { formatArea, formatLatLon, nearestProvince } from "./field/geometry.js";
+import Credits from "./ui/layout/Credits.jsx";
 import DashboardNav from "./ui/layout/DashboardNav.jsx";
 import Icon from "./ui/components/Icon.jsx";
 import FieldSidebar from "./ui/layout/FieldSidebar.jsx";
@@ -404,6 +405,7 @@ export default function App() {
           </div>
         )}
 
+        <Credits />
       </main>
       </div>
     </div>

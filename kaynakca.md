@@ -16,7 +16,7 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 - **Access:** live API `https://power.larc.nasa.gov/api/temporal/daily/point`; history 2005-01-01 to 2024-12-31.
 - **Kind:** NASA reanalysis (MERRA-2 based, with observation corrections); GWETTOP/GWETROOT = NASA model estimate; solar radiation from satellites.
 - **Resolution:** about 0.5° × 0.625° (tens of km); nearby fields share values.
-- **License / terms:** NASA open data; cite NASA POWER as the source.
+- **License / terms:** NASA open data; cite NASA POWER as the source. The app's credits section carries POWER's acknowledgement sentence ("These data were obtained from the NASA Langley Research Center (LaRC) POWER Project funded through the NASA Earth Science/Applied Science Program.").
 - **Accessed:** 2026-11-14. **Status:** used.
 
 ### MODIS MOD13Q1 v061 NDVI (16-day, 250 m) via ORNL DAAC MODIS Web Service
@@ -63,13 +63,17 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 
 ---
 
+## Credits shown in the app
+
+`web/src/ui/layout/Credits.jsx` (bottom of every page, English and Turkish, added 2026-11-15) names every data source the app uses with a link: NASA POWER (with its acknowledgement sentence), MODIS NDVI (ORNL DAAC), HWSD (ORNL DAAC, Wieder et al. 2014), GRACE/GRACE-FO (JPL, Wiese et al. 2016; Watkins et al. 2015), SRTM via OpenTopoData; Open-Meteo (CC BY 4.0), Esri imagery, TÜİK ("Kaynak: TÜİK"), TAGEM-DSİ 2017, FAO-56, FAO EcoCrop, FAOSTAT (CC BY 4.0), Ludemann et al. 2023 (CC0), Herridge et al. 2008, FAO AquaCrop parameters (AquaCrop-OSPy), Tebliğ 2024/39; plus the AI-use note and a link to this file. Not listed there: SoilGrids (not called by the app) and AppEEARS/GIBS (not used).
+
 ## Non-NASA data (labelled as such in the app)
 
 ### Open-Meteo forecast
 - **For:** Today tab: 7-day daily max/min temperature, rain, rain probability, FAO-56 reference evapotranspiration and the WMO weather code (shown as Sunny / Cloudy / Rain… per day; older snapshots without it fall back to rain amount), plus an hourly strip for the day the farmer taps (temperature, rain, wind, sky; live only, snapshots have no hourly values), compared with the crop's limits. **Not NASA**; labelled "Open-Meteo · not NASA data" in the app.
 - **Files:** `web/src/data/forecast.js` (live call, falls back to the saved snapshot), `web/src/scoring/today.js` (alerts), `scripts/fetch_forecast_snapshot.mjs`; demo snapshots `web/public/data/cache/<id>/forecast_snapshot.json` for Konya, Edirne, Adana, Şanlıurfa, Erzurum (saved 2026-11-15; shown with their save date, never as current).
 - **Access:** `https://api.open-meteo.com/v1/forecast` (`daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,et0_fao_evapotranspiration,weather_code`; `hourly=temperature_2m,precipitation,precipitation_probability,weather_code,wind_speed_10m,wind_gusts_10m,is_day`, `timezone=Europe/Istanbul`, `forecast_days=7`). Browser calls allowed (CORS).
-- **Kind:** model estimate (weather forecast models, a few km). **License:** free for non-commercial use; data CC BY 4.0, attribution "Weather data by Open-Meteo.com".
+- **Kind:** model estimate (weather forecast models, a few km). **License:** free for non-commercial use; data CC BY 4.0, attribution "Weather data by Open-Meteo.com", shown with a link under the Today forecast and in the credits section on every page (added 2026-11-15).
 - **Accessed:** 2026-11-15. **Status:** used.
 
 ### Spray hours (Today tab hourly strip)

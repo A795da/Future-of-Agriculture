@@ -171,7 +171,11 @@ export default function TodayTab({ tables, features, inputs, lat, lon, provinceI
 
       <p className="source">
         <span className="chip">Open-Meteo</span>
-        {t("forecast_src")} <strong>{t("not_nasa")}</strong>
+        {t("forecast_src")} <strong>{t("not_nasa")}</strong> ·{" "}
+        <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">
+          {t("weather_credit")}
+        </a>{" "}
+        (CC BY 4.0)
         {fc.data.snapshot ? t("saved_on", { d: fc.data.snapshot }) : ` · ${place}`}
       </p>
       <details className="gaps">

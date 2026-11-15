@@ -14,6 +14,18 @@ import GlossaryList from "./ui/components/Glossary.jsx";
 import { LangProvider } from "./i18n/LangContext.jsx";
 import { translate } from "./i18n/strings.js";
 import { formatArea, formatLatLon, nearestProvince } from "./field/geometry.js";
+import DashboardNav from "./ui/layout/DashboardNav.jsx";
+
+const VALID_TABS = ["today", "plan", "check", "field", "climate"];
+const DEFAULT_TAB = "plan";
+
+function getInitialTab() {
+  if (typeof window !== "undefined") {
+    const h = window.location.hash.replace(/^#/, "");
+    if (VALID_TABS.includes(h)) return h;
+  }
+  return DEFAULT_TAB;
+}
 
 export default function App() {
   const [tables, setTables] = useState(null);
@@ -21,7 +33,26 @@ export default function App() {
   const [field, setField] = useState(null);
   const [inputs, setInputs] = useState(DEFAULT_INPUTS);
   const [scenario, setScenario] = useState({ rainPct: 0, tempC: 0 });
-  const [tab, setTab] = useState("plan");
+  const [tab, setTabState] = useState(getInitialTab);
+
+  const setTab = (nextTab) => {
+    setTabState(nextTab);
+    if (typeof window !== "undefined") {
+      window.location.hash = nextTab;
+    }
+  };
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const h = window.location.hash.replace(/^#/, "");
+      if (VALID_TABS.includes(h)) {
+        setTabState(h);
+      }
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
   const [lang, setLang] = useState(() => {
     try {
       return localStorage.getItem("fieldshift-lang") === "tr" ? "tr" : "en";
@@ -176,112 +207,129 @@ export default function App() {
 
   const place = usingField ? t("your_field") : point?.name ?? "…";
 
+  const locPill = useMemo(() => {
+    if (onField && field?.centroid) {
+      const near = nearestProvince(field.centroid[1], field.centroid[0], provinces)?.name ?? point?.name;
+      const nearText = t("pill_near", { place: near });
+      return `${nearText}${field.area_ha ? ` · ${formatArea(field.area_ha)}` : ""}`;
+    }
+    return point?.name ?? "…";
+  }, [onField, field, provinces, point, t]);
+
   return (
     <LangProvider lang={lang}>
     <div className="app">
       <header className="top">
-        <h1>FieldShift</h1>
-        <p className="tag">{t("tagline")}</p>
-        <div className="lang" role="group" aria-label="Language / Dil">
-          <span className="muted">{t("language")}</span>
-          {[["en", "English"], ["tr", "Türkçe"]].map(([id, label]) => (
-            <button key={id} className={lang === id ? "on" : ""} aria-pressed={lang === id} onClick={() => setLang(id)}>
-              {label}
-            </button>
-          ))}
+        <div className="top-brand">
+          <h1>FieldShift</h1>
+          <p className="tag">{t("tagline")}</p>
+        </div>
+        <div className="top-actions">
+          <button className="loc-pill-btn" onClick={() => setTab("field")} title={t("tab_field")}>
+            <span className="loc-icon" aria-hidden="true">📍</span>
+            <span className="loc-text">{locPill}</span>
+          </button>
+          <div className="lang" role="group" aria-label="Language / Dil">
+            {[["en", "English"], ["tr", "Türkçe"]].map(([id, label]) => (
+              <button key={id} className={lang === id ? "on" : ""} aria-pressed={lang === id} onClick={() => setLang(id)}>
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
-      <main>
-        <section className="card">
-          <label className="field-label" htmlFor="point">{t("province")}</label>
-          <select id="point" value={pointId} onChange={(e) => setPointId(e.target.value)}>
-            {provinces.map((p) => (
-              <option key={p.id} value={p.id}>
-                {String(p.plate).padStart(2, "0")} · {p.name}
-              </option>
-            ))}
-          </select>
-        </section>
+      <DashboardNav tab={tab} onSelect={setTab} />
 
-        {point && (
-          <section className="card">
-            <h2>{t("field_h")}</h2>
-            <FieldMap center={point} provinces={provinces} onChange={setField} />
-            <p className="note">
-              {t("field_note")}
-              {onField && terrain && ` ${t("slope_note", { v: terrain.mean_slope_pct.value })}`}
-              {onField &&
-                field.area_ha &&
-                ` ${t("area_note", {
-                  v: formatArea(field.area_ha),
-                  loc: t("map_loc", {
-                    coords: formatLatLon(field.centroid[1], field.centroid[0]),
-                    place: nearestProvince(field.centroid[1], field.centroid[0], provinces)?.name ?? "?",
-                  }),
-                })}`}
-            </p>
-          </section>
-        )}
-
-        {tables && (
-          <section className="card">
-            <h2>{t("farm_h")}</h2>
-            <FarmerInputs crops={tables.cropTable.crops} value={inputs} onChange={setInputs} ratingCrops={ratingCrops} />
-          </section>
-        )}
-
-        <nav className="tabs" role="tablist" aria-label="FieldShift tools">
-          {[
-            ["today", t("tab_today")],
-            ["plan", t("tab_plan")],
-            ["check", t("tab_check")],
-          ].map(([id, label]) => (
-            <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? "on" : ""} onClick={() => setTab(id)}>
-              {label}
-            </button>
-          ))}
-        </nav>
-
+      <main className="dashboard-content">
+        {/* 1. Plan View (Default) */}
         {tab === "plan" && (
-          <section className="card">
+          <section className="card view-plan">
             <h2>{t("plan_h")} <span className="muted">({place})</span></h2>
             <PlanTab outcome={outcome} scenario={scenario} onScenario={setScenario} status={planStatus} cropsById={cropsById} shift={tables?.climateShift?.provinces?.[point?.id] ?? null} />
           </section>
         )}
 
+        {/* 2. Today View */}
         {tab === "today" && tables && (
-          <section className="card">
+          <section className="card view-today">
             <h2>{t("today_h")} <span className="muted">({place})</span></h2>
             <TodayTab tables={tables} features={features} inputs={inputs} lat={cLat} lon={cLon} provinceId={point?.id} place={place} status={planStatus} lang={lang} />
           </section>
         )}
 
+        {/* 3. Crop Check View */}
         {tab === "check" && tables && (
-          <section className="card">
+          <section className="card view-check">
             <h2>{t("check_h")} <span className="muted">({place})</span></h2>
             <CropCheck tables={tables} features={features} inputs={inputs} status={planStatus} place={place} lang={lang} localYields={localYields} />
           </section>
         )}
 
-        <section className="card">
-          <h2>{t("chart_h")} <span className="muted">({place})</span></h2>
-          {chart.status === "loading" && <p className="muted">{t("chart_loading")}</p>}
-          {chart.status === "error" && <p className="warn">{t("chart_error")}</p>}
-          {chart.conditions && chart.status === "ready" && (
-            <>
-              <PowerChart conditions={chart.conditions} />
-              <p className="source">
-                <span className="chip nasa">NASA POWER</span>
-                {chart.conditions.period.start} {t("to")} {chart.conditions.period.end} · {chart.conditions.resolution}
-              </p>
-            </>
-          )}
-        </section>
+        {/* 4. Field & Farm Profile View (ALWAYS MOUNTED to preserve drawing & coordinates) */}
+        <div className={`view-field-wrap ${tab !== "field" ? "view-hidden" : ""}`} aria-hidden={tab !== "field"}>
+          <section className="card">
+            <label className="field-label" htmlFor="point">{t("province")}</label>
+            <select id="point" value={pointId} onChange={(e) => setPointId(e.target.value)}>
+              {provinces.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {String(p.plate).padStart(2, "0")} · {p.name}
+                </option>
+              ))}
+            </select>
+          </section>
 
-        <section className="card">
-          <GlossaryList />
-        </section>
+          {point && (
+            <section className="card">
+              <h2>{t("field_h")}</h2>
+              <FieldMap center={point} provinces={provinces} onChange={setField} visible={tab === "field"} />
+              <p className="note">
+                {t("field_note")}
+                {onField && terrain && ` ${t("slope_note", { v: terrain.mean_slope_pct.value })}`}
+                {onField &&
+                  field.area_ha &&
+                  ` ${t("area_note", {
+                    v: formatArea(field.area_ha),
+                    loc: t("map_loc", {
+                      coords: formatLatLon(field.centroid[1], field.centroid[0]),
+                      place: nearestProvince(field.centroid[1], field.centroid[0], provinces)?.name ?? "?",
+                    }),
+                  })}`}
+              </p>
+            </section>
+          )}
+
+          {tables && (
+            <section className="card">
+              <h2>{t("farm_h")}</h2>
+              <FarmerInputs crops={tables.cropTable.crops} value={inputs} onChange={setInputs} ratingCrops={ratingCrops} />
+            </section>
+          )}
+        </div>
+
+        {/* 5. Climate & Historical Trends View */}
+        {tab === "climate" && (
+          <div className="view-climate-wrap">
+            <section className="card">
+              <h2>{t("chart_h")} <span className="muted">({place})</span></h2>
+              {chart.status === "loading" && <p className="muted">{t("chart_loading")}</p>}
+              {chart.status === "error" && <p className="warn">{t("chart_error")}</p>}
+              {chart.conditions && chart.status === "ready" && (
+                <>
+                  <PowerChart conditions={chart.conditions} />
+                  <p className="source">
+                    <span className="chip nasa">NASA POWER</span>
+                    {chart.conditions.period.start} {t("to")} {chart.conditions.period.end} · {chart.conditions.resolution}
+                  </p>
+                </>
+              )}
+            </section>
+
+            <section className="card">
+              <GlossaryList />
+            </section>
+          </div>
+        )}
 
         <p className="disclaimer">{t("disclaimer")}</p>
       </main>

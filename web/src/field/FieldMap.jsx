@@ -31,11 +31,12 @@ function withCoordLabel(marker, [lat, lon], offsetY) {
   return marker;
 }
 
-export default function FieldMap({ center, provinces, onChange }) {
+export default function FieldMap({ center, provinces, onChange, visible = true }) {
   const { t } = useLang();
   const el = useRef(null);
   const map = useRef(null);
   const layer = useRef(null);
+  const hasFirstOpened = useRef(false);
   const [mode, setMode] = useState("draw"); // "draw" | "pin"
   const [verts, setVerts] = useState([]); // [[lat, lon], ...]
   const [closed, setClosed] = useState(false);
@@ -79,6 +80,19 @@ export default function FieldMap({ center, provinces, onChange }) {
     lastCenter.current = key;
     map.current?.flyTo([center.lat, center.lon], 11, { duration: 0.8 });
   }, [center.lat, center.lon]);
+
+  // Re-centre once when the map first opens/becomes visible.
+  // After this initial positioning, preserve the farmer's zoom and pan.
+  useEffect(() => {
+    if (!visible || !map.current || hasFirstOpened.current) return;
+    hasFirstOpened.current = true;
+    map.current.invalidateSize();
+    if (field?.valid && field.centroid) {
+      map.current.setView([field.centroid[1], field.centroid[0]], 14);
+    } else {
+      map.current.setView([center.lat, center.lon], 11);
+    }
+  }, [visible, field, center.lat, center.lon]);
 
   // Map taps: add a corner, or place the pin.
   useEffect(() => {

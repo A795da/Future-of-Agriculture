@@ -1,6 +1,7 @@
 // Farmer input: irrigation, current rotation (one crop per year), priorities
 // and crops they will never grow. Pure UI; the parent owns the state.
 
+import { useMemo } from "react";
 import { useLang } from "../../i18n/LangContext.jsx";
 import { cropLabel } from "../../i18n/strings.js";
 
@@ -9,11 +10,25 @@ const MAX_YEARS = 4;
 const PRIORITIES = ["water", "soil", "income", "simplicity"];
 const SOILS = ["unknown", "clay", "loam", "sandy"];
 
+const PRESETS = {
+  balanced: { water: 50, soil: 50, income: 50, simplicity: 50 },
+  water: { water: 80, soil: 50, income: 40, simplicity: 50 },
+  income: { water: 40, soil: 40, income: 90, simplicity: 40 },
+  soil: { water: 50, soil: 90, income: 40, simplicity: 50 },
+};
+
 export default function FarmerInputs({ crops, value, onChange, ratingCrops = [] }) {
   const { lang, t } = useLang();
   const cropName = (c) => cropLabel(c, null, lang);
   const set = (patch) => onChange({ ...value, ...patch, touched: true });
   const seq = value.current;
+
+  const activePreset = useMemo(() => {
+    for (const [key, preset] of Object.entries(PRESETS)) {
+      if (PRIORITIES.every((p) => value.priorities[p] === preset[p])) return key;
+    }
+    return "custom";
+  }, [value.priorities]);
 
   const setYear = (i, id) => {
     const next = [...seq];
@@ -84,20 +99,54 @@ export default function FarmerInputs({ crops, value, onChange, ratingCrops = [] 
 
       <fieldset>
         <legend>{t("priorities")}</legend>
-        {PRIORITIES.map((key) => (
-          <label key={key} className="slider">
-            <span>{t(`p_${key}`)}</span>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              step="5"
-              value={value.priorities[key]}
-              onChange={(e) => set({ priorities: { ...value.priorities, [key]: +e.target.value } })}
-            />
-            <output>{value.priorities[key]}</output>
-          </label>
-        ))}
+        <div className="preset-btns" role="group" aria-label={t("priorities")}>
+          <button
+            type="button"
+            className={activePreset === "balanced" ? "on" : ""}
+            onClick={() => set({ priorities: { ...PRESETS.balanced } })}
+          >
+            ⚖️ {t("preset_balanced")}
+          </button>
+          <button
+            type="button"
+            className={activePreset === "water" ? "on" : ""}
+            onClick={() => set({ priorities: { ...PRESETS.water } })}
+          >
+            💧 {t("preset_water")}
+          </button>
+          <button
+            type="button"
+            className={activePreset === "income" ? "on" : ""}
+            onClick={() => set({ priorities: { ...PRESETS.income } })}
+          >
+            💰 {t("preset_income")}
+          </button>
+          <button
+            type="button"
+            className={activePreset === "soil" ? "on" : ""}
+            onClick={() => set({ priorities: { ...PRESETS.soil } })}
+          >
+            🌿 {t("preset_soil")}
+          </button>
+        </div>
+
+        <details className="custom-sliders" open={activePreset === "custom"}>
+          <summary>{t("preset_custom")}</summary>
+          {PRIORITIES.map((key) => (
+            <label key={key} className="slider">
+              <span>{t(`p_${key}`)}</span>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="5"
+                value={value.priorities[key]}
+                onChange={(e) => set({ priorities: { ...value.priorities, [key]: +e.target.value } })}
+              />
+              <output>{value.priorities[key]}</output>
+            </label>
+          ))}
+        </details>
       </fieldset>
 
       <details className="ratings" open={Object.keys(ratings).length > 0}>

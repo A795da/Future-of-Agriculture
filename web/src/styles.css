@@ -38,39 +38,38 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #151613;
-    --surface: #1c1d19;
-    --panel: #21231e;
-    --raised: #2a2c26;
-    --text: #e9e8e0;
-    --muted: #a3a397;
-    --border: #2f312b;
-    --grid: #272923;
-    --brand: oklch(0.78 0.09 150);
-    --brand-ink: #121811;
-    --accent: oklch(0.74 0.11 50);
-    --accent-soft: oklch(0.3 0.04 55);
-    --water: oklch(0.74 0.085 240);
-    --water-soft: oklch(0.28 0.03 240);
-    --leaf-soft: oklch(0.28 0.03 150);
-    --nasa: #a3b8de;
-    --warn: oklch(0.76 0.11 45);
-    --rain: oklch(0.74 0.085 240 / 0.4);
-    --hot: oklch(0.7 0.12 30);
-    --cold: oklch(0.74 0.085 240);
-    --good: oklch(0.76 0.1 150);
-    --caution: oklch(0.8 0.1 80);
-    --bad: oklch(0.7 0.12 30);
-    --wheat: oklch(0.8 0.1 85);
-    --leaf: oklch(0.68 0.09 150);
-    --fallow: oklch(0.36 0.02 80);
-    --on-data: #161712;
-    --on-wheat: #2a2410;
-    --shadow: none;
-    color-scheme: dark;
-  }
+/* Always dark, whatever the device setting. */
+:root {
+  --bg: #151613;
+  --surface: #1c1d19;
+  --panel: #21231e;
+  --raised: #2a2c26;
+  --text: #e9e8e0;
+  --muted: #a3a397;
+  --border: #2f312b;
+  --grid: #272923;
+  --brand: oklch(0.78 0.09 150);
+  --brand-ink: #121811;
+  --accent: oklch(0.74 0.11 50);
+  --accent-soft: oklch(0.3 0.04 55);
+  --water: oklch(0.74 0.085 240);
+  --water-soft: oklch(0.28 0.03 240);
+  --leaf-soft: oklch(0.28 0.03 150);
+  --nasa: #a3b8de;
+  --warn: oklch(0.76 0.11 45);
+  --rain: oklch(0.74 0.085 240 / 0.4);
+  --hot: oklch(0.7 0.12 30);
+  --cold: oklch(0.74 0.085 240);
+  --good: oklch(0.76 0.1 150);
+  --caution: oklch(0.8 0.1 80);
+  --bad: oklch(0.7 0.12 30);
+  --wheat: oklch(0.8 0.1 85);
+  --leaf: oklch(0.68 0.09 150);
+  --fallow: oklch(0.36 0.02 80);
+  --on-data: #161712;
+  --on-wheat: #2a2410;
+  --shadow: none;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -168,7 +167,7 @@ body {
   font-size: 1rem;
   background-color: var(--surface);
   color: var(--text);
-  color-scheme: light dark;
+  color-scheme: dark;
   flex: 1;
   min-width: 0;
   cursor: pointer;

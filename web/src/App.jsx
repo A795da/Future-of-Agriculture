@@ -128,6 +128,16 @@ export default function App() {
   }, [provinces, point]);
   const onField = field?.valid === true;
 
+  // A drawn field picks its province: its climate zone, yields, water and forecast
+  // data come from the province, so it must be the one the field is in (nearest centre).
+  const fieldLat = onField ? field.centroid[1] : null;
+  const fieldLon = onField ? field.centroid[0] : null;
+  useEffect(() => {
+    if (fieldLat == null || !provinces.length) return;
+    const near = nearestProvince(fieldLat, fieldLon, provinces);
+    if (near) setPointId(near.id);
+  }, [fieldLat, fieldLon, provinces]);
+
   // Province: cached features; a region default rotation until the farmer edits it.
   useEffect(() => {
     if (!point || !tables) return;

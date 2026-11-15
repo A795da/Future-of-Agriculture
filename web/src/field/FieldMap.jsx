@@ -87,6 +87,17 @@ export default function FieldMap({ center, provinces, onChange, visible = true }
     lastCenter.current = key;
     const m = map.current;
     if (!m) return;
+    // The province changed because the farmer drew a field there: show the field,
+    // not the province centre (and don't move if the field is already in view).
+    if (field?.valid && field.centroid && nearestProvince(field.centroid[1], field.centroid[0], provinces)?.id === center.id) {
+      const at = [field.centroid[1], field.centroid[0]];
+      const s = m.getSize();
+      if (!(s.x > 0 && s.y > 0 && m.getBounds().contains(at))) {
+        if (verts.length >= 3 && s.x > 0 && s.y > 0) m.fitBounds(verts, { padding: [30, 30], maxZoom: 16, animate: false });
+        else m.setView(at, 14, { animate: false });
+      }
+      return;
+    }
     // flyTo needs a real size: on a hidden tab the box is 0×0 and Leaflet throws
     // "Invalid LatLng (NaN, NaN)", which blanks the whole app. Jump instead.
     const size = m.getSize();

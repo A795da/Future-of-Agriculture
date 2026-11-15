@@ -1,0 +1,26 @@
+product_code,crop_id,note
+01.11.12.00.00,wheat,bread wheat (Buğday, Durum Buğdayı Hariç); durum wheat is a separate TÜİK product and is not mixed in
+01.11.31.00.02,barley,feed barley (Arpa Diğer); malting barley is a separate product
+01.11.33.00.00,oats,
+01.11.49.00.04,triticale,
+01.11.71.00,dry_bean,
+01.11.73.00.00,chickpea,
+01.11.74.00.01,lentil,red lentil (the crop table's winter red lentil)
+01.11.93.00.00,canola,
+01.11.99.00.03,safflower,
+01.11.81.00.00,soybean,
+01.11.95.00.01,sunflower,oilseed sunflower (Yağlık); confectionery sunflower is a separate product
+01.11.20.00.00,maize,grain maize (Tahıllar table: rain-fed and irrigated together; includes second-crop maize)
+01.19.10.20.00,silage_maize,silage maize (Tahıllar table; no nutrient row)
+01.11.82.00.00,groundnut,in-shell groundnut (Tahıllar table), matching FAOSTAT groundnuts excluding shelled
+01.11.94.00.00,sesame,(Tahıllar table)
+01.16.11.00.01,cotton,"seed cotton (kütlü), matching FAOSTAT seed cotton (Tahıllar table)"
+01.13.51.00.00,potato,potato excluding sweet potato (Tahıllar table)
+01.12.10.00.00,rice,paddy rice (Çeltik; Tahıllar table); all Turkish rice is flooded, so the unsplit figures count as irrigated
+01.13.71.00.00,sugar_beet,sugar beet roots (Tahıllar table)
+01.15.10.00.00,tobacco,unmanufactured tobacco (Tahıllar table)
+01.11.41.00.00,sorghum,grain sorghum (green-fodder sorghum is a separate product)
+01.11.32.00.00,rye,grain rye (green-fodder rye is a separate product)
+01.11.75.00.00,pea,dry pea (fodder pea is a separate product)
+01.11.72.00.00,faba_bean,dry faba bean for human consumption (feed faba bean is a separate product)
+01.19.31.06.01,vetch,"common vetch seed, matching the nutrient table's grain basis (green-fodder vetch is a separate product)"

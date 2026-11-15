@@ -1,8 +1,9 @@
 import RotationCard from "./RotationCard.jsx";
+import ClimateShift from "./ClimateShift.jsx";
 import { useLang } from "../../i18n/LangContext.jsx";
 import { cropLabel } from "../../i18n/strings.js";
 
-export default function PlanTab({ outcome, scenario, onScenario, status, cropsById }) {
+export default function PlanTab({ outcome, scenario, onScenario, status, cropsById, shift = null }) {
   const { lang, t } = useLang();
   if (status === "loading") return <p className="muted">{t("loading_climate")}</p>;
   if (status === "error") return <p className="warn">{t("climate_error")}</p>;
@@ -15,17 +16,18 @@ export default function PlanTab({ outcome, scenario, onScenario, status, cropsBy
 
   return (
     <div className="plan">
+      <ClimateShift shift={shift} onScenario={onScenario} />
       <div className="what-if">
         <h3>{t("what_if")}</h3>
         <label className="slider">
           <span>{t("rainfall")}</span>
-          <input type="range" min="-30" max="20" step="10" value={scenario.rainPct}
+          <input type="range" min="-30" max="20" step="1" value={scenario.rainPct}
             onChange={(e) => onScenario({ ...scenario, rainPct: +e.target.value })} />
           <output>{scenario.rainPct > 0 ? "+" : ""}{scenario.rainPct}%</output>
         </label>
         <label className="slider">
           <span>{t("temperature")}</span>
-          <input type="range" min="0" max="3" step="0.5" value={scenario.tempC}
+          <input type="range" min="0" max="3" step="0.1" value={scenario.tempC}
             onChange={(e) => onScenario({ ...scenario, tempC: +e.target.value })} />
           <output>+{scenario.tempC} °C</output>
         </label>

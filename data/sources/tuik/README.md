@@ -1,5 +1,10 @@
 # TÜİK province crop statistics: how to export
 
+**Done (2026-11-15):** four exports are in this folder (the fourth, `medas_kurusulu_sunflower_alan_verim_uretim_2020_2025.xls`, adds sunflower planted area by water regime for the "grown here" area rule) (`medas_*.xls`). Convert and build with
+`pip install xlrd`, `python -I scripts/tuik_medas_to_csv.py`, then `node scripts/build_tuik_yields.mjs`.
+New exports (for example maize, groundnut, sesame, cotton, potato with the first/second-crop breakdown) only need
+to be saved here as `medas_<anything>.xls`; the codes are already in `tuik_crop_map.csv`.
+
 Source: TÜİK Merkezi Dağıtım Sistemi (MEDAS), https://biruni.tuik.gov.tr/medas/?locale=tr
 Topic: **Bitkisel Üretim İstatistikleri**. There is no public API (the site is a session-based web app), and the
 data changes once a year, so we export once and keep the files here. Put every exported file in this folder.
@@ -9,6 +14,14 @@ second-crop data, and "this crop is grown in this province" evidence.
 
 Limit: one export may hold at most 50,000 cells (indicators × provinces × years). The counter at the bottom of the
 page ("Seçilen gösterge adedi × düzey adedi × zaman adedi") shows the product; if it is over 50,000, take fewer years.
+
+## Rice (Çeltik): where to find it (done 2026-11-15: found in Tahıllar, exported as `medas_tahillar_diger_2020.xls` … `_2025.xls` with every field crop)
+
+The team could not find Çeltik in the `(Kuru / Sulu) - (1. Ekiliş / 2. Ekiliş) ürünleri` table (the crop list in
+Export A below was written from the MEDAS layout, not checked). Rice is grown only on irrigated land, so it is
+expected in **`Tahıllar ve diğer bitkisel ürünler`** (no rain-fed / irrigated split needed): product `Çeltik`,
+measures `Ekilen Alan`, `Üretim Miktarı` (and `Verim` if listed), level `İl`, years 2020-2025. The converter treats
+rice from that table as irrigated; its label format may need a small converter change when the file arrives.
 
 ## Export A: rain-fed / irrigated, first / second crop (27 crops), 3 files
 

@@ -8,17 +8,21 @@
 // otherwise reasonable.
 
 import { round } from "../features/stats.js";
-import { climateHistory, dryYearCoverage, irrigationNeed } from "./agronomy.js";
+import { climateHistory, describePaddySoil, dryYearCoverage, irrigationNeed } from "./agronomy.js";
 import { phenology, sowingDoy, zoneCalendar } from "./calendar.js";
 import { checkCrop } from "./filter.js";
 import { heatUnits } from "./heat.js";
 import { shortName } from "./names.js";
 import { shortSource } from "./rules.js";
 import { CONFIDENCE, EFFECTS, KINDS, REASON_TYPES } from "./contract.js";
+import { yieldFor } from "./nutrients.js";
+import { localYield } from "./yields.js";
+import { climateOutlook, describeOutlook } from "./outlook.js";
+import { waterSupply } from "./waterSupply.js";
 
 // ---- FROZEN OUTPUT (like the rotation contract; change only by agreement)
 export const VERDICTS = ["reasonable", "possible_with_care", "not_reasonable"];
-export const CHECK_REASON_TYPES = [...REASON_TYPES, "timing", "farmer"];
+export const CHECK_REASON_TYPES = [...REASON_TYPES, "timing", "farmer", "local"];
 export const LEVELS = ["blocker", "caution", "info"];
 
 /**
@@ -65,7 +69,14 @@ function cropWindow(crop, f) {
 }
 
 function evaluate(crop, previous, ctx) {
-  const { f, cropsById, farmer, ruleTable, nutrientTable } = ctx;
+  const { f, cropsById, farmer, ruleTable, nutrientTable, localYields } = ctx;
+  // Legume N fixation (Herridge method) scales with yield: use the local yield when TÜİK has one.
+  const fixedN = (id) => {
+    const c = nutrientTable?.crops?.[id];
+    if (!c?.fixed_kg_n_ha) return null;
+    const y = yieldFor(id, nutrientTable, localYields);
+    return c.fixation_method === "grain_legume" && y && c.yield_t_ha ? round((c.fixed_kg_n_ha * y.t_ha) / c.yield_t_ha) : c.fixed_kg_n_ha;
+  };
   const reasons = [];
   const risks = [];
   const gaps = [];
@@ -75,8 +86,14 @@ function evaluate(crop, previous, ctx) {
   const lastCrop = last && last !== "fallow" ? cropsById[last] : null;
 
   // 1. Site suitability: the Plan tab's hard filters for this field.
-  const site = checkCrop(crop, f, farmer);
+  const site = checkCrop(crop, f, farmer, localYields);
   for (const d of site.details) add({ ...d, effect: "negative", level: "blocker" });
+  // Failed water/warmth checks where TÜİK shows the crop grown here: a caution, not a blocker.
+  for (const c of site.cautions) {
+    add({ ...c, effect: "negative", level: "caution" });
+    risks.push(c.evidence);
+  }
+  const softFailed = (check) => site.cautions.some((c) => c.check === check);
 
   // 2. Climate history at the sensitive stage, plus heat units for warm-season crops.
   const hist = climateHistory(crop, f);
@@ -99,7 +116,7 @@ function evaluate(crop, previous, ctx) {
     if (hist.badYears >= 3) risks.push(`${name}: ${parts.join(", ")} of the last ${hist.n} years`);
   }
   const heat = heatUnits(crop, f, sowingDoy(crop, f));
-  if (heat && heat.ratio < 1 && site.ok) {
+  if (heat && heat.ratio < 1 && site.ok && !softFailed("heat_units")) {
     const pct = round(heat.ratio * 100);
     add({
       type: "climate",
@@ -112,24 +129,73 @@ function evaluate(crop, previous, ctx) {
     risks.push(`${name} may only mature in warm years or with a short-season variety`);
   }
 
+  // 2b. Climate outlook (rice): climate fit today and with +2/+3 °C warming, kept
+  // apart from water supply (the paddy-area rule above). Information only.
+  if (crop.paddy) {
+    const o = climateOutlook(crop, f);
+    const paddyOnly = site.details.length > 0 && site.details.every((d) => d.check === "paddy_area");
+    const later = o.warmer.find((w) => w.fit);
+    let extra = "";
+    if (paddyOnly && o.today.fit) extra = `; the climate alone would allow ${name} here, the missing piece is a paddy area with river or canal water`;
+    else if (!o.today.fit && later) extra = `; the climate would allow ${name} from +${later.tempC} °C, but it would also need paddy basins and a river or canal supply`;
+    add({
+      type: "climate",
+      evidence: describeOutlook(name, o) + extra,
+      source: "NASA POWER + FieldShift what-if",
+      kind: "NASA reanalysis",
+      effect: o.today.fit && !o.changes ? "positive" : "neutral",
+      level: "info",
+    });
+    const lost = o.today.fit && o.warmer.find((w) => !w.fit);
+    if (lost) risks.push(`with +${lost.tempC} °C warming ${name} may stop fitting here (${lost.why === "hot_flowering" ? `heat at flowering in ${lost.heatYears} of ${lost.n} years` : "too hot"}); watch for heat-tolerant varieties`);
+  }
+
   // 3. Water.
   const afterFallow = last === "fallow";
   if (farmer.irrigation === "irrigated") {
     const w = irrigationNeed(crop, f, afterFallow);
     const care = w.deficit > IRRIGATION_CAUTION_MM;
-    add({
-      type: "water",
-      evidence:
-        w.deficit < 20
-          ? `in a normal year rain and stored soil water cover ${name}'s water need (~${round(w.need)} mm); little or no irrigation`
-          : `${name} needs about ${round(w.deficit)} mm of irrigation in a normal year (crop uses ~${round(w.need)} mm)`,
-      ...POWER,
-      effect: w.deficit < 150 ? "positive" : care ? "negative" : "neutral",
-      level: care ? "caution" : "info",
-    });
-    if (care) risks.push(`high irrigation need (~${round(w.deficit)} mm); check that your water source can supply it`);
-  } else if (crop.rainfed_ok && !site.details.some((d) => d.type === "water")) {
-    // (a dry-year failure is already a blocker from the site check above)
+    if (w.paddy) {
+      // Flooded rice: crop use plus soaking, water layer and seepage (FAO Training Manual 3).
+      const soil = describePaddySoil(w);
+      add({
+        type: "water",
+        evidence: `flooded ${name} needs about ${round(w.deficit)} mm of irrigation in a normal year (about ${round(w.deficit * 10)} m³ per hectare): the crop uses ~${round(w.need)} mm and the basin loses ~${round(w.paddy.total)} mm to soaking the soil, the standing water layer and seepage over ${w.paddy.days} days; ${soil.text}`,
+        source: soil.source,
+        kind: "NASA reanalysis",
+        effect: "negative",
+        level: "caution",
+      });
+      risks.push(`flooded ${name} needs about ${round(w.deficit * 10)} m³ of water per hectare over the season; check that your water allocation (DSİ or irrigation cooperative) covers it`);
+    } else {
+      add({
+        type: "water",
+        evidence:
+          w.deficit < 20
+            ? `in a normal year rain and stored soil water cover ${name}'s water need (~${round(w.need)} mm); little or no irrigation`
+            : `${name} needs about ${round(w.deficit)} mm of irrigation in a normal year (crop uses ~${round(w.need)} mm)`,
+        ...POWER,
+        effect: w.deficit < 150 ? "positive" : care ? "negative" : "neutral",
+        level: care ? "caution" : "info",
+      });
+      if (care) risks.push(`high irrigation need (~${round(w.deficit)} mm); check that your water source can supply it`);
+    }
+    // Is the water source shrinking? NASA GRACE/GRACE-FO; a caution for water-hungry crops.
+    const ws = waterSupply(f);
+    if (ws) {
+      const thirsty = care || Boolean(w.paddy);
+      add({
+        type: "water",
+        evidence: ws.falling && thirsty ? `${ws.text}; ${name} needs a lot of irrigation, so a shrinking water source matters more` : ws.text,
+        source: ws.source,
+        kind: ws.kind,
+        effect: ws.falling ? "negative" : ws.trend < -0.2 ? "neutral" : "positive",
+        level: ws.falling && thirsty ? "caution" : "info",
+      });
+      if (ws.falling && thirsty) risks.push(`water stored underground and on land here has fallen about ${Math.abs(ws.trend)} cm a year (NASA GRACE): check that your well or water allocation will keep up`);
+    }
+  } else if (crop.rainfed_ok && !site.details.some((d) => d.type === "water") && !softFailed("dry_year")) {
+    // (a dry-year failure is already a blocker or caution from the site check above)
     const w = dryYearCoverage(crop, f, afterFallow);
     const pct = round(w.coverage * 100);
     const care = w.coverage < WATER_CAUTION_COVERAGE;
@@ -216,7 +282,7 @@ function evaluate(crop, previous, ctx) {
         });
       }
     }
-    const fixedBefore = nutrientTable?.crops?.[last]?.fixed_kg_n_ha;
+    const fixedBefore = fixedN(last);
     if (lastCrop.is_legume && fixedBefore && !crop.is_legume) {
       add({
         type: "soil",
@@ -229,7 +295,7 @@ function evaluate(crop, previous, ctx) {
     }
   }
   if (crop.is_legume) {
-    const fixed = nutrientTable?.crops?.[crop.id]?.fixed_kg_n_ha;
+    const fixed = fixedN(crop.id);
     add({
       type: "soil",
       evidence: `${name} is a legume and adds nitrogen to the soil${fixed ? ` (about ${fixed} kg N per hectare)` : ""} for the crop after it`,
@@ -243,7 +309,8 @@ function evaluate(crop, previous, ctx) {
   // 8. Nutrient note: what last season's and this harvest remove (information only).
   const nut = (id) => {
     const c = nutrientTable?.crops?.[id];
-    return c?.product && c.yield_t_ha ? { n: c.yield_t_ha * c.product.N, p: c.yield_t_ha * c.product.P * 2.291, k: c.yield_t_ha * c.product.K * 1.205 } : null;
+    const y = yieldFor(id, nutrientTable, localYields);
+    return c?.product && y ? { n: y.t_ha * c.product.N, p: y.t_ha * c.product.P * 2.291, k: y.t_ha * c.product.K * 1.205, local: y.source === "local" } : null;
   };
   const now = nut(crop.id);
   const before = lastCrop ? nut(last) : null;
@@ -253,13 +320,36 @@ function evaluate(crop, previous, ctx) {
     add({
       type: "soil",
       evidence: before
-        ? `${shortName(lastCrop)} and ${name} together remove about ${sum("n")} kg N, ${sum("p")} kg P2O5 and ${sum("k")} kg K2O per hectare at average yields${heavyPair ? "; both are heavy feeders" : ""}`
-        : `a ${name} harvest removes about ${round(now.n)} kg N, ${round(now.p)} kg P2O5 and ${round(now.k)} kg K2O per hectare at average yields`,
-      source: "FAOSTAT yields + Ludemann 2023",
+        ? `${shortName(lastCrop)} and ${name} together remove about ${sum("n")} kg N, ${sum("p")} kg P2O5 and ${sum("k")} kg K2O per hectare at ${now.local && before.local ? "local" : "average"} yields${heavyPair ? "; both are heavy feeders" : ""}`
+        : `a ${name} harvest removes about ${round(now.n)} kg N, ${round(now.p)} kg P2O5 and ${round(now.k)} kg K2O per hectare at ${now.local ? "local" : "average"} yields`,
+      source: `${now.local ? "TÜİK province yields" : "FAOSTAT yields"} + Ludemann 2023`,
       kind: "compiled rule",
       effect: heavyPair ? "negative" : "neutral",
       level: "info",
     });
+  }
+
+  // 10. Grown here? TÜİK province statistics for this crop and water regime (information only).
+  if ((localYields?.coveredAll ?? localYields?.covered)?.has(crop.id)) {
+    const w = localYields.irrigation === "irrigated" ? "irrigated" : "rain-fed";
+    const y = localYield(localYields, crop.id);
+    const split = localYields.covered.has(crop.id);
+    if (y) {
+      add({
+        type: "local",
+        evidence: y.mixed
+          ? `TÜİK reports ${name} in this province (rain-fed and irrigated together) in ${y.years} of the last 5 years${y.planted_ha ? `, about ${y.planted_ha} ha a year` : ""}, with an average yield of ${y.t_ha} t/ha`
+          : `TÜİK reports ${w} ${name} in this province in ${y.years} of the last 5 years${y.planted_ha ? `, about ${y.planted_ha} ha a year` : ""}, with an average yield of ${y.t_ha} t/ha`,
+        source: "TÜİK MEDAS 2020-2024",
+        kind: "official statistics",
+        effect: "positive",
+        level: "info",
+      });
+    } else {
+      const text = `TÜİK reports no ${split ? `${w} ` : ""}${name} harvest in this province in 2020-2024 (or in fewer than 3 years)`;
+      add({ type: "local", evidence: text, source: "TÜİK MEDAS 2020-2024", kind: "official statistics", effect: "negative", level: "info" });
+      risks.push(`${text}; check with farmers or the district agriculture office that it grows here`);
+    }
   }
 
   // 9. Timing: last season's harvest against this crop's sowing.
@@ -331,13 +421,13 @@ function rankKey(e) {
  * @param {string[]} p.previous  last season first; "fallow" allowed; blanks removed
  * @returns {CropCheckResult}
  */
-export function runCropCheck({ cropId, previous = [], features, cropTable, ruleTable = null, nutrientTable = null, farmer, dataStatus = {} }) {
+export function runCropCheck({ cropId, previous = [], features, cropTable, ruleTable = null, nutrientTable = null, localYields = null, farmer, dataStatus = {} }) {
   const crops = cropTable.crops;
   const cropsById = Object.fromEntries(crops.map((c) => [c.id, c]));
   const crop = cropsById[cropId];
   if (!crop) throw new Error(`unknown crop ${cropId}`);
   const prev = previous.filter((id) => id === "fallow" || cropsById[id]);
-  const ctx = { f: features, cropsById, farmer, ruleTable, nutrientTable };
+  const ctx = { f: features, cropsById, farmer, ruleTable, nutrientTable, localYields };
 
   const main = evaluate(crop, prev, ctx);
 

@@ -13,3 +13,4 @@ spring_barley,BarleyGDD,none,TAGEM calendar used instead
 alfalfa,AlfalfaGDD,none,perennial; cutting cycles not modelled
 sorghum,SorghumGDD,heat_check,warm-season cereal
 soybean,SoybeanGDD,heat_check,warm-season legume
+rice,PaddyRiceGDD,heat_check,flooded paddy rice; warm-season cereal

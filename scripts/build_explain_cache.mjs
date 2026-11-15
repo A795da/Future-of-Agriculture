@@ -13,13 +13,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import { explainWith, makeProvider } from "../web/api/explain.js";
-import { withSowingCalendar } from "../web/src/data/loader.js";
+import { withSoilTexture, withSowingCalendar, withWaterStorage } from "../web/src/data/loader.js";
 import { cardSummary, checkSummary } from "../web/src/explain/templates.js";
 import { cacheKey, checkFacts, rotationFacts } from "../web/src/explain/payload.js";
 import { runCropCheck } from "../web/src/scoring/cropCheck.js";
 import { DEFAULT_INPUTS, defaultRotation, previousFromRotation } from "../web/src/scoring/defaults.js";
 import { runScoring } from "../web/src/scoring/index.js";
 import { shortName } from "../web/src/scoring/names.js";
+import { localYields as buildLocalYields } from "../web/src/scoring/yields.js";
 
 const DEMO = ["konya", "edirne", "adana", "sanliurfa", "erzurum"];
 const CHECKS = ["sunflower", "chickpea", "wheat", "maize"];
@@ -54,6 +55,7 @@ const tables = {
   ruleTable: J("rotation_rules.json"),
   tagem: J("tagem_calendar.json"),
 };
+const tuikYields = fs.existsSync(path.join(ROOT, "web/public/data/tuik_yields.json")) ? J("tuik_yields.json") : null;
 const provinces = J("provinces.json");
 const plist = provinces.provinces ?? provinces;
 const cropsById = Object.fromEntries(tables.cropTable.crops.map((c) => [c.id, c]));
@@ -99,14 +101,18 @@ for (const id of ids) {
   const base = raw.features ?? raw;
   const current = defaultRotation(tables, point.region, withSowingCalendar(base, point, tables.tagem, "rainfed"));
   const inputs = { ...DEFAULT_INPUTS, current };
-  const features = withSowingCalendar(base, point, tables.tagem, inputs.irrigation);
+  const soilTexture = fs.existsSync(path.join(ROOT, "web/public/data/soil_texture.json")) ? J("soil_texture.json") : null;
+  const waterStorage = fs.existsSync(path.join(ROOT, "web/public/data/water_storage.json")) ? J("water_storage.json") : null;
+  const features = withWaterStorage(withSoilTexture(withSowingCalendar(base, point, tables.tagem, inputs.irrigation), point, soilTexture, inputs.soil), point, waterStorage); // same as the app
   console.log(`${point.name}: ${current.join(" > ")}`);
+  const localYields = buildLocalYields(tuikYields, point.id, inputs.irrigation); // same as the app
 
   const { results } = runScoring({
     features,
     terrain: null,
     vegetation: null,
     ...tables,
+    localYields,
     farmer: {
       region: point.region,
       irrigation: inputs.irrigation,
@@ -131,6 +137,7 @@ for (const id of ids) {
       previous,
       features,
       ...tables,
+      localYields,
       farmer: { irrigation: inputs.irrigation, never_grow: inputs.never },
       dataStatus: { power: true, soil: false },
     });

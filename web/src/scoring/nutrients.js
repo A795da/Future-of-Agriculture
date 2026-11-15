@@ -2,30 +2,52 @@
 // what the harvests remove (yield × nutrient per tonne) and the nitrogen legumes fix.
 // Only legumes add nitrogen; phosphorus and potassium can only come back through
 // fertilizer or manure. Crop residues are assumed to stay in the field.
+//
+// Yield: the province's own TÜİK average for the farmer's water regime when known
+// (scoring/yields.js), otherwise the national FAOSTAT average.
 
 import { round } from "../features/stats.js";
+import { localYield } from "./yields.js";
 
 const P_TO_P2O5 = 2.291;
 const K_TO_K2O = 1.205;
 
-export function nutrientBalance(sequence, secondCrops, nutrientTable) {
+/** Yield used for one crop: { t_ha, source: "local" | "national" } or null. */
+export function yieldFor(id, nutrientTable, local, asSecond = false) {
+  const l = localYield(local, id, asSecond);
+  if (l) return { t_ha: l.t_ha, source: "local", mixed: l.mixed };
+  const c = nutrientTable?.crops?.[id];
+  return c?.yield_t_ha ? { t_ha: c.yield_t_ha, source: "national" } : null;
+}
+
+export function nutrientBalance(sequence, secondCrops, nutrientTable, local = null) {
   if (!nutrientTable) return null;
   let n = 0, p = 0, k = 0, fixed = 0;
   const missing = [];
-  const add = (id) => {
+  const localIds = new Set();
+  const mixedIds = new Set();
+  const nationalIds = new Set();
+  const add = (id, asSecond) => {
     if (id === "fallow") return;
     const c = nutrientTable.crops[id];
-    if (c?.product && c.yield_t_ha) {
-      n += c.yield_t_ha * c.product.N;
-      p += c.yield_t_ha * c.product.P;
-      k += c.yield_t_ha * c.product.K;
+    const y = yieldFor(id, nutrientTable, local, asSecond);
+    if (c?.product && y) {
+      n += y.t_ha * c.product.N;
+      p += y.t_ha * c.product.P;
+      k += y.t_ha * c.product.K;
+      (y.source === "local" ? localIds : nationalIds).add(id);
+      if (y.mixed) mixedIds.add(id);
     } else missing.push(id);
-    if (c?.fixed_kg_n_ha) fixed += c.fixed_kg_n_ha;
+    if (c?.fixed_kg_n_ha) {
+      // Herridge method is proportional to yield: scale the national figure to the local yield.
+      const scale = y && c.yield_t_ha ? y.t_ha / c.yield_t_ha : 1;
+      fixed += c.fixation_method === "grain_legume" ? c.fixed_kg_n_ha * scale : c.fixed_kg_n_ha;
+    }
   };
   sequence.forEach((id, i) => {
-    add(id);
+    add(id, false);
     const second = secondCrops?.[i] ?? secondCrops?.[String(i)];
-    if (second) add(second);
+    if (second) add(second, true);
   });
   const years = sequence.length;
   return {
@@ -35,6 +57,9 @@ export function nutrientBalance(sequence, secondCrops, nutrientTable) {
     p2o5_removed: round((p * P_TO_P2O5) / years),
     k2o_removed: round((k * K_TO_K2O) / years),
     missing: [...new Set(missing)],
+    yields_local: [...localIds],
+    yields_national: [...nationalIds],
+    yields_mixed: [...mixedIds], // subset of yields_local: TÜİK rain-fed and irrigated together
     per: "kg/ha per year",
   };
 }

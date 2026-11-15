@@ -17,7 +17,7 @@ import { checkSummaryTr } from "../../i18n/summaries.js";
 const SEASONS = 3;
 const EXAMPLES = { en: ["nohut", "ayçiçek", "mısır", "sugar beet"], tr: ["nohut", "ayçiçeği", "mısır", "şeker pancarı"] };
 
-export default function CropCheck({ tables, features, inputs, status, place }) {
+export default function CropCheck({ tables, features, inputs, status, place, localYields = null }) {
   const { lang, t } = useLang();
   const crops = tables.cropTable.crops;
   const cropsById = useMemo(() => Object.fromEntries(crops.map((c) => [c.id, c])), [crops]);
@@ -48,6 +48,7 @@ export default function CropCheck({ tables, features, inputs, status, place }) {
         features,
         cropTable: tables.cropTable,
         ruleTable: tables.ruleTable,
+        localYields,
         nutrientTable: tables.nutrientTable,
         farmer: { irrigation: inputs.irrigation, never_grow: inputs.never },
         dataStatus: { power: true, soil: false },
@@ -55,7 +56,7 @@ export default function CropCheck({ tables, features, inputs, status, place }) {
     } catch (e) {
       return { error: e.message };
     }
-  }, [crop, features, previous, tables, inputs.irrigation, inputs.never]);
+  }, [crop, features, previous, tables, inputs.irrigation, inputs.never, localYields]);
 
   const summary = result && !result.error ? checkSummary(result, nameOf) : null;
   // eslint-disable-next-line react-hooks/exhaustive-deps

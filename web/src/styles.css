@@ -145,6 +145,16 @@ legend { font-weight: 600; margin-bottom: 8px; padding: 0; }
 /* Plan */
 .plan { display: flex; flex-direction: column; gap: 14px; }
 .what-if { border: 1px dashed var(--border); border-radius: 10px; padding: 10px 12px; }
+.shift { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+.shift summary { cursor: pointer; font-size: 0.95rem; }
+.shift table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 0.82rem; }
+.shift td { padding: 3px 4px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.shift td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.shift tr.lvl-none td { color: var(--muted); }
+.badge { display: inline-block; font-size: 0.72rem; padding: 1px 6px; border-radius: 999px; border: 1px solid var(--border); white-space: nowrap; }
+.badge-clear { border-color: var(--warn); color: var(--warn); font-weight: 700; }
+.badge-possible { border-style: dashed; }
+.shift-btn { margin-top: 2px; }
 .what-if h3 { margin: 0 0 4px; font-size: 0.95rem; }
 button.link { border: none; background: none; color: var(--brand); padding: 4px 0; min-height: 0; text-decoration: underline; }
 .cards { display: flex; flex-direction: column; gap: 14px; }
@@ -167,6 +177,8 @@ button.link { border: none; background: none; color: var(--brand); padding: 4px 
 .score em.down { color: var(--warn); }
 .summary { margin: 8px 0 10px; }
 .what-if-tag { margin: 6px 0 0; font-size: 0.8rem; font-weight: 700; color: #b45309; }
+.resil { margin: 6px 0 0; font-size: 0.8rem; color: var(--muted); }
+.resil-sensitive strong, .resil-sensitive { color: var(--warn); }
 
 .bars { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; }
 .bar { display: grid; grid-template-columns: 9.5rem 1fr 2rem; align-items: center; gap: 8px; font-size: 0.82rem; }

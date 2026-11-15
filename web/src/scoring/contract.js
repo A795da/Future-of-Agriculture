@@ -17,6 +17,7 @@ export const KINDS = [
   "model estimate",
   "farmer input",
   "compiled rule",
+  "official statistics", // TÜİK province statistics (crop check "grown here" evidence)
 ];
 
 export const CONFIDENCE = ["high", "medium", "low"];
@@ -106,5 +107,10 @@ export function validateResult(r) {
   need(Array.isArray(r?.gaps), "gaps must be an array");
   need(CONFIDENCE.includes(r?.confidence), "confidence invalid");
   need(typeof r?.what_if === "boolean", "what_if must be boolean");
+  if (r?.resilience != null) {
+    // optional: score under what-if warming (scoring/index.js)
+    for (const k of ["today", "warm", "warm_dry", "drop"]) need(Number.isFinite(r.resilience[k]), `resilience.${k} must be a number`);
+    need(["holds_up", "some_loss", "sensitive"].includes(r.resilience.label), "resilience.label invalid");
+  }
   return errs;
 }

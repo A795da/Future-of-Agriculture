@@ -373,14 +373,14 @@
       "notes": "Drought-tolerant summer cereal for grain or feed. kc FAO-56 Table 12 (sorghum, grain); stages Table 11 (May/June, Mediterranean).",
       "sources": ["FAO-56", "FAO EcoCrop", "TAGEM-DSİ 2017", "FAO AquaCrop"],
       "verified": false,
-      "heat_units": { "base_c": 8, "upper_c": 30, "flowering_gdd": 1041, "maturity_gdd": 1760, "source": "FAO AquaCrop default crop file (SorghumGDD, AquaCrop-OSPy 256cac4c2c)" },
       "field_sources": {
         "temp_opt_c": "FAO EcoCrop (Sorghum bicolor): TOPMN-TOPMX, mean temperature",
         "temp_abs_c": "FAO EcoCrop (Sorghum bicolor): TMIN-TMAX, mean temperature",
         "soil_ph": "FAO EcoCrop (Sorghum bicolor): PHMIN-PHMAX (absolute range)",
         "rain_abs_mm": "FAO EcoCrop (Sorghum bicolor): RMIN-RMAX, annual rainfall"
       },
-      "rain_abs_mm": [300, 700]
+      "rain_abs_mm": [300, 700],
+      "heat_units": { "base_c": 8, "upper_c": 30, "flowering_gdd": 1041, "maturity_gdd": 1760, "source": "FAO AquaCrop default crop file (SorghumGDD, AquaCrop-OSPy 256cac4c2c)" }
     },
     {
       "id": "chickpea",
@@ -541,14 +541,14 @@
       "notes": "Irrigated main or second crop (after wheat) in Cukurova and on the Black Sea coast. kc FAO-56 Table 12; stages Table 11 (May, central USA).",
       "sources": ["FAO-56", "FAO EcoCrop", "TAGEM-DSİ 2017", "FAO AquaCrop"],
       "verified": false,
-      "heat_units": { "base_c": 5, "upper_c": 30, "flowering_gdd": 1500, "maturity_gdd": 2700, "source": "FAO AquaCrop default crop file (SoybeanGDD, AquaCrop-OSPy 256cac4c2c)" },
       "field_sources": {
         "temp_opt_c": "FAO EcoCrop (Glycine max): TOPMN-TOPMX, mean temperature",
         "temp_abs_c": "FAO EcoCrop (Glycine max): TMIN-TMAX, mean temperature",
         "soil_ph": "FAO EcoCrop (Glycine max): PHMIN-PHMAX (absolute range)",
         "rain_abs_mm": "FAO EcoCrop (Glycine max): RMIN-RMAX, annual rainfall"
       },
-      "rain_abs_mm": [450, 1800]
+      "rain_abs_mm": [450, 1800],
+      "heat_units": { "base_c": 5, "upper_c": 30, "flowering_gdd": 1500, "maturity_gdd": 2700, "source": "FAO AquaCrop default crop file (SoybeanGDD, AquaCrop-OSPy 256cac4c2c)" }
     },
     {
       "id": "dry_bean",
@@ -569,17 +569,18 @@
       "heat_stress_c": 32,
       "frost_tolerance": "low",
       "drought_tolerance": "low",
-      "rainfed_ok": false,
+      "rainfed_ok": true,
       "root_depth_m": [0.6, 0.9],
       "soil_ph": [4, 9],
-      "notes": "Frost-sensitive and shallow-rooted; usually irrigated. Weaker nitrogen fixer than chickpea or lentil.",
-      "sources": ["FAO-56", "FAO EcoCrop", "FAO AquaCrop"],
+      "notes": "Frost-sensitive and shallow-rooted; mostly irrigated, but TÜİK reports rain-fed dry bean in about 50 provinces (2020-2024), so rain-fed is allowed and the dry-year water check decides. Weaker nitrogen fixer than chickpea or lentil.",
+      "sources": ["FAO-56", "FAO EcoCrop", "FAO AquaCrop", "TÜİK MEDAS 2020-2024"],
       "verified": false,
       "field_sources": {
         "temp_opt_c": "FAO EcoCrop (Phaseolus vulgaris): TOPMN-TOPMX, mean temperature",
         "temp_abs_c": "FAO EcoCrop (Phaseolus vulgaris): TMIN-TMAX, mean temperature",
         "soil_ph": "FAO EcoCrop (Phaseolus vulgaris): PHMIN-PHMAX (absolute range)",
-        "rain_abs_mm": "FAO EcoCrop (Phaseolus vulgaris): RMIN-RMAX, annual rainfall"
+        "rain_abs_mm": "FAO EcoCrop (Phaseolus vulgaris): RMIN-RMAX, annual rainfall",
+        "rainfed_ok": "TÜİK MEDAS 2020-2024: rain-fed (kuru) dry bean harvested in about 50 provinces"
       },
       "rain_abs_mm": [300, 4300],
       "heat_units": { "base_c": 9, "upper_c": 30, "flowering_gdd": 556, "maturity_gdd": 1298, "source": "FAO AquaCrop default crop file (DryBeanGDD, AquaCrop-OSPy 256cac4c2c)" }
@@ -1172,6 +1173,57 @@
         "soil_ph": "FAO EcoCrop (Cucumis melo): PHMIN-PHMAX (absolute range)",
         "rain_abs_mm": "FAO EcoCrop (Cucumis melo): RMIN-RMAX, annual rainfall"
       }
+    },
+    {
+      "id": "rice",
+      "name_tr": "Çeltik",
+      "name_en": "Rice (paddy)",
+      "family": "poaceae",
+      "is_legume": false,
+      "season": "summer",
+      "sowing_months": [5],
+      "season_days": 160,
+      "stages_days": [30, 35, 65, 30],
+      "sensitive_das": 80,
+      "kc": { "ini": 1.05, "mid": 1.2, "end": 0.75 },
+      "frost_damage_c": 0,
+      "winter_hardiness_c": null,
+      "heat_stress_c": 40,
+      "frost_tolerance": "low",
+      "drought_tolerance": "low",
+      "rainfed_ok": false,
+      "root_depth_m": [0.5, 1],
+      "paddy": {
+        "saturation_mm": 200,
+        "water_layer_mm": 100,
+        "percolation_mm_day": 6,
+        "percolation_range_mm_day": [4, 8],
+        "source": "FAO Irrigation Water Management Training Manual 3 (Brouwer & Heibloem 1986), section 4.4: saturation 200 mm, water layer 100 mm, percolation and seepage 4 (heavy clay) to 8 (sandy) mm/day"
+      },
+      "notes": "Flooded (paddy) rice, irrigated only. About two thirds of Turkish rice is in Thrace-Marmara (Edirne, Balıkesir, Çanakkale) and a quarter on the Black Sea deltas (Samsun Bafra and Çarşamba, Sinop, Çorum along the Kızılırmak). Usually grown year after year; a winter vetch crop fits between rice harvests where the field drains in winter (Dok et al. 2016). Water need adds basin flooding and seepage to crop water use, because the TAGEM-DSİ guide's rice figures leave both out (its Note 2).",
+      "sources": ["FAO-56", "FAO EcoCrop", "FAO AquaCrop", "TAGEM-DSİ 2017", "FAO Training Manual 3", "Dok et al. 2016"],
+      "verified": false,
+      "field_sources": {
+        "stages_days": "TAGEM-DSİ 2017 zone calendars (çeltik, 145-170 days); crop-table fallback 30/35/65/30",
+        "kc": "FAO-56 Table 12 (rice: ini 1.05, mid 1.20, end 0.90-0.60, middle value used)",
+        "root_depth_m": "FAO-56 Table 22 (rice 0.5-1.0 m)",
+        "heat_stress_c": "FAO AquaCrop PaddyRiceGDD: Tmax_lo 40 °C (pollination fails); the stress onset Tmax_up 35 °C is not used because the data is the afternoon daily maximum while rice flowers in the cooler morning above a water layer (35 °C flagged Edirne, the main rice province, in 18 of 20 years)",
+        "sowing_months": "TAGEM-DSİ 2017 (çeltik sown late April to mid May in the rice zones); Dok et al. 2016 (first half of May best in Samsun)",
+        "sensitive_das": "team-compiled (booting to flowering, end of the development stage), needs expert check",
+        "frost_damage_c": "team-compiled; cold-induced sterility at booting (AquaCrop Tmin_up 8 °C) is not modelled",
+        "rainfed_ok": "flooded paddy: irrigated only",
+        "paddy": "FAO Training Manual 3 section 4.4; TAGEM-DSİ 2017 Note 2 says the guide's rice water use excludes open-water evaporation and deep percolation, which users must add",
+        "reason_added": "TÜİK 2025 crop production bulletin: rice in the husk about 1.0 Mt (team decision 15 Nov)",
+        "temp_opt_c": "FAO EcoCrop (Oryza sativa): TOPMN-TOPMX, mean temperature",
+        "temp_abs_c": "FAO EcoCrop (Oryza sativa): TMIN-TMAX, mean temperature",
+        "soil_ph": "FAO EcoCrop (Oryza sativa): PHMIN-PHMAX (absolute range)",
+        "rain_abs_mm": "FAO EcoCrop (Oryza sativa): RMIN-RMAX, annual rainfall"
+      },
+      "temp_opt_c": [20, 30],
+      "temp_abs_c": [10, 36],
+      "soil_ph": [4.5, 9],
+      "rain_abs_mm": [1000, 4000],
+      "heat_units": { "base_c": 8, "upper_c": 30, "flowering_gdd": 1150, "maturity_gdd": 1900, "source": "FAO AquaCrop default crop file (PaddyRiceGDD, AquaCrop-OSPy 256cac4c2c)" }
     }
   ]
 }

@@ -7,6 +7,7 @@ import { cropLabel } from "../../i18n/strings.js";
 const MAX_YEARS = 4;
 
 const PRIORITIES = ["water", "soil", "income", "simplicity"];
+const SOILS = ["unknown", "clay", "loam", "sandy"];
 
 export default function FarmerInputs({ crops, value, onChange, ratingCrops = [] }) {
   const { lang, t } = useLang();
@@ -42,6 +43,18 @@ export default function FarmerInputs({ crops, value, onChange, ratingCrops = [] 
             {t("irrigated")}
           </button>
         </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>{t("soil_legend")}</legend>
+        <div className="seg">
+          {SOILS.map((s) => (
+            <button key={s} className={(value.soil ?? "unknown") === s ? "on" : ""} onClick={() => set({ soil: s })}>
+              {t(`soil_${s}`)}
+            </button>
+          ))}
+        </div>
+        <p className="note">{t("soil_hint")}</p>
       </fieldset>
 
       <fieldset>

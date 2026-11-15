@@ -54,9 +54,64 @@ export function dryYearCoverage(crop, f, afterFallow = false) {
   return { ...w, stored, supply, coverage: w.need > 0 ? supply / w.need : 1 };
 }
 
+/**
+ * Extra water a flooded paddy loses beyond crop water use, mm (FAO Training Manual 3,
+ * section 4.4): soaking the root zone before planting, building the standing water
+ * layer, and seepage and percolation every day the basin is flooded. The TAGEM-DSİ
+ * guide's rice figures leave these out (its Note 2), so they are added here.
+ * `percolationMmDay` lets a soil test or a what-if pick 4 (heavy clay) to 8 (sandy).
+ */
+export function paddyLosses(crop, f, percolationMmDay = null) {
+  const p = crop.paddy;
+  if (!p) return null;
+  const days = phenology(crop, f).season;
+  // Seepage by topsoil texture: FAO gives 4 mm/day for heavy clay, 8 for sandy
+  // soil and 6 as the average; texture from the farmer or NASA HWSD (loader.js).
+  const [lo, hi] = p.percolation_range_mm_day ?? [p.percolation_mm_day, p.percolation_mm_day];
+  const tex = f.soil_texture;
+  const byClass = { clay: lo, loam: p.percolation_mm_day, sandy: hi };
+  const perc = percolationMmDay ?? byClass[tex?.value?.class] ?? p.percolation_mm_day;
+  const fixed = p.saturation_mm + p.water_layer_mm;
+  return {
+    days,
+    saturation: p.saturation_mm,
+    water_layer: p.water_layer_mm,
+    perc_mm_day: perc,
+    soil: tex ? { class: tex.value.class, clay: tex.value.clay ?? null, sand: tex.value.sand ?? null, source: tex.source } : null,
+    percolation: perc * days,
+    total: fixed + perc * days,
+    range: [fixed + lo * days, fixed + hi * days], // heavy clay .. sandy soil
+  };
+}
+
+/** Plain-language seepage basis for rice evidence, and the source label to cite. */
+export function describePaddySoil(w) {
+  const p = w.paddy;
+  const r = (x) => Math.round(x);
+  const range = `; ${r(w.deficitRange[0])} mm on heavy clay to ${r(w.deficitRange[1])} mm on sandy soil`;
+  if (!p.soil) return { text: `seepage at the average ${p.perc_mm_day} mm a day (soil type unknown)${range}`, source: "NASA POWER + FAO Training Manual 3" };
+  if (p.soil.source === "farmer") return { text: `seepage ${p.perc_mm_day} mm a day for your ${p.soil.class} soil`, source: "NASA POWER + FAO Training Manual 3 + farmer soil type" };
+  return {
+    text: `seepage ${p.perc_mm_day} mm a day for ${p.soil.class} topsoil (NASA HWSD: ${p.soil.clay}% clay, ${p.soil.sand}% sand on a ~5 km grid; set your soil type if your field differs)${range}`,
+    source: "NASA POWER + NASA HWSD + FAO Training Manual 3",
+  };
+}
+
 /** Irrigated: water the farmer must add in a normal year, mm. */
 export function irrigationNeed(crop, f, afterFallow = false) {
   const w = cropWater(crop, f);
+  const paddy = paddyLosses(crop, f);
+  if (paddy) {
+    // FAO paddy method: no stored-soil-water credit (soaking the soil is counted in
+    // the saturation term); rain falling on the flooded basin still counts.
+    const supply = EFFECTIVE_RAIN * w.rainMed;
+    const gross = w.need + paddy.total;
+    return {
+      ...w, stored: 0, supply, paddy,
+      deficit: Math.max(0, gross - supply),
+      deficitRange: paddy.range.map((x) => Math.max(0, w.need + x - supply)),
+    };
+  }
   const stored = storedWater(crop, f, w.start, { afterFallow });
   const supply = EFFECTIVE_RAIN * w.rainMed + stored;
   return { ...w, stored, supply, deficit: Math.max(0, w.need - supply) };

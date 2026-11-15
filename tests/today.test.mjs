@@ -132,3 +132,32 @@ test("demo snapshots parse", () => {
     assert.equal(parseForecast(s.response).days.length, 7, id);
   }
 });
+
+test("frost and heat alarms say how unusual the forecast is in 20 years of NASA POWER", async () => {
+  const { historyContext, dekadOf } = await import("../web/src/scoring/today.js");
+  const { alertEvidenceTr } = await import("../web/src/i18n/summaries.js");
+  const f = features("konya");
+  assert.equal(dekadOf("2027-05-01"), 12);
+  assert.equal(dekadOf("2027-05-31"), 14);
+  const hot = historyContext(f, "2027-07-15", 60, "heat");
+  assert.ok(hot.record && hot.beaten === hot.n && hot.n === 20);
+  assert.equal(historyContext(f, "2027-07-15", -10, "heat").beaten, 0);
+  // a 10-day period's coldest night: half the years milder than its median
+  const k = dekadOf("2027-01-10");
+  const lows = f.dekad_extremes_by_year.value.map((y) => y.tmin_abs[k]).sort((a, b) => a - b);
+  const mid = historyContext(f, "2027-01-10", lows[10] - 0.01, "frost");
+  assert.ok(mid.beaten >= 9 && mid.beaten <= 11, JSON.stringify(mid));
+
+  // In the alarm: English evidence, Turkish evidence, and the structured value.
+  let date;
+  for (let d = 0; d < 120 && !date; d++) {
+    const iso = new Date(Date.UTC(2027, 3, 1) + d * 86400000).toISOString().slice(0, 10);
+    if (cropStage(cropsById.wheat, f, iso).key === "flowering") date = iso;
+  }
+  const heat = today("wheat", forecast(date, { 4: { tmax: 45, rain: 5 } }));
+  const a = heat.alerts.find((x) => x.type === "heat");
+  assert.ok(a.data.context?.record, JSON.stringify(a.data));
+  assert.match(a.evidence, /hotter than the hottest day of this 10-day period in every year since 2005 \(NASA POWER\)/);
+  assert.match(a.source, /NASA POWER/);
+  assert.match(alertEvidenceTr(a, "buğday"), /2005 yılından beri her yıl bu 10 günlük dönemin en sıcak gününden daha sıcak/);
+});

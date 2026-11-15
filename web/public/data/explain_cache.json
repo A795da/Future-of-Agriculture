@@ -10,11 +10,39 @@
    "label": "adana check sunflower",
    "model": "gemini-3.5-flash-lite"
   },
+  "46774836": {
+   "text": "Sunflower is possible_with_care. Heat at flowering occurred in 18 of the last 20 years, and rain and stored soil water cover 39% of sunflower's water need in a dry year. At the same time, faba bean fixes about 173 kg N per hectare, part of which is left for sunflower.",
+   "kind": "check",
+   "lang": "en",
+   "label": "adana check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "78737734": {
+   "text": "Sunflower is possible with care after the previous seasons. There is heat at flowering in 18 of the last 20 years and rain and stored soil water cover 39% of sunflower's water need in a dry year. Check that faba bean fixes about 173 kg N per hectare, part of which is left for sunflower.",
+   "kind": "check",
+   "lang": "en",
+   "label": "adana check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "91140733": {
+   "text": "Maize is not_reasonable here. It usually needs irrigation, and your field is rain-fed. Watch for heat at flowering, which occurred in 4 of the last 20 years.",
+   "kind": "check",
+   "lang": "en",
+   "label": "konya check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
   "96512977": {
    "text": "Mısır için mevcut ekim nöbeti mantıklı değil, çünkü tarla sulamasız ve bu ürün genellikle sulama istiyor. Ayrıca ekim ile sonbahardaki ilk don arasında 8 °C üzerindeki sıcaklık birikimi yaklaşık 1013 iken çeşit 1700 istiyor ve yaz oldukça serin geçiyor. Alternatif olarak çavdar, yazlık buğday veya yazlık arpa değerlendirebilirsiniz, güven düzeyi ise orta.",
    "kind": "check",
    "lang": "tr",
    "label": "erzurum check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "97656259": {
+   "text": "Chickpea is possible with care. In a dry year rain covers only 35% of its water need, but TÜİK reports rain-fed chickpea in this province in 5 of the last 5 years at about 3070 ha a year, and chickpea follows lentil, a crop of the same family that they share some pests and diseases with. Check that your field is like those where local varieties and practice manage it somewhere in the province.",
+   "kind": "check",
+   "lang": "en",
+   "label": "sanliurfa check chickpea",
    "model": "gemini-3.5-flash-lite"
   },
   "830922df": {
@@ -484,6 +512,608 @@
    "kind": "rotation",
    "lang": "tr",
    "label": "adana wheat > common vetch",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "896ad4c9": {
+   "text": "Your current rotation wheat > fallow scores 58 out of 100. In its favour, there has been no damaging frost or heat at the sensitive stage of any crop in the last 20 years. Watch out that in a dry year, rain and stored soil water cover 51% of wheat's water need (~486 mm), 2005-2024 (20 years).",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "konya wheat > fallow",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "fd54b58c": {
+   "text": "Mevcut ekim nöbeti olan buğday > nadas için puan 58. Son 20 yılda hiçbir bitkinin hassas döneminde zarar veren don veya sıcaklık stresi görülmedi. Kurak yılda yağmur ve depolanan toprak suyu buğdayın su ihtiyacının %51 kadarını karşılıyor; bu durum yaklaşık 486 mm suya denk geliyor.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "konya wheat > fallow",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "e4898a04": {
+   "text": "For wheat > common vetch, the score is 71 out of 100. Common vetch is a legume that adds nitrogen to the soil. Watch out that in a dry year, rain and stored soil water cover 39% of wheat's water need (~486 mm), 2005-2024 (20 years).",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "konya wheat > common vetch",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "b259b54d": {
+   "text": "Mevcut ekim nöbeti buğday > fiğ ve puanı 71, güven düzeyi orta. Bu seçenek buğday ve fiğ içermektedir; fiğ toprağa azot ekleyen bir baklagildir. Kurak bir yılda yağmur ve depolanan toprak suyu buğdayın su ihtiyacının %39 oranını karşılamaktadır.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "konya wheat > common vetch",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "9f6a626b": {
+   "text": "This rotation of wheat > pea scores 64 out of 100, which is 6 points above your current rotation. In its favour, pea is a legume that adds nitrogen to the soil. Watch out that in a dry year, rain and stored soil water cover 39% of wheat's water need (~486 mm), 2005-2024 (20 years).",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "konya wheat > pea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "96fd9988": {
+   "text": "Buğday > bezelye ekim nöbeti 100 üzerinden 64 puan aldı ve mevcut ekim nöbeti puanının üstünde yer alıyor. Bezelye toprağa azot ekleyen bir baklagildir. Kurak yılda yağış ve depolanan toprak suyu buğdayın su ihtiyacının %39 oranını karşılıyor ve güven düzeyi orta düzeydedir.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "konya wheat > pea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "41c08188": {
+   "text": "Sunflower after fallow is not a reasonable choice here. In a dry year rain covers only 30% of its water need. TÜİK reports rain-fed sunflower in this province in 5 of the last 5 years, with an average yield of 1.9 t/ha.",
+   "kind": "check",
+   "lang": "en",
+   "label": "konya check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "db03990d": {
+   "text": "Ayçiçeği mevcut ekim nöbeti için uygun bir seçenek değildir, çünkü kurak bir yılda yağış su ihtiyacının yalnızca %30 kadarını karşılamaktadır. Alternatif olarak tritikale, arpa veya buğday değerlendirilebilir. Güven düzeyi orta seviyededir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "konya check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "581a88dc": {
+   "text": "Chickpea is possible with care because of frost at flowering in 7 of the last 20 years. Rain and stored soil water cover 62% of chickpea's water need (~323 mm), counting the water saved by last season's fallow. Watch that a chickpea harvest removes about 32 kg N, 13 kg P2O5 and 21 kg K2O per hectare at local yields.",
+   "kind": "check",
+   "lang": "en",
+   "label": "konya check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "d62e9939": {
+   "text": "Nohut için mevcut ekim nöbeti dikkatle mümkündür. Çiçeklenme döneminde son 20 yılın 7 yılında don görülmüştür. Güven düzeyi orta seviyededir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "konya check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "c16c5049": {
+   "text": "Wheat after fallow is possible with care, because in a dry year, rain and stored soil water cover 51% of wheat's water need (~486 mm), counting the water saved by last season's fallow. In its favour, there has been no damaging frost or heat at wheat's sensitive stage in the last 20 years.",
+   "kind": "check",
+   "lang": "en",
+   "label": "konya check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "11b90e8a": {
+   "text": "Buğday ekimi dikkatle mümkündür. Kurak bir yılda, yağmur ve depolanan toprak suyu, geçen sezonun nadasıyla korunan su hesaba katılarak, buğdayın su ihtiyacının %51 kadarını (~486 mm) karşılar. Son 20 yılda buğdayın hassas döneminde zarar veren don veya sıcaklık stresi olmamıştır ve güven düzeyi orta düzeydedir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "konya check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "4b3bf35a": {
+   "text": "Your current rotation wheat > sunflower scores 52 out of 100. Watch out: in a dry year, rain and stored soil water cover 39% of sunflower's water need (~486 mm), 2005-2024 (20 years). Sunflower comes back every 2 years; it needs at least 4 years between crops: broomrape (canavar otu, Orobanche cumana) seeds stay viable for years; damage was highest in the 2-year wheat-sunflower rotation.",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "edirne wheat > sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "b6f1ba13": {
+   "text": "Mevcut ekim nöbeti olan buğday > ayçiçeği 52 puan almaktadır. Kurak yılda yağış ve depolanan toprak suyu ayçiçeğinin su ihtiyacının %39 kadarını karşılamaktadır ve son 20 yılın 7 yılında çiçeklenme döneminde sıcaklık stresi görülmüştür. Toprağın yılın yaklaşık 6.2 ayı çıplak kalması ve ayçiçeğinin her 2 yılda bir tekrarlanması durumunu takip ediniz.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "edirne wheat > sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "bde922fe": {
+   "text": "The wheat > pea rotation scores 66 out of 100, which is 14 points higher than your current rotation. This option benefits because pea is a legume that adds nitrogen to the soil. However, you should watch out that in a dry year, rain and stored soil water cover 59% of pea's water need (~326 mm), 2005-2024 (20 years).",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "edirne wheat > pea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "80b8da6b": {
+   "text": "Buğday > bezelye ekim nöbeti 100 üzerinden 66 puan alıyor. Bezelye toprağa azot ekleyen bir baklagildir. Kurak bir yılda yağmur ve depolanan toprak suyu bezelyenin su ihtiyacının %59 kadarını karşılayabilir, ayrıca erozyon riskine karşı dikkatli olmalısınız.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "edirne wheat > pea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "d1686c18": {
+   "text": "The rotation wheat > canola > sunflower scores 47 out of 100. In its favour: 3 crop families in 3 years. Watch out: in a dry year, rain and stored soil water cover 39% of sunflower's water need (~486 mm), 2005-2024 (20 years).",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "edirne wheat > canola > sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "c6077e33": {
+   "text": "Buğday > kanola > ayçiçeği mevcut ekim nöbeti seçeneği 47 puan alarak mevcut ekim nöbetinin 5 puan altında kalmaktadır. Bu seçenekte 3 yılda 3 bitki ailesi yer almaktadır, ancak kurak bir yılda yağış ve depolanan toprak suyu ayçiçeği su ihtiyacının %39 oranını karşılamaktadır. Ayçiçeği çiçeklenme döneminde son 20 yılın 7 yılında sıcaklık stresi yaşamıştır ve tarlada çıplak toprak süreleri ile canavar otu riskine dikkat edilmelidir.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "edirne wheat > canola > sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "58657e7f": {
+   "text": "Sunflower after sunflower is not_reasonable here. Sunflower was grown last season, but it needs at least 4 years between crops because broomrape seeds stay viable for years and damage was highest in the 2-year wheat-sunflower rotation. Also, there is heat at flowering in 7 of the last 20 years, and in a dry year rain and stored soil water cover 39% of sunflower's water need (~486 mm).",
+   "kind": "check",
+   "lang": "en",
+   "label": "edirne check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "f82a4c08": {
+   "text": "Ayçiçeği ekimi mevcut ekim nöbeti için mantıklı değil. Ayçiçeği geçen sezon yetiştirildi ve ürünler arasında en az 4 yıl geçmesi gerekiyor. Alternatif olarak nohut, fiğ veya arpa ekimini değerlendirebilirsiniz, güven düzeyi orta.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "edirne check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "f052ba4c": {
+   "text": "Chickpea after sunflower looks reasonable. In its favour, there has been no damaging frost or heat at chickpea's sensitive stage in the last 20 years. Also, TÜİK reports rain-fed chickpea in this province in 5 of the last 5 years, about 156 ha a year, with an average yield of 1.84 t/ha.",
+   "kind": "check",
+   "lang": "en",
+   "label": "edirne check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "03a51677": {
+   "text": "Nohut için mevcut ekim nöbeti makul ve güven düzeyi orta. Son 20 yılda nohut un hassas döneminde zarar veren don veya sıcaklık stresi görülmedi. Kurak bir yılda yağış ve depolanan toprak suyu nohut un su ihtiyacı nın %61 ini karşılıyor.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "edirne check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "055a2b89": {
+   "text": "Wheat looks reasonable. TÜİK reports rain-fed wheat in this province in 5 of the last 5 years, about 118814 ha a year, with an average yield of 4.24 t/ha. Watch for frost at flowering in 3 and a too-cold winter in 1 of the last 20 years.",
+   "kind": "check",
+   "lang": "en",
+   "label": "edirne check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "cb30b3d0": {
+   "text": "Buğday ekimi makul durumdadır. Son 5 yılda bu ilde bildirilen kuru tarım buğday ekim alanı yılda yaklaşık 118814 hektardır ve ortalama verim 4.24 ton/hektardır. Güven düzeyi orta seviyededir; daha iyi seçenekler arasında nohut, fiğ ve arpa bulunmaktadır.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "edirne check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "7438bb0f": {
+   "text": "Maize is not_reasonable. It usually needs irrigation, and your field is rain-fed. You should also watch for heat at flowering in 9 of the last 20 years.",
+   "kind": "check",
+   "lang": "en",
+   "label": "edirne check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "b1be6c12": {
+   "text": "Mısır için mevcut ekim nöbeti makul değil çünkü tarlanız kuru tarım arazisidir ve bu ürün genellikle sulama gerektirir. Son 20 yılın 9 yılında çiçeklenme döneminde sıcaklık stresi görülmüştür. Alternatif olarak nohut, fiğ veya arpa ekimini değerlendirebilirsiniz ve güven düzeyi orta düzeydedir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "edirne check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "46faa3ff": {
+   "text": "Your current rotation is wheat > faba bean, and it scores 77 out of 100 with medium confidence. In its favour, faba bean is a legume that adds nitrogen to the soil. You should watch for heat at flowering for wheat, which occurred in 4 of the last 20 years.",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "adana wheat > faba bean",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "2b031aaa": {
+   "text": "Mevcut ekim nöbeti olan buğday > bakla 77 puan almıştır. Faydası olarak, bakla toprağa azot ekleyen bir baklagildir. Güven düzeyi orta seviyededir; buğdayda çiçeklenme döneminde görülen sıcaklık stresini takip edebilirsiniz.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "adana wheat > faba bean",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "634b53d3": {
+   "text": "The rotation wheat > common vetch scores 69 out of 100, which is 8 points below your current rotation. In its favour, common vetch is a legume that adds nitrogen to the soil. Watch out for heat at flowering in 10 of the last 20 years, and since this rotation is common in another region of Turkey, check it with a local agronomist.",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "adana wheat > common vetch",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "8a88374a": {
+   "text": "Buğday > fiğ mevcut ekim nöbeti 69 puan alıyor ve mevcut ekim nöbetinizin 8 puan altında kalıyor. Fiğ toprağa azot ekleyen bir baklagildir. Çiçeklenme dönemindeki sıcaklık stresi durumunu ve yerel ziraat mühendisi ile görüşmeyi takip edin; güven düzeyi düşük.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "adana wheat > common vetch",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "c77b8b46": {
+   "text": "For the rotation wheat > lentil, the score is 65 out of 100, which is 12 points below your current rotation. In its favour, lentil is a legume that adds nitrogen to the soil. Watch out because lentil comes back every 2 years and needs at least 3 years between crops, and a local agronomist should check it.",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "adana wheat > lentil",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "4b9b2fd1": {
+   "text": "buğday > mercimek ekim nöbeti 65 puan almıştır ve güven düzeyi düşük durumdadır. Olumlu yönü, baklagil olan mercimeğin tarlaya azot katmasıdır. Mercimek tarlaya 2 yılda bir gelmektedir ancak ürünler arasında en az 3 yıl geçmesi gerekir; bunu ve diğer konuları yerel ziraat mühendisi ile kontrol edin.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "adana wheat > lentil",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "05ac7ad5": {
+   "text": "Ayçiçeği için mevcut ekim nöbeti dikkate alınarak verilen karar: dikkatli yapılabilir ve güven düzeyi orta. Son 20 yılın 18 yılında çiçeklenme döneminde sıcaklık stresi görülmesi ve kurak yılda yağış ile toprak suyu ihtiyacın %39 oranını karşılaması dezavantaj oluşturmaktadır. Alternatif olarak buğday, arpa veya tritikale tercih edilebilir; yerel ziraat mühendisi ile görüşebilirsiniz.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "adana check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "5dd4d9a5": {
+   "text": "Chickpea is possible with care because it follows faba bean, which belongs to the same family and shares some pests and diseases. On the positive side, chickpea is a legume and adds 78 kg N per hectare to the soil for the crop after it. A local agronomist should check the confidence level, which is medium.",
+   "kind": "check",
+   "lang": "en",
+   "label": "adana check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "6b1ced76": {
+   "text": "Nohut için mevcut ekim nöbeti dikkatle mümkündür. Bunun sebebi, nohutun bakla ile aynı familyadan olması ve bazı zararlı ile hastalıkları paylaşmasıdır. Çiçeklenme dönemindeki sıcaklık stresi riskine ve yağmur ile depolanan toprak suyunun su ihtiyacının %61 oranını karşılamasına dikkat ediniz. Güven düzeyi orta seviyededir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "adana check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "8276ee88": {
+   "text": "Wheat looks reasonable for your field. Having faba bean before wheat is in its favour, as a legume before a cereal raised the next crop's yield by about 20% on average in 462 studies across 53 countries, and it fixes about 173 kg N per hectare. You should watch out for heat at flowering, which occurred in 4 of the last 20 years.",
+   "kind": "check",
+   "lang": "en",
+   "label": "adana check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "e411b911": {
+   "text": "Buğday ekimi mevcut ekim nöbeti için makul görülmektedir ve güven düzeyi orta düzeydedir. Önceki baklagil bitkisi sonraki verimi ortalama %20 artırmıştır ve hektar başına yaklaşık 173 kg azot bağlamaktadır. Çiçeklenme dönemindeki sıcaklık stresi ile yağış ve depolanan toprak suyunun su ihtiyacının %66 oranını karşılama durumunu takip edebilirsiniz. Alternatif olarak arpa veya tritikale değerlendirilebilir ve gerekirse yerel ziraat mühendisine danışabilirsiniz.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "adana check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "b5a857f5": {
+   "text": "Your current rotation of wheat > lentil scores 70 out of 100. In its favour, lentil is a legume that adds nitrogen to the soil. Watch out because in a dry year, rain and stored soil water cover 39% of wheat's water need (~395 mm), 2005-2024 (20 years).",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "sanliurfa wheat > lentil",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "d523cbfe": {
+   "text": "Mevcut ekim nöbetiniz buğday > mercimek, puanı 70. Olumlu yönü, mercimek toprağa azot ekleyen bir baklagil. Dikkat edilmesi gereken husus ise kurak yılda yağmur ve depolanan toprak suyu buğdayın su ihtiyacının %39 oranını karşılaması, güven düzeyi orta.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "sanliurfa wheat > lentil",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "56addeff": {
+   "text": "For the rotation wheat > faba bean, the score is 71 out of 100, which is 1 points above your current rotation and has low confidence. In its favour, faba bean is a legume that adds nitrogen to the soil. Watch out that in a dry year, rain and stored soil water cover 39% of wheat's water need (~395 mm), 2005-2024 (20 years), and you should check it with a local agronomist since this rotation is common in another region of Turkey.",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "sanliurfa wheat > faba bean",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "94b78f8c": {
+   "text": "Buğday > bakla ekim nöbeti 71 puan alarak mevcut ekim nöbetinizin 1 puan üzerinde yer alıyor. Olumlu yönü, bakla toprağa azot ekleyen bir baklagil olmasıdır. Dikkat ederseniz, kurak yılda yağmur ve depolanan toprak suyu buğdayın su ihtiyacının %39 oranını (~395 mm) karşılıyor (2005-2024 yılları arasında, 20 yıl). Bu ekim nöbeti Türkiye'nin başka bir bölgesinde yaygındır; yerel ziraat mühendisi ile kontrol edin.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "sanliurfa wheat > faba bean",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "176d8373": {
+   "text": "The rotation wheat > common vetch scores 70 out of 100, which is the same as your current rotation. Common vetch is a legume that adds nitrogen to the soil. Watch out because in a dry year, rain and stored soil water cover 39% of wheat's water need (~395 mm), 2005-2024 (20 years).",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "sanliurfa wheat > common vetch",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "4f28de1e": {
+   "text": "Buğday > fiğ ekim nöbeti 70 puan almıştır ve bu puan mevcut ekim nöbeti ile aynıdır. Artı yönü olarak, fiğ toprağa azot ekleyen bir baklagildir. Dikkat edilmesi gereken husus ise kurak yılda yağmur ve depolanan toprak suyunun buğdayın su ihtiyacının %39 oranını karşılamasıdır; bu güven düzeyi düşük olarak değerlendirilmiştir.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "sanliurfa wheat > common vetch",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "b2627d92": {
+   "text": "Sunflower after lentil is not a reasonable choice here because in a dry year rain covers only 21% of its water need. There is also heat at flowering in 20 of the last 20 years, and TÜİK reports no rain-fed sunflower harvest in this province in 2020-2024 (or in fewer than 3 years). You should check with farmers or the district agriculture office that it grows here.",
+   "kind": "check",
+   "lang": "en",
+   "label": "sanliurfa check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "797bfdb3": {
+   "text": "Ayçiçeği mevcut ekim nöbeti için makul değil, çünkü kurak bir yılda yağış su ihtiyacının yalnızca %21 kadarını karşılayabiliyor. Ayrıca son 20 yılın 20 yılında çiçeklenme döneminde sıcaklık stresi görülmüş ve ilde yağmura dayalı ayçiçeği hasadı bildirilmemiştir. Alternatif olarak arpa, yulaf veya buğday seçeneklerini değerlendirebilirsiniz; güven düzeyi orta.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "sanliurfa check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "165f93c8": {
+   "text": "Chickpea is not_reasonable. In a dry year rain covers only 35% of its water need, and it follows lentil, a crop of the same family with which they share some pests and diseases. Watch the confidence which is medium.",
+   "kind": "check",
+   "lang": "en",
+   "label": "sanliurfa check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "325d5a9f": {
+   "text": "Nohut mevcut ekim nöbeti için mantıklı değil, güven düzeyi orta. Kurak yılda yağmur su ihtiyacının sadece %35 oranını karşılayabiliyor ve aynı ailenin bitkisi olan mercimekten sonra bazı zararlıları ile hastalıkları paylaşıyor. Alternatif olarak arpa, yulaf veya buğday ekimini değerlendirebilirsiniz.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "sanliurfa check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "dafa21b5": {
+   "text": "Wheat after lentil is possible with care, because in a dry year, rain and stored soil water cover 39% of wheat's water need (~395 mm). In its favour, a legume before a cereal raised the next crop's yield by about 20% on average across 462 studies in 53 countries. Watch out that in a dry year about 264 mm of rain falls here, which is below the 300 mm a year that rain-fed wheat needs.",
+   "kind": "check",
+   "lang": "en",
+   "label": "sanliurfa check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "aae18ed6": {
+   "text": "Buğday için mevcut ekim nöbeti dikkatle mümkündür ve güven düzeyi orta olarak belirlenmiştir. Kurak bir yılda yağış ve depolanan toprak suyu, buğdayın su ihtiyacının yaklaşık %39 oranını karşılamaktadır (~395 mm). Yağış miktarını, kurak yılda buğdayın ihtiyaç duyduğu yağ miktarını ve alternatif olarak arpa veya yulaf seçeneklerini gözden geçirebilirsiniz.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "sanliurfa check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "490d1e51": {
+   "text": "Maize is not reasonable after lentil, wheat, lentil because it usually needs irrigation, and your field is rain-fed. There is heat at flowering in 20 of the last 20 years. Check the better choices like barley, oats, wheat.",
+   "kind": "check",
+   "lang": "en",
+   "label": "sanliurfa check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "0b4b730a": {
+   "text": "Mısır için mevcut ekim nöbeti makul değil; çünkü tarlanız kısıtlı yağış alıyor ve bu ürün genellikle sulama istiyor. Çiçeklenme döneminde görülen sıcaklık stresi de 20 yılın 20 sinde bir risk oluşturuyor. Alternatif olarak arpa, yulaf veya buğday değerlendirilebilir ve güven düzeyi orta düzeydedir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "sanliurfa check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "e0606823": {
+   "text": "Sunflower is not_reasonable here. The summer is too cool, with about 1684 heat units above 4 °C between sowing and the first autumn frost, while a typical variety needs 2400. TÜİK reports no rain-fed sunflower harvest in this province in 2020-2024, so check with farmers or the district agriculture office that it grows here.",
+   "kind": "check",
+   "lang": "en",
+   "label": "erzurum check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "41513e5a": {
+   "text": "Ayçiçeği için mevcut ekim nöbeti mantıklı değil, çünkü yaz dönemi bu ürün için fazla serin geçiyor ve ekim ile ilk sonbahar donu arasında 4 °C üzerinde 1684 sıcaklık birikimi (gün-derece) kalırken tipik bir çeşit 2400 ihtiyaç duyuyor. Bu ilde 2020-2024 yılları arasında bildirilen bir kuru tarım ayçiçeği hasadı bulunmuyor; bu durumu çiftçilerle veya ilçe tarım müdürlüğü ile kontrol edin. Orta güven düzeyi ile bu kararın güven düzeyi verilmiştir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "erzurum check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "901b6307": {
+   "text": "Chickpea is possible with care. Frost at flowering occurred in 20 of the last 20 years. In a dry year, rain and stored soil water cover 100% of chickpea's water need (~236 mm), counting the water saved by last season's fallow.",
+   "kind": "check",
+   "lang": "en",
+   "label": "erzurum check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "066351e4": {
+   "text": "Nohut için mevcut ekim nöbeti dikkatle yapılabilir durumdadır. Son 20 yılın 20 yılında çiçeklenme döneminde don görülmüştür. Kurak yılda yağış ve toprak suyu su ihtiyacının %100 kısmını karşılar.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "erzurum check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "936bf57d": {
+   "text": "Wheat is not reasonable here because winters here reach -23.9 °C in a typical year, colder than the -20 °C it survives. Also, wheat experiences a too-cold winter in 14 of the last 20 years. Please check the confidence level, which is medium.",
+   "kind": "check",
+   "lang": "en",
+   "label": "erzurum check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "a075af20": {
+   "text": "Buğday için buğday nadas sonrasında mantıklı bir seçenek değil, çünkü kışlar burada dayanabildiği -20 °C'den daha soğuk olarak tipik bir yılda -23.9 °C'ye ulaşıyor. Güven düzeyi orta ve daha iyi alternatifler arasında çavdar, yazlık buğday, yazlık arpa yer alıyor. Son 20 yılın 14 yılında kışların çok soğuk geçtiğini takip edin.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "erzurum check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "ae9f00f0": {
+   "text": "Rotation wheat > common vetch scores 71 out of 100, which is 13 points above your current rotation. Common vetch is a legume that adds nitrogen to the soil. Watch out because in a dry year, rain and stored soil water cover 39% of wheat's water need (~486 mm), 2005-2024 (20 years).",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "konya wheat > common vetch",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "f7a46225": {
+   "text": "Mevcut ekim nöbeti buğday > fiğ ve puanı 71. Baklagil olan fiğ toprağa azot katıyor. Kurak yılda yağmur ve depolanan toprak suyu buğdayın su ihtiyacının %39 kadarını karşılıyor.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "konya wheat > common vetch",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "fc910e90": {
+   "text": "This option scores 64 out of 100, which is 6 points above your current rotation. In its favour, pea is a legume that adds nitrogen to the soil. Watch out because in a dry year, rain and stored soil water cover 39% of wheat's water need (~486 mm), 2005-2024 (20 years).",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "konya wheat > pea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "63fb7941": {
+   "text": "Buğday > bezelye ekim nöbeti 100 üzerinden 64 puan aldı ve güven düzeyi orta. Bu seçeneğin olumlu yönü, bezelyenin toprağa azot ekleyen bir baklagil olmasıdır. Kurak yılda yağmur ve depolanan toprak suyu buğdayın su ihtiyacının %39 oranını karşılar, ayrıca bezelye için don ve sıcaklık stresi durumlarını takip edin.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "konya wheat > pea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "601b5f81": {
+   "text": "Sunflower is possible_with_care. In a dry year rain covers only 30% of its water need, but TÜİK reports rain-fed sunflower in this province in 5 of the last 5 years at about 3774 ha a year. Check that your field is like those, and note that there was no damaging frost or heat at sunflower's sensitive stage in the last 20 years.",
+   "kind": "check",
+   "lang": "en",
+   "label": "konya check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "d4b2f22a": {
+   "text": "Ayçiçeği için mevcut ekim nöbeti sonrası karar: dikkatle mümkün. Kurak bir yılda yağmur su ihtiyacının %30 kadarını karşılar; ancak TÜİK bu ilde son 5 yılın 5 yılında kıraç ayçiçeği bildirmiştir, bu yüzden tarlanızın bu koşullara uyup uymadığını kontrol edin. Daha iyi alternatifler arasında tritikale ve arpa bulunmaktadır. Güven düzeyi orta seviyededir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "konya check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "f178a0a8": {
+   "text": "Mısır için mevcut ekim nöbeti makul değil çünkü genellikle sulama ister ancak tarlanız kıraçtır. Bu durumda sıcaklık birikimi ve toprak durumu takip edilmelidir. Alternatif olarak tritikale, arpa veya buğday değerlendirilebilir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "konya check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "a49c6f65": {
+   "text": "Sunflower is not a reasonable choice here because sunflower was grown last season, and it needs at least 4 years between crops. Heat occurred at flowering in 7 of the last 20 years, and rain and stored soil water cover 39% of sunflower's water need (~486 mm) in a dry year.",
+   "kind": "check",
+   "lang": "en",
+   "label": "edirne check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "9839f284": {
+   "text": "Ayçiçeği için mevcut ekim nöbeti mantıklı değil, çünkü ayçiçeği geçen sezon da yetiştirildi ve bu bitkiler arasında en az 4 yıl bulunması gerekiyor. Canavar otu tohumları yıllarca canlı kalabiliyor ve zarar 2 yıllık buğday-ayçiçeği ekim nöbetinde en yüksek seviyedeydi. Güven düzeyi orta olan bu durumda, alternatif olarak nohut, fiğ veya arpa ekmeyi değerlendirebilirsiniz.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "edirne check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "c42c3e69": {
+   "text": "Wheat looks reasonable after sunflower, wheat, and sunflower. TÜİK reports rain-fed wheat in this province in 5 of the last 5 years, about 118814 ha a year, with an average yield of 4.24 t/ha. Watch for frost at flowering in 3 and a too-cold winter in 1 of the last 20 years.",
+   "kind": "check",
+   "lang": "en",
+   "label": "edirne check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "6080aa27": {
+   "text": "Maize after sunflower is not a reasonable choice here. It usually needs irrigation, and your field is rain-fed, while NASA data shows heat at flowering in 9 of the last 20 years. Check the confidence level, which is medium.",
+   "kind": "check",
+   "lang": "en",
+   "label": "edirne check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "5f073dba": {
+   "text": "Mısır için mevcut ekim nöbeti makul değil; çünkü genellikle sulama ister ve tarlanız kıraçtır. Çiçeklenme döneminde yaşanan sıcaklık stresi son 20 yılın 9 yılında görüldü. Alternatif olarak nohut, fiğ veya arpa ekmeyi değerlendirebilirsiniz; güven düzeyi orta seviyededir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "edirne check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "e3c2d09c": {
+   "text": "Maize is not_reasonable here because it usually needs irrigation, and your field is rain-fed. There was also heat at flowering in 18 of the last 20 years. You can check the confidence which is medium.",
+   "kind": "check",
+   "lang": "en",
+   "label": "adana check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "49b2b345": {
+   "text": "Mısır için mevcut ekim nöbeti makul değil; genellikle sulama ister ancak tarlanız kıraç. Çiçeklenme döneminde son 20 yılın 18 yılında sıcaklık stresi görüldü ve güven düzeyi orta seviyede. Daha iyi tercihler arasında buğday, arpa, tritikale bulunuyor.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "adana check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "0b8113ae": {
+   "text": "Mevcut ekim nöbeti buğday > fiğ için puan 70 ve güven düzeyi düşük. Olumlu yönü, fiğ toprağa azot ekleyen bir baklagil olmasıdır. Dikkat edilmesi gereken husus ise kurak yılda yağmur ve depolanan toprak suyunun buğdayın su ihtiyacının %39 oranını karşılamasıdır.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "sanliurfa wheat > common vetch",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "d9a3af80": {
+   "text": "Sunflower is not_reasonable for this season. In a dry year rain covers only 21% of its water need, and heat at flowering occurred in 20 of the last 20 years.",
+   "kind": "check",
+   "lang": "en",
+   "label": "sanliurfa check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "537e2783": {
+   "text": "Ayçiçeği mevcut ekim nöbeti için uygun bir seçim değildir, çünkü kurak bir yılda yağış su ihtiyacının yalnızca %21 kadarını karşılar. Son 20 yılın 20 yılında çiçeklenme döneminde sıcaklık stresi görülmüştür. Alternatif olarak arpa, yulaf veya buğday değerlendirilebilir ve güven düzeyi orta düzeydedir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "sanliurfa check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "cf34ca3c": {
+   "text": "Nohut için mevcut ekim nöbeti dikkatle mümkündür ve güven düzeyi orta düzeydedir. Kurak bir yılda yağmur su ihtiyacının %35 kadarını karşılar, ancak yerel şartlar ve çeşitler bu durumu yönetebilmektedir. Tarlanızın bu koşullara uyup uymadığını kontrol etmek için bir yerel ziraat mühendisi ile görüşebilirsiniz.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "sanliurfa check chickpea",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "3feff4ed": {
+   "text": "Maize after lentil is not a reasonable choice here because it usually needs irrigation, and your field is rain-fed. Also, there was heat at flowering in 20 of the last 20 years. Please check the better choices or consult a local agronomist.",
+   "kind": "check",
+   "lang": "en",
+   "label": "sanliurfa check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "b26fac8c": {
+   "text": "Mısır ve mercen, buğday, mercimek ardındam mantıklı bir seçim değil çünkü genellikle sulama ister ve tarlanız kıraçtır. Çiçeklenme döneminde 20 yılın 20 yılında sıcaklık stresi görülmesi bir diğer etkendir. Alternatif olarak arpa, yulaf ve buğday değerlendirilebilir ve güven düzeyi orta düzeydedir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "sanliurfa check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "922bd441": {
+   "text": "The rye > fallow rotation scores 61 out of 100, which is 3 points above your current rotation. In a dry year, rain and stored soil water cover 91% of rye's water need (~477 mm), 2005-2024 (20 years). Watch out because 1 fallow year and no legume means nothing adds nitrogen, and long bare periods in the rainy season raise erosion risk.",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "erzurum rye > fallow",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "d426b226": {
+   "text": "Çavdar > nadas ekim nöbeti 61 puan aldı ve mevcut ekim nöbetinizin 3 puan üzerinde yer alıyor. Kurak yılda yağmur ve depolanan toprak suyu çavdarın su ihtiyacının %91 kadarını karşılıyor. Bir nadas yılı ve baklagil olmaması nedeniyle azot eklemesi yapılmadığını takip etmelisiniz.",
+   "kind": "rotation",
+   "lang": "tr",
+   "label": "erzurum rye > fallow",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "d88b70f2": {
+   "text": "Sunflower is not_reasonable here. The main reason is that the summer is too cool: about 1684 heat units above 4 °C between sowing and the first autumn frost, but a typical variety needs 2400 (FAO AquaCrop). In a dry year, rain and stored soil water cover 76% of sunflower's water need (~367 mm), counting the water saved by last season's fallow.",
+   "kind": "check",
+   "lang": "en",
+   "label": "erzurum check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "e3959d4f": {
+   "text": "Ayçiçeği mevcut ekim nöbeti için uygun bir seçenek değil, güven düzeyi orta. Yaz mevsimi bu ürün için fazla serin geçiyor ve ekim ile ilk sonbahar donu arasında sıcaklık birikimi (gün-derece) sadece 1684 kalırken, tipik bir çeşit 2400 ihtiyaç duyar. Alternatif olarak çavdar, yazlık buğday veya yazlık arpa değerlendirilebilir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "erzurum check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "1e2b5837": {
+   "text": "Maize is not_reasonable here. It usually needs irrigation, and your field is rain-fed, plus the summer is too cool with 1013 heat units above 8 °C compared to 1700 needed. Check the other blocking reason.",
+   "kind": "check",
+   "lang": "en",
+   "label": "erzurum check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "7b195308": {
+   "text": "Mısır için mevcut ekim nöbeti makul değil; çünkü tarlanız kıraç ve ürün normalde sulama ister. Ayrıca ekim ile sonbahardaki ilk don arasında 8 °C üzerinde yaklaşık 1013 sıcaklık birikimi (gün-derece) var, fakat tipik bir çeşit 1700 ister. Güven düzeyi orta seviyesindedir.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "erzurum check maize",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "b81ff930": {
+   "text": "Buğday ekimi mevcut ekim nöbeti için makul bir seçenektir. TÜİK verilerine göre bu ilde son 5 yılın 5 yılında yaklaşık yıllık 118814 ha alanda kuru tarım buğday yapılmış ve ortalama verim 4.24 t/ha olmuştur. Güven düzeyi orta seviyededir; son 20 yılın 3 yılında çiçeklenme döneminde don ve 1 yılında çok soğuk kış görülmüştür, ayrıca nohut, ortak fiğ ve arpa gibi alternatifleri de gözden geçirebilirsiniz.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "edirne check wheat",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "bfe45665": {
+   "text": "Ayçiçeği için mevcut ekim nöbeti dikkatle mümkündür. Çiçeklenme dönemindeki sıcaklık stresi ve yağmur ile depolanan toprak suyunun su ihtiyacının %39 oranını karşılaması önemli risklerdir. Yerel ziraat mühendisi ile görüşerek alternatif olarak buğday, arpa veya tritikale seçeneklerini kontrol edebilirsiniz.",
+   "kind": "check",
+   "lang": "tr",
+   "label": "adana check sunflower",
+   "model": "gemini-3.5-flash-lite"
+  },
+  "7deabf6b": {
+   "text": "The wheat > common vetch rotation scores 70 out of 100, which is the same as your current rotation with low confidence. In its favour, common vetch is a legume that adds nitrogen to the soil. Watch out because in a dry year, rain and stored soil water cover 39% of wheat's water need (~395 mm), 2005-2024 (20 years).",
+   "kind": "rotation",
+   "lang": "en",
+   "label": "sanliurfa wheat > common vetch",
    "model": "gemini-3.5-flash-lite"
   }
  }

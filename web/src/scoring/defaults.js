@@ -8,6 +8,7 @@ export const DEFAULT_INPUTS = {
   current: ["wheat", "fallow"],
   priorities: { water: 50, soil: 50, income: 50, simplicity: 50 },
   never: [],
+  soil: "unknown", // farmer's topsoil texture: unknown | clay | loam | sandy (rice seepage)
   ratings: {}, // farmer's own income rating per crop, 1-5 (unrated = 3)
   touched: false,
 };

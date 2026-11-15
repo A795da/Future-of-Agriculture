@@ -2,7 +2,8 @@
 // and structured reasons. Every number shown to the farmer comes from here.
 
 import { clamp, mean, round } from "../features/stats.js";
-import { climateHistory, dryYearCoverage, irrigationNeed } from "./agronomy.js";
+import { climateHistory, describePaddySoil, dryYearCoverage, irrigationNeed } from "./agronomy.js";
+import { waterSupply } from "./waterSupply.js";
 import { bareStats, rotationTimeline, sowingDoy } from "./calendar.js";
 import { heatUnits } from "./heat.js";
 import { nutrientBalance } from "./nutrients.js";
@@ -60,7 +61,7 @@ export function scoreRotation(rot, ctx) {
     const crop = cropsById[id];
     if (irrigated) {
       const w = irrigationNeed(crop, f, afterFallow);
-      return { id, score: clamp(100 - w.deficit / 7), deficit: w.deficit, need: w.need };
+      return { id, score: clamp(100 - w.deficit / 7), deficit: w.deficit, need: w.need, paddy: w.paddy ?? null, w };
     }
     const w = dryYearCoverage(crop, f, afterFallow);
     return { id, score: clamp(100 * Math.min(1, w.coverage)), coverage: w.coverage, need: w.need };
@@ -146,11 +147,27 @@ export function scoreRotation(rot, ctx) {
     if (irrigated) {
       reasons.push({
         type: "water",
-        evidence: `${n} needs about ${round(worst.deficit)} mm of irrigation in a normal year (crop uses ~${round(worst.need)} mm)`,
-        source: "NASA POWER",
+        evidence: worst.paddy
+          ? `flooded ${n} needs about ${round(worst.deficit)} mm of irrigation in a normal year (about ${round(worst.deficit * 10)} m³ per hectare): the crop uses ~${round(worst.need)} mm and the basin loses ~${round(worst.paddy.total)} mm to soaking, the water layer and seepage; ${describePaddySoil(worst.w).text}`
+          : `${n} needs about ${round(worst.deficit)} mm of irrigation in a normal year (crop uses ~${round(worst.need)} mm)`,
+        source: worst.paddy ? describePaddySoil(worst.w).source : "NASA POWER",
         kind: "NASA reanalysis",
         effect: worst.deficit < 150 ? "positive" : worst.deficit > 400 ? "negative" : "neutral",
       });
+      // Is the water source itself shrinking? NASA GRACE/GRACE-FO (irrigated fields only).
+      const ws = waterSupply(f);
+      if (ws) {
+        reasons.push({ type: "water", evidence: ws.text, source: ws.source, kind: ws.kind, effect: ws.falling ? "negative" : ws.trend < -0.2 ? "neutral" : "positive" });
+        if (ws.falling) {
+          const thirsty = [...new Set(water.filter((y) => y.deficit > 400).map((y) => nameOf(y.id, cropsById)))];
+          risks.push(
+            `water stored underground and on land here has fallen about ${Math.abs(ws.trend)} cm a year (NASA GRACE): wells and reservoirs may become less reliable${thirsty.length ? `, a bigger risk for water-hungry ${thirsty.join(", ")}` : ""}`
+          );
+        }
+      }
+      for (const y of water.filter((y) => y.paddy)) {
+        risks.push(`flooded ${nameOf(y.id, cropsById)} needs about ${round(y.deficit * 10)} m³ of water per hectare a season; check that your water allocation (DSİ or irrigation cooperative) covers it`);
+      }
     } else {
       const pct = round(worst.coverage * 100);
       reasons.push({
@@ -263,7 +280,7 @@ export function scoreRotation(rot, ctx) {
   } else if (sameFamilyPairs) risks.push("same crop family back to back can build up pests and diseases");
 
   // Nutrient balance (information; it does not change the score yet).
-  const nutrients = nutrientBalance(seq, rot.second_crops, ctx.nutrientTable);
+  const nutrients = nutrientBalance(seq, rot.second_crops, ctx.nutrientTable, ctx.localYields);
   if (nutrients) {
     const parts = [`harvests remove about ${nutrients.n_removed} kg N, ${nutrients.p2o5_removed} kg P2O5 and ${nutrients.k2o_removed} kg K2O per hectare a year`];
     if (nutrients.n_fixed > 0) {
@@ -272,7 +289,7 @@ export function scoreRotation(rot, ctx) {
     reasons.push({
       type: "soil",
       evidence: parts.join("; "),
-      source: "FAOSTAT yields + Ludemann 2023 + Herridge 2008",
+      source: `${nutrients.yields_local.length ? "TÜİK province yields" : "FAOSTAT yields"} + Ludemann 2023 + Herridge 2008`,
       kind: "compiled rule",
       effect: nutrients.n_net >= 0 ? "positive" : nutrients.n_net < -40 ? "negative" : "neutral",
     });

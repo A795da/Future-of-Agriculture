@@ -98,6 +98,12 @@ export default function RotationCard({ result, baseline, index, cropsById }) {
           {t("not_forecast")}
         </p>
       )}
+      {result.resilience && (
+        <p className={`resil resil-${result.resilience.label}`} title={t("resil_note")}>
+          <strong>{t("resil_label")}:</strong> {t(`resil_${result.resilience.label}`)} ·{" "}
+          {t("resil_line", { today: result.resilience.today, warm: result.resilience.warm, dry: result.resilience.warm_dry })}
+        </p>
+      )}
       <p className="summary">{tr ? cardSummaryTr(result, baseline) : summary}</p>
       <AiSummary kind="rotation" facts={facts} lang={lang} />
 

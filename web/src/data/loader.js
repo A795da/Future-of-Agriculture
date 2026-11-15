@@ -20,15 +20,19 @@ async function getJson(url, opts) {
 }
 
 export async function loadTables() {
-  const [cropTable, rotationTable, provinces, tagem, nutrientTable, ruleTable] = await Promise.all([
+  const [cropTable, rotationTable, provinces, tagem, nutrientTable, ruleTable, tuikYields, soilTexture, waterStorage, climateShift] = await Promise.all([
     getJson("/data/crops.json"),
     getJson("/data/rotations.json"),
     getJson("/data/provinces.json"),
     getJson("/data/tagem_calendar.json"),
     getJson("/data/nutrients.json"),
     getJson("/data/rotation_rules.json"),
+    getJson("/data/tuik_yields.json").catch(() => null), // optional: TÜİK province yields
+    getJson("/data/soil_texture.json").catch(() => null), // optional: NASA ORNL DAAC HWSD topsoil texture
+    getJson("/data/water_storage.json").catch(() => null), // optional: NASA GRACE/GRACE-FO water-storage trend
+    getJson("/data/climate_shift.json").catch(() => null), // optional: recent climate shift (NASA POWER)
   ]);
-  return { cropTable, rotationTable, provinces, tagem, nutrientTable, ruleTable };
+  return { cropTable, rotationTable, provinces, tagem, nutrientTable, ruleTable, tuikYields, soilTexture, waterStorage, climateShift };
 }
 
 /** Add the TAGEM-DSİ sowing calendar of the province's climate zone as a feature.
@@ -56,6 +60,62 @@ export function withSowingCalendar(features, province, tagem, irrigation = "irri
       zone_name: tagem.zones[zone],
       listed: Object.keys(all), // our crops the guide lists for this zone
       mapped: Object.keys(tagem.crops), // our crops that have a TAGEM name at all
+    },
+  };
+}
+
+// Topsoil texture class from sand and clay (% weight): the usual texture-class
+// boundaries (clay ≥ 40% → clay; sand ≥ 70% → sandy, i.e. sand or loamy sand).
+export const TEXTURE_CLAY_PCT = 40;
+export const TEXTURE_SAND_PCT = 70;
+export function textureClass(clay, sand) {
+  if (clay == null || sand == null) return null;
+  if (clay >= TEXTURE_CLAY_PCT) return "clay";
+  if (sand >= TEXTURE_SAND_PCT) return "sandy";
+  return "loam";
+}
+
+/**
+ * Adds `soil_texture` to the features: the farmer's own choice when given
+ * (clay | loam | sandy), otherwise the NASA ORNL DAAC regridded HWSD topsoil
+ * value for the province (web/public/data/soil_texture.json). A drawn field uses
+ * its province's value (the grid is about 5 km; the province point stands in).
+ */
+export function withSoilTexture(features, province, table, farmerChoice = null) {
+  if (!features) return features;
+  if (farmerChoice && farmerChoice !== "unknown") {
+    return { ...features, soil_texture: { value: { class: farmerChoice }, unit: "", source: "farmer", kind: "farmer input" } };
+  }
+  const p = table?.provinces?.[province?.id];
+  const cls = p && textureClass(p.clay, p.sand);
+  if (!cls) return features;
+  return {
+    ...features,
+    soil_texture: {
+      value: { class: cls, clay: p.clay, sand: p.sand },
+      unit: "% weight",
+      source: table._meta?.short ?? "NASA ORNL DAAC regridded HWSD v1.2",
+      kind: "model estimate",
+    },
+  };
+}
+
+/**
+ * Adds `water_storage` to the features: the 2002-2026 trend of total water stored
+ * on land and underground near the province, from NASA GRACE/GRACE-FO
+ * (web/public/data/water_storage.json; ~300 km mascons, so it describes the basin).
+ */
+export function withWaterStorage(features, province, table) {
+  const p = table?.provinces?.[province?.id];
+  if (!features || !p) return features;
+  return {
+    ...features,
+    water_storage: {
+      value: { trend_cm_yr: p.trend_cm_yr, change_cm: p.change_cm, months: p.months },
+      unit: "cm water",
+      source: table._meta?.short ?? "NASA GRACE/GRACE-FO",
+      kind: "NASA observation",
+      period: table._meta?.period ?? "",
     },
   };
 }

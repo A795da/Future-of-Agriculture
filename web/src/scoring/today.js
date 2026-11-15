@@ -7,7 +7,7 @@
 // the farmer's own planting date is not an input yet.
 
 import { MONTH_NAMES, MONTH_START, monthOfDoy, round, sum } from "../features/stats.js";
-import { SNOW_MARGIN_C } from "./agronomy.js";
+import { SNOW_MARGIN_C, paddyLosses } from "./agronomy.js";
 import { SENSITIVE_DAYS, kcOnDay, phenology } from "./calendar.js";
 import { shortName } from "./names.js";
 
@@ -84,6 +84,35 @@ export function cropStage(crop, f, iso) {
 
 const inField = (stage) => !["not_in_field", "before_sowing"].includes(stage.key);
 
+/** 10-day period (dekad) index 0-35 of a date, like dekad_extremes_by_year. */
+export function dekadOf(iso) {
+  const [, m, d] = iso.split("-").map(Number);
+  return (m - 1) * 3 + Math.min(2, Math.floor((d - 1) / 10));
+}
+
+/**
+ * How unusual a forecast extreme is for this place and time of year: in how many
+ * of the last 20 years (NASA POWER) the hottest day (heat) or coldest night (frost)
+ * of this 10-day period was milder than the forecast value.
+ */
+export function historyContext(f, iso, value, kind) {
+  const years = f?.dekad_extremes_by_year?.value;
+  if (!years?.length || value == null) return null;
+  const k = dekadOf(iso);
+  const past = years.map((y) => (kind === "heat" ? y.tmax_abs[k] : y.tmin_abs[k])).filter((x) => x != null);
+  if (!past.length) return null;
+  const beaten = past.filter((x) => (kind === "heat" ? x < value : x > value)).length;
+  return { beaten, n: past.length, first: years[0].year, last: years.at(-1).year, record: beaten === past.length };
+}
+
+/** English clause for the evidence line. */
+function contextText(c, kind) {
+  if (!c) return "";
+  const what = kind === "heat" ? "hotter than the hottest day" : "colder than the coldest night";
+  if (c.record) return `; ${what} of this 10-day period in every year since ${c.first} (NASA POWER)`;
+  return `; ${what} of this 10-day period in ${c.beaten} of the last ${c.n} years (NASA POWER ${c.first}-${c.last})`;
+}
+
 /** Frost limit for this stage: [red below, yellow below, what the limit means]. */
 function frostLimit(crop, stage, month) {
   const k = stage.key;
@@ -135,10 +164,11 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
     if (hits.length) {
       const low = hits.reduce((a, b) => (b.tmin < a.tmin ? b : a));
       const level = low.tmin < red ? "red" : "yellow";
+      const context = historyContext(features, low.date, low.tmin, "frost");
       push({
         type: "frost",
         level,
-        evidence: `lows down to ${low.tmin} °C (${shortDate(low.date)}); ${meaning}`,
+        evidence: `lows down to ${low.tmin} °C (${shortDate(low.date)}); ${meaning}${contextText(context, "frost")}`,
         action:
           hardiness
             ? "check snow cover and plant damage after the cold nights; ask a local agronomist before replanting"
@@ -147,9 +177,9 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
               : "watch the forecast; the low is close to the damage limit",
         dates: hits.map((d) => d.date),
         ...SOURCES.forecast,
-        source: "Open-Meteo forecast + crop table",
+        source: context ? "Open-Meteo forecast + crop table + NASA POWER" : "Open-Meteo forecast + crop table",
         // structured values so the interface can say the same thing in Turkish
-        data: { value: low.tmin, date: low.date, mode, limit, action: hardiness ? "snow" : level === "red" ? "protect" : "watch" },
+        data: { value: low.tmin, date: low.date, mode, limit, action: hardiness ? "snow" : level === "red" ? "protect" : "watch", context },
       });
     }
   }
@@ -162,18 +192,19 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
     if (hits.length) {
       const hot = hits.reduce((a, b) => (b.tmax > a.tmax ? b : a));
       const level = hot.tmax > redAt ? "red" : "yellow";
+      const context = historyContext(features, hot.date, hot.tmax, "heat");
       push({
         type: "heat",
         level,
-        evidence: `highs up to ${hot.tmax} °C (${shortDate(hot.date)}); ${name} is stressed above ${crop.heat_stress_c} °C${stage.key === "flowering" ? " at flowering" : ""}`,
+        evidence: `highs up to ${hot.tmax} °C (${shortDate(hot.date)}); ${name} is stressed above ${crop.heat_stress_c} °C${stage.key === "flowering" ? " at flowering" : ""}${contextText(context, "heat")}`,
         action:
           irrigation === "irrigated"
             ? "irrigate before the hot days rather than during the midday heat"
             : "heat at flowering can cut yield; nothing to add on a rain-fed field, but note it for next year's variety choice",
         dates: hits.map((d) => d.date),
-        source: "Open-Meteo forecast + crop table",
+        source: context ? "Open-Meteo forecast + crop table + NASA POWER" : "Open-Meteo forecast + crop table",
         kind: "model estimate",
-        data: { value: hot.tmax, date: hot.date, limit: crop.heat_stress_c, flowering: stage.key === "flowering", action: irrigation === "irrigated" ? "irrigate" : "note" },
+        data: { value: hot.tmax, date: hot.date, limit: crop.heat_stress_c, flowering: stage.key === "flowering", action: irrigation === "irrigated" ? "irrigate" : "note", context },
       });
     }
   }
@@ -214,15 +245,20 @@ export function runToday({ cropId, forecast, features, cropsById, irrigation }) 
       })
     );
     if (irrigation === "irrigated") {
+      // Flooded rice also loses water to seepage every day (FAO Training Manual 3, section 4.4).
+      const seep = crop.paddy ? paddyLosses(crop, features).perc_mm_day * days.length : 0;
+      const total = use + seep;
       push({
         type: "water",
         level: "info",
-        evidence: `${name} will use about ${round(use)} mm of water this week; about ${round(weekRain)} mm of rain is forecast`,
-        action: use - weekRain > 10 ? `plan about ${round(use - weekRain)} mm of irrigation over the week` : "rain should cover this week's need",
+        evidence: seep
+          ? `${name} will use about ${round(use)} mm of water this week and the flooded basin loses about ${round(seep)} mm to seepage; about ${round(weekRain)} mm of rain is forecast`
+          : `${name} will use about ${round(use)} mm of water this week; about ${round(weekRain)} mm of rain is forecast`,
+        action: total - weekRain > 10 ? `plan about ${round(total - weekRain)} mm of irrigation over the week` : "rain should cover this week's need",
         dates: [],
-        source: "Open-Meteo forecast + FAO-56",
+        source: seep ? "Open-Meteo forecast + FAO-56 + FAO Training Manual 3" : "Open-Meteo forecast + FAO-56",
         kind: "model estimate",
-        data: { use: round(use), rain: round(weekRain), need: round(use - weekRain), action: use - weekRain > 10 ? "plan" : "covered" },
+        data: { use: round(total), rain: round(weekRain), need: round(total - weekRain), action: total - weekRain > 10 ? "plan" : "covered" },
       });
     } else if (weekRain < DRY_WEEK_RAIN_MM && use >= DRY_WEEK_USE_MM) {
       push({

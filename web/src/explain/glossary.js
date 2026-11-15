@@ -53,6 +53,13 @@ export const GLOSSARY = [
     match: /\bcompiled rule\b/i,
   },
   {
+    id: "official-stats",
+    tr: { term: "Resmî istatistik (TÜİK)", text: "Türkiye İstatistik Kurumu'nun il bazında ekilen alan ve verim verileri (2020-2024 ortalaması). FieldShift bunları yerel verim ve bir ürünün o ilde gerçekten yetiştirilip yetiştirilmediği için kullanır." },
+    term: "Official statistics (TÜİK)",
+    text: "Planted area and yield per province from the Turkish Statistical Institute (2020-2024 average). FieldShift uses them for local yields and to show whether a crop is actually grown in the province.",
+    match: /official statistics/i,
+  },
+  {
     id: "heat-units",
     tr: { term: "Sıcaklık birikimi (gün-derece)", text: "Ürünün gelişmesi için gereken sıcaklığın üzerindeki sıcaklığın gün gün toplanması. Her ürünün olgunlaşmak için belli bir toplama ihtiyacı vardır; yaz çok serin ya da kısaysa buna ulaşamaz." },
     term: "Heat units (growing degree days)",

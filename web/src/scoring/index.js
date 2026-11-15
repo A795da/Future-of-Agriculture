@@ -7,10 +7,19 @@ import { applyScenario } from "../features/scenario.js";
 import { validateResult } from "./contract.js";
 import { filterCrops } from "./filter.js";
 import { labelOf, scoreRotation } from "./score.js";
+import { climateOutlook } from "./outlook.js";
 
 const sameSeq = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
 const MAX_GENERATOR_CROPS = 8; // above this, only 2-year rotations are generated
 const MAX_GENERATOR_CROPS_2Y = 16; // keeps the 2-year search under ~300 sequences
+
+// Resilience: each card is scored again under two what-if climates (uniform warming
+// of the 20-year NASA POWER record; not a forecast). The drop from today's score is
+// shown on the card so the farmer can prefer a rotation that holds up. Team-compiled
+// cut-offs, tune with an agronomist. Not part of the AI facts (cached texts unchanged).
+export const RESILIENCE_SCENARIOS = { warm: { tempC: 2 }, warm_dry: { tempC: 2, rainPct: -10 } };
+export const RESILIENCE_HOLDS_UP = 4; // drop of at most this many points
+export const RESILIENCE_SOME_LOSS = 10; // above this: sensitive to warming
 
 /** Same cycle, any starting year (wheat>chickpea equals chickpea>wheat). */
 function sameCycle(a, b) {
@@ -35,7 +44,7 @@ function generateRotations(okIds, existing) {
   return out;
 }
 
-export function runScoring({ features, terrain = null, vegetation = null, cropTable, rotationTable, nutrientTable = null, ruleTable = null, farmer, scenario = null, dataStatus = {} }) {
+export function runScoring({ features, terrain = null, vegetation = null, cropTable, rotationTable, nutrientTable = null, ruleTable = null, localYields = null, farmer, scenario = null, dataStatus = {} }) {
   const whatIf = Boolean(scenario && (scenario.rainPct || scenario.tempC));
   const f = whatIf ? applyScenario(features, scenario) : features;
   const crops = cropTable.crops;
@@ -43,7 +52,8 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
 
   // 1. hard filters use today's climate: a what-if scenario re-ranks the options
   // (scores, risks) but does not delete them.
-  const checks = filterCrops(crops, features, farmer);
+  // TÜİK "grown here" turns failed water/warmth checks into risks (filter.js).
+  const checks = filterCrops(crops, features, farmer, localYields);
   const okCrop = new Set(checks.filter((c) => c.ok).map((c) => c.id));
   const removed = checks.filter((c) => !c.ok);
 
@@ -75,7 +85,7 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
     candidates = [...candidates, ...generateRotations(pool, have)];
   }
 
-  const ctx = { f, cropsById, farmer, terrain, nutrientTable, ruleTable };
+  const ctx = { f, cropsById, farmer, terrain, nutrientTable, ruleTable, localYields };
   const finish = (rot, scored, isBaseline) => {
     const gaps = [
       "crop table compiled from FAO sources, not yet checked by a local expert",
@@ -86,7 +96,19 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
     if (!vegetation) gaps.push("no satellite vegetation history cached for this location yet");
     if (!terrain) gaps.push("field slope unknown; erosion uses rainfall and bare periods only");
     if (scored.nutrients) {
-      gaps.push("nutrient numbers use Türkiye average yields (FAOSTAT 2020-2024, irrigated and rain-fed mixed) and assume straw and residues stay in the field");
+      const nm = (ids) => ids.map((id) => labelOf([id], cropsById)).join(", ");
+      const water = farmer.irrigation === "irrigated" ? "irrigated" : "rain-fed";
+      if (scored.nutrients.yields_local.length) {
+        const mixed = scored.nutrients.yields_mixed ?? [];
+        const split = scored.nutrients.yields_local.filter((id) => !mixed.includes(id));
+        const parts = [];
+        if (split.length) parts.push(`TÜİK ${water} yields for this province (${localYields.years} average) for ${nm(split)}`);
+        if (mixed.length) parts.push(`TÜİK yields for this province with rain-fed and irrigated land together (${localYields.years} average) for ${nm(mixed)}`);
+        if (scored.nutrients.yields_national.length) parts.push(`Türkiye average yields (FAOSTAT 2020-2024) for ${nm(scored.nutrients.yields_national)}`);
+        gaps.push(`nutrient numbers use ${parts.join(", and ")}; straw and residues are assumed to stay in the field`);
+      } else {
+        gaps.push("nutrient numbers use Türkiye average yields (FAOSTAT 2020-2024, irrigated and rain-fed mixed) and assume straw and residues stay in the field");
+      }
       if (scored.nutrients.missing.length) {
         gaps.push(`no nutrient removal data for ${scored.nutrients.missing.map((id) => labelOf([id], cropsById)).join(", ")}`);
       }
@@ -111,6 +133,17 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
         const c = removed.find((x) => x.id === id);
         if (c) risks.unshift(`${c.name} did not pass the checks: ${c.reasons.join("; ")}`);
       }
+    }
+    for (const id of new Set([...rot.sequence, ...Object.values(rot.second_crops ?? {})])) {
+      for (const c of checks.find((x) => x.id === id)?.cautions ?? []) risks.push(`${labelOf([id], cropsById)}: ${c.evidence}`);
+    }
+    // Climate outlook for rice (today's climate, +2/+3 °C what-if): warn when it stops fitting.
+    for (const id of new Set(rot.sequence)) {
+      const c = cropsById[id];
+      if (!c?.paddy) continue;
+      const o = climateOutlook(c, features);
+      const lost = o.today.fit && o.warmer.find((w) => !w.fit);
+      if (lost) risks.push(`${labelOf([id], cropsById)}: with +${lost.tempC} °C warming it may stop fitting here (heat at flowering in ${lost.heatYears} of ${lost.n} years; what-if, not a forecast)`);
     }
     if (rot.fromOtherRegion) risks.push("this rotation is common in another region of Turkey; check it with a local agronomist");
     if (rot.generated) {
@@ -141,6 +174,19 @@ export function runScoring({ features, terrain = null, vegetation = null, cropTa
       what_if: whatIf,
       notes: rot.notes ?? null,
       nutrients: scored.nutrients ?? null,
+    };
+    // Score today (even while a what-if slider is on) and under the two stress climates.
+    const today = whatIf ? scoreRotation(rot, { ...ctx, f: features }).score : scored.score;
+    const stressed = Object.fromEntries(
+      Object.entries(RESILIENCE_SCENARIOS).map(([k, s]) => [k, scoreRotation(rot, { ...ctx, f: applyScenario(features, s) }).score])
+    );
+    const drop = Math.max(0, today - Math.min(...Object.values(stressed)));
+    result.resilience = {
+      today,
+      ...stressed,
+      drop,
+      label: drop <= RESILIENCE_HOLDS_UP ? "holds_up" : drop <= RESILIENCE_SOME_LOSS ? "some_loss" : "sensitive",
+      scenarios: RESILIENCE_SCENARIOS,
     };
     const errs = validateResult(result);
     if (errs.length) throw new Error(`scoring broke the contract for ${result.id}: ${errs.join("; ")}`);

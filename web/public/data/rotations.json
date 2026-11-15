@@ -233,6 +233,13 @@
       "regions": ["southeast-anatolia", "mediterranean", "aegean"],
       "irrigation": "either",
       "notes": "Fusarium wilt calls for 5 or more years between watermelon crops, so watermelon moves to a new field each year; here it returns every fifth year."
+    },
+    {
+      "id": "rice",
+      "sequence": ["rice"],
+      "regions": ["marmara", "black-sea"],
+      "irrigation": "irrigated",
+      "notes": "Rice year after year in flooded basins, the usual practice in Thrace and on the Black Sea deltas (5 or more years in a row on the Black Sea; Dok et al. 2016). Where the basins drain in winter, a winter vetch (Hungarian or common vetch, with barley) sown right after the October rice harvest and cut in April or May fits before the next rice crop and adds nitrogen (Dok et al. 2016)."
     }
   ]
 }

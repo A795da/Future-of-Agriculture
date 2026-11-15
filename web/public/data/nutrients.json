@@ -472,6 +472,23 @@
     "HI": null
    },
    "residue": null
+  },
+  "rice": {
+   "note": "paddy rice (rice in the husk)",
+   "yield_t_ha": 7.87,
+   "yield_years": "2020-2024 (5 years)",
+   "product": {
+    "N": 12.22,
+    "P": 2.83,
+    "K": 2.96,
+    "HI": null
+   },
+   "residue": {
+    "N": 9.8,
+    "P": 1.75,
+    "K": 26.6,
+    "HI": 0.408
+   }
   }
  }
 }

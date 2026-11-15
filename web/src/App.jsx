@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchPowerDaily } from "./data/power.js";
-import { loadPointFeatures, loadProvinceData, loadTables, loadTerrain, withSowingCalendar } from "./data/loader.js";
+import { loadPointFeatures, loadProvinceData, loadTables, loadTerrain, withSoilTexture, withSowingCalendar, withWaterStorage } from "./data/loader.js";
 import { runScoring } from "./scoring/index.js";
+import { localYields as buildLocalYields } from "./scoring/yields.js";
 import { DEFAULT_INPUTS, defaultRotation } from "./scoring/defaults.js";
 import PowerChart from "./ui/components/PowerChart.jsx";
 import FieldMap from "./field/FieldMap.jsx";
@@ -103,11 +104,23 @@ export default function App() {
   const usingField = onField && fieldFeatures && !fieldFeatures.error;
   const rawFeatures = usingField ? fieldFeatures : provinceData?.features;
   // A drawn field uses its province's TAGEM climate zone for sowing dates.
+  // Soil texture: the farmer's choice, else NASA HWSD for the province (rice seepage).
   const features = useMemo(
-    () => withSowingCalendar(rawFeatures, point, tables?.tagem, inputs.irrigation),
-    [rawFeatures, point, tables, inputs.irrigation]
+    () =>
+      withWaterStorage(
+        withSoilTexture(withSowingCalendar(rawFeatures, point, tables?.tagem, inputs.irrigation), point, tables?.soilTexture, inputs.soil),
+        point,
+        tables?.waterStorage
+      ),
+    [rawFeatures, point, tables, inputs.irrigation, inputs.soil]
   );
   const planStatus = dataStatus === "error" ? "error" : !features || (onField && !fieldFeatures) ? "loading" : "ready";
+
+  // TÜİK yields for this province and water regime (a drawn field uses its province).
+  const localYields = useMemo(
+    () => buildLocalYields(tables?.tuikYields, point?.id, inputs.irrigation),
+    [tables, point, inputs.irrigation]
+  );
 
   const outcome = useMemo(() => {
     if (!features || !tables || !point) return null;
@@ -120,6 +133,7 @@ export default function App() {
         rotationTable: tables.rotationTable,
         nutrientTable: tables.nutrientTable,
         ruleTable: tables.ruleTable,
+        localYields,
         farmer: {
           region: point.region,
           irrigation: inputs.irrigation,
@@ -135,7 +149,7 @@ export default function App() {
     } catch (e) {
       return { error: e.message };
     }
-  }, [features, terrain, provinceData, tables, point, inputs, scenario, onField]);
+  }, [features, terrain, provinceData, tables, point, inputs, scenario, onField, localYields]);
 
   // Crops worth rating: those that pass the checks here, plus the farmer's own rotation.
   const ratingCrops = useMemo(() => {
@@ -224,7 +238,7 @@ export default function App() {
         {tab === "plan" && (
           <section className="card">
             <h2>{t("plan_h")} <span className="muted">({place})</span></h2>
-            <PlanTab outcome={outcome} scenario={scenario} onScenario={setScenario} status={planStatus} cropsById={cropsById} />
+            <PlanTab outcome={outcome} scenario={scenario} onScenario={setScenario} status={planStatus} cropsById={cropsById} shift={tables?.climateShift?.provinces?.[point?.id] ?? null} />
           </section>
         )}
 
@@ -238,7 +252,7 @@ export default function App() {
         {tab === "check" && tables && (
           <section className="card">
             <h2>{t("check_h")} <span className="muted">({place})</span></h2>
-            <CropCheck tables={tables} features={features} inputs={inputs} status={planStatus} place={place} lang={lang} />
+            <CropCheck tables={tables} features={features} inputs={inputs} status={planStatus} place={place} lang={lang} localYields={localYields} />
           </section>
         )}
 

@@ -35,6 +35,7 @@ export const ALIASES = {
   onion: ["soğan", "kuru soğan", "onions"],
   watermelon: ["karpuz"],
   melon: ["kavun", "cantaloupe", "sweet melon"],
+  rice: ["çeltik", "celtik", "pirinç", "paddy", "paddy rice", "rice"],
 };
 
 const TR = { ı: "i", İ: "i", ğ: "g", ş: "s", ç: "c", ö: "o", ü: "u", â: "a", î: "i", û: "u" };

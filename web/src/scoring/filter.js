@@ -12,21 +12,68 @@ export const MIN_RAINFED_COVERAGE = 0.35; // below this, a rain-fed crop fails i
 export const FROST_SEASON_ALLOWANCE = { low: 0, medium: 30, high: 60 };
 
 import { shortName } from "./names.js";
+import { localYield } from "./yields.js";
+
+// Observed farming beats the model: where TÜİK reports the crop in this province
+// and water regime (in at least this many of the last 5 years), a failed water or
+// warmth check becomes a risk instead of a removal, like the TAGEM official-calendar
+// override. Winter cold, soil pH and the flowering heat limit stay hard checks.
+// TÜİK numbers are for the whole province, so a few hectares (garden plots, a wetter
+// valley) are not proof: where TÜİK gives the planted area, it must reach
+// OBSERVED_MIN_HA a year. Where it gives no area (sunflower; irrigated land), the
+// years alone count and the evidence says the area is unknown.
+export const OBSERVED_MIN_YEARS = 3;
+export const OBSERVED_MIN_HA = 1000;
+const SOFT_CHECKS = new Set(["season", "warmth", "heat_units", "dry_year"]);
 
 const POWER = ["NASA POWER", "NASA reanalysis"];
 
-export function checkCrop(crop, f, farmer) {
+/**
+ * @param local  TÜİK local yields for this province and water regime (yields.js), optional
+ * @returns {{ id, name, ok, reasons: string[], details: object[], cautions: object[] }}
+ *   `cautions`: soft-check failures kept as risks because TÜİK shows the crop grown here.
+ */
+export function checkCrop(crop, f, farmer, local = null) {
   const reasons = [];
   // Same order as `reasons`: what kind of evidence each failure rests on (crop check tab).
   const details = [];
-  const add = (text, type, source, kind) => {
+  const cautions = [];
+  const seen = localYield(local, crop.id);
+  const observed =
+    seen && !seen.mixed && seen.years >= OBSERVED_MIN_YEARS && (seen.planted_ha == null || seen.planted_ha >= OBSERVED_MIN_HA) ? seen : null;
+  const water = farmer.irrigation === "irrigated" ? "irrigated" : "rain-fed";
+  const add = (text, type, source, kind, check = null) => {
+    if (observed && SOFT_CHECKS.has(check)) {
+      cautions.push({
+        type, source, kind, check,
+        evidence: `${text}; but TÜİK reports ${water} ${shortName(crop)} in this province in ${observed.years} of the last 5 years (${observed.planted_ha != null ? `about ${observed.planted_ha} ha a year` : "area not reported"}), so local varieties and practice manage it somewhere in the province; check that your field is like those`,
+      });
+      return;
+    }
     reasons.push(text);
-    details.push({ type, evidence: text, source, kind });
+    details.push({ type, evidence: text, source, kind, check });
   };
   if (farmer.never_grow?.includes(crop.id)) add("on your never-grow list", "farmer", "farmer", "farmer input");
 
   if (farmer.irrigation === "rainfed" && !crop.rainfed_ok) {
     add("usually needs irrigation, and your field is rain-fed", "water", "crop table", "compiled rule");
+  }
+
+  // Flooded paddy rice needs basins that hold standing water and a large, reliable
+  // river or canal supply (about 16,000-22,000 m³ per hectare a season). Where TÜİK
+  // reports irrigated rice on at least OBSERVED_MIN_HA, that supply exists in the
+  // province; elsewhere rice is removed. Without TÜİK rice data it cannot be confirmed.
+  if (crop.paddy && farmer.irrigation === "irrigated") {
+    const rice = localYield(local, crop.id);
+    const ok = rice && !rice.mixed && rice.years >= OBSERVED_MIN_YEARS && (rice.planted_ha == null || rice.planted_ha >= OBSERVED_MIN_HA);
+    if (!ok) {
+      const what = !(local?.coveredAll ?? local?.covered)?.has(crop.id)
+        ? "no TÜİK rice statistics are loaded, so a paddy area with river or canal water cannot be confirmed here"
+        : rice
+          ? `TÜİK reports only about ${rice.planted_ha} ha of irrigated rice in this province (2020-2024); flooded rice needs paddy basins and a large, reliable river or canal supply, found where rice is already grown`
+          : "TÜİK reports no irrigated rice in this province (2020-2024); flooded rice needs paddy basins and a large, reliable river or canal supply, found where rice is already grown";
+      add(what, "water", "TÜİK MEDAS 2020-2024", "official statistics", "paddy_area");
+    }
   }
 
   if (crop.winter_hardiness_c != null) {
@@ -44,7 +91,7 @@ export function checkCrop(crop, f, farmer) {
     const season = phenology(crop, f).season;
     const needed = season - (FROST_SEASON_ALLOWANCE[crop.frost_tolerance] ?? 0);
     if (ff < needed) {
-      add(`the frost-free season is about ${ff} days, shorter than the ${season} days it needs`, "climate", ...POWER);
+      add(`the frost-free season is about ${ff} days, shorter than the ${season} days it needs`, "climate", ...POWER, "season");
     }
   }
 
@@ -77,7 +124,7 @@ export function checkCrop(crop, f, farmer) {
       if (mean < crop.temp_opt_c[0]) {
         add(
           `the summer is too cool: even ${MONTH_NAMES[warmest]}, the warmest month of its season, averages ${mean} °C, below the ${crop.temp_opt_c[0]} °C it needs to grow well (FAO EcoCrop)`,
-          "climate", "NASA POWER + FAO EcoCrop", "NASA reanalysis"
+          "climate", "NASA POWER + FAO EcoCrop", "NASA reanalysis", "warmth"
         );
       }
     }
@@ -89,7 +136,7 @@ export function checkCrop(crop, f, farmer) {
   if (heat && heat.ratio < HEAT_FAIL_RATIO && !official) {
     add(
       `the summer is too cool: about ${heat.available} heat units above ${heat.base} °C between sowing and ${heat.endsAtFrost ? "the first autumn frost" : "the end of the season"}, but a typical variety needs ${heat.required} (FAO AquaCrop)`,
-      "climate", "NASA POWER + FAO AquaCrop", "NASA reanalysis"
+      "climate", "NASA POWER + FAO AquaCrop", "NASA reanalysis", "heat_units"
     );
   }
 
@@ -101,13 +148,13 @@ export function checkCrop(crop, f, farmer) {
   if (farmer.irrigation === "rainfed" && crop.rainfed_ok) {
     const w = dryYearCoverage(crop, f);
     if (w.coverage < MIN_RAINFED_COVERAGE) {
-      add(`in a dry year rain covers only ${round(w.coverage * 100)}% of its water need`, "water", ...POWER);
+      add(`in a dry year rain covers only ${round(w.coverage * 100)}% of its water need`, "water", ...POWER, "dry_year");
     }
   }
 
-  return { id: crop.id, name: shortName(crop), ok: reasons.length === 0, reasons, details };
+  return { id: crop.id, name: shortName(crop), ok: reasons.length === 0, reasons, details, cautions };
 }
 
-export function filterCrops(crops, f, farmer) {
-  return crops.map((c) => checkCrop(c, f, farmer));
+export function filterCrops(crops, f, farmer, local = null) {
+  return crops.map((c) => checkCrop(c, f, farmer, local));
 }

@@ -23,7 +23,7 @@ CSV_OUT = ROOT / "data/sources/aquacrop_gdd.csv"
 
 # AquaCrop GDD crop versions we use (CalendarType 2 = growing degree days).
 WANTED = ["WheatGDD", "BarleyGDD", "MaizeGDD", "SunflowerGDD", "CottonGDD", "PotatoGDD",
-          "SugarBeetGDD", "TomatoGDD", "DryBeanGDD", "SoybeanGDD", "AlfalfaGDD", "SorghumGDD"]
+          "SugarBeetGDD", "TomatoGDD", "DryBeanGDD", "SoybeanGDD", "AlfalfaGDD", "SorghumGDD", "PaddyRiceGDD"]
 
 
 def get(url):

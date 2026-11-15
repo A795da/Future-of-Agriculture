@@ -44,6 +44,15 @@ export function checkSummaryTr(result, nameTr) {
 const LEVEL_WORD = { red: "uyarısı", yellow: "riski" };
 const TYPE_WORD = { frost: "Don", heat: "Sıcaklık", rain: "Şiddetli yağış", water: "Kuraklık" };
 
+/** Turkish clause: how unusual the forecast is in the 20-year NASA POWER record. */
+function contextTr(c, kind) {
+  if (!c) return "";
+  const what = kind === "heat" ? "bu 10 günlük dönemin en sıcak gününden daha sıcak" : "bu 10 günlük dönemin en soğuk gecesinden daha soğuk";
+  // Number-free suffixes ("yılında", "yılından") so vowel harmony never depends on the digits.
+  if (c.record) return `; ${c.first} yılından beri her yıl ${what} (NASA POWER)`;
+  return `; son ${c.n} yılın ${c.beaten} yılında ${what} (NASA POWER ${c.first}-${c.last})`;
+}
+
 /** One-line Turkish evidence for a Today alert, from its structured values. */
 export function alertEvidenceTr(a, cropTr) {
   const d = a.data ?? {};
@@ -56,9 +65,9 @@ export function alertEvidenceTr(a, cropTr) {
           : d.mode === "sensitive"
             ? `${cropTr} dona hassastır, her don zarar verebilir`
             : `${cropTr} yaklaşık ${d.limit} °C altında zarar görür`;
-    return `en düşük sıcaklık ${d.value} °C (${when(d.date)}); ${limit}`;
+    return `en düşük sıcaklık ${d.value} °C (${when(d.date)}); ${limit}${contextTr(d.context, "frost")}`;
   }
-  if (a.type === "heat") return `en yüksek sıcaklık ${d.value} °C (${when(d.date)}); ${cropTr} ${d.limit} °C üzerinde${d.flowering ? " çiçeklenmede" : ""} strese girer`;
+  if (a.type === "heat") return `en yüksek sıcaklık ${d.value} °C (${when(d.date)}); ${cropTr} ${d.limit} °C üzerinde${d.flowering ? " çiçeklenmede" : ""} strese girer${contextTr(d.context, "heat")}`;
   if (a.type === "rain") return `${when(d.date)} günü ${d.value} mm yağış bekleniyor${d.days > 1 ? ` (${d.days} gün 20 mm ya da daha fazla)` : ""}`;
   if (a.type === "water" && a.level === "info") return `${cropTr} bu hafta yaklaşık ${d.use} mm su kullanacak; yaklaşık ${d.rain} mm yağış bekleniyor`;
   if (a.type === "water") return `önümüzdeki 7 günde yalnızca ${d.rain} mm yağış bekleniyor, ${cropTr} ise yaklaşık ${d.use} mm su kullanır`;

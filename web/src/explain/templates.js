@@ -12,7 +12,8 @@ export const DIMENSION_LABELS = {
   simplicity: "Simplicity",
 };
 
-const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+// Lowercase the first letter, but keep acronyms and names that start with two capitals (TÜİK, NASA).
+const lower = (s) => (/^\p{Lu}\p{Lu}/u.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1));
 
 export function cardSummary(result, baseline) {
   const pos = result.reasons.filter((r) => r.effect === "positive");

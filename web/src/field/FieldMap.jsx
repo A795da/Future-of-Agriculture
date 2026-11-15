@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { fieldFromPin, fieldFromVertices, formatArea } from "./geometry.js";
+import { fieldFromPin, fieldFromVertices, formatArea, formatLatLon, nearestProvince } from "./geometry.js";
 import { useLang } from "../i18n/LangContext.jsx";
 
 // Satellite basemap: Esri World Imagery (attribution required; check the
@@ -16,7 +16,22 @@ const vertexIcon = (closer) =>
 const pinIcon = L.divIcon({ className: "pin", iconSize: [22, 22] });
 const shapeStyle = { color: "#facc15", weight: 3, fillColor: "#facc15", fillOpacity: 0.2 };
 
-export default function FieldMap({ center, onChange }) {
+// Coordinates above a dot; kept up to date while the dot is dragged.
+function withCoordLabel(marker, [lat, lon], offsetY) {
+  marker.bindTooltip(formatLatLon(lat, lon), {
+    permanent: true,
+    direction: "top",
+    offset: [0, offsetY],
+    className: "coord-tip",
+  });
+  marker.on("drag", (e) => {
+    const ll = e.target.getLatLng();
+    e.target.setTooltipContent(formatLatLon(ll.lat, ll.lng));
+  });
+  return marker;
+}
+
+export default function FieldMap({ center, provinces, onChange }) {
   const { t } = useLang();
   const el = useRef(null);
   const map = useRef(null);
@@ -85,7 +100,7 @@ export default function FieldMap({ center, onChange }) {
     g.clearLayers();
     if (mode === "pin") {
       if (pin) {
-        L.marker(pin, { icon: pinIcon, draggable: true })
+        withCoordLabel(L.marker(pin, { icon: pinIcon, draggable: true }), pin, -12)
           .on("dragend", (e) => {
             const ll = e.target.getLatLng();
             setPin([ll.lat, ll.lng]);
@@ -99,7 +114,7 @@ export default function FieldMap({ center, onChange }) {
     }
     verts.forEach((v, i) => {
       const canClose = i === 0 && !closed && verts.length >= 3;
-      L.marker(v, { icon: vertexIcon(canClose), draggable: true })
+      withCoordLabel(L.marker(v, { icon: vertexIcon(canClose), draggable: true }), v, canClose ? -13 : -10)
         .on("dragend", (e) => {
           const ll = e.target.getLatLng();
           setVerts((vs) => vs.map((x, j) => (j === i ? [ll.lat, ll.lng] : x)));
@@ -159,6 +174,15 @@ export default function FieldMap({ center, onChange }) {
     );
   };
 
+  // Field location: centroid coordinates and the nearest province centre.
+  const locText =
+    field?.valid && field.centroid
+      ? t("map_loc", {
+          coords: formatLatLon(field.centroid[1], field.centroid[0]),
+          place: nearestProvince(field.centroid[1], field.centroid[0], provinces)?.name ?? "?",
+        })
+      : null;
+
   return (
     <div className="field-map">
       <div className="seg" role="group" aria-label="How to mark your field">
@@ -199,7 +223,7 @@ export default function FieldMap({ center, onChange }) {
             : field.valid
               ? field.kind === "pin"
                 ? t("map_pin_set", { lat: field.centroid[1], lon: field.centroid[0] })
-                : t("map_field", { area: formatArea(field.area_ha), n: field.sample_points.length })
+                : t("map_field", { area: formatArea(field.area_ha), loc: locText, n: field.sample_points.length })
               : field.errorKey
                 ? t(field.errorKey, field.errorVars)
                 : field.error}

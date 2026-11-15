@@ -67,3 +67,24 @@ export function formatArea(ha) {
     v >= 100 ? Math.round(v).toLocaleString("tr-TR") : v.toLocaleString("tr-TR", { maximumFractionDigits: 1 });
   return `${fmt(ha)} ha · ${fmt(ha * DONUM_PER_HA)} dönüm`;
 }
+
+/** "37.87212, 32.48451" (lat, lon; 5 decimals ≈ 1 m). */
+export function formatLatLon(lat, lon) {
+  return `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+}
+
+/** Nearest province centre to a point (equirectangular distance; fine at Turkey's scale).
+ * A label only: a field near a border can sit in the neighbouring province. */
+export function nearestProvince(lat, lon, provinces) {
+  let best = null;
+  let bestD = Infinity;
+  const k = Math.cos((lat * Math.PI) / 180);
+  for (const p of provinces ?? []) {
+    const d = (p.lat - lat) ** 2 + ((p.lon - lon) * k) ** 2;
+    if (d < bestD) {
+      bestD = d;
+      best = p;
+    }
+  }
+  return best;
+}

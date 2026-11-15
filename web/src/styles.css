@@ -316,3 +316,16 @@ button.term[aria-expanded="true"] { color: var(--brand); text-decoration-style: 
 .rating-btns { display: flex; gap: 4px; }
 .rating-btns button { min-height: 32px; min-width: 32px; padding: 2px 0; font-size: 0.82rem; }
 .rating-btns button.on { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700; }
+
+/* Coordinate labels above field corners and the pin */
+.leaflet-tooltip.coord-tip {
+  background: rgba(17, 24, 17, 0.82);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  box-shadow: none;
+}
+.leaflet-tooltip.coord-tip::before { border-top-color: rgba(17, 24, 17, 0.82); }

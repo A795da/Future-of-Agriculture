@@ -13,7 +13,7 @@ import TodayTab from "./ui/today/TodayTab.jsx";
 import GlossaryList from "./ui/components/Glossary.jsx";
 import { LangProvider } from "./i18n/LangContext.jsx";
 import { translate } from "./i18n/strings.js";
-import { formatArea } from "./field/geometry.js";
+import { formatArea, formatLatLon, nearestProvince } from "./field/geometry.js";
 
 export default function App() {
   const [tables, setTables] = useState(null);
@@ -207,11 +207,19 @@ export default function App() {
         {point && (
           <section className="card">
             <h2>{t("field_h")}</h2>
-            <FieldMap center={point} onChange={setField} />
+            <FieldMap center={point} provinces={provinces} onChange={setField} />
             <p className="note">
               {t("field_note")}
               {onField && terrain && ` ${t("slope_note", { v: terrain.mean_slope_pct.value })}`}
-              {onField && field.area_ha && ` ${t("area_note", { v: formatArea(field.area_ha) })}`}
+              {onField &&
+                field.area_ha &&
+                ` ${t("area_note", {
+                  v: formatArea(field.area_ha),
+                  loc: t("map_loc", {
+                    coords: formatLatLon(field.centroid[1], field.centroid[0]),
+                    place: nearestProvince(field.centroid[1], field.centroid[0], provinces)?.name ?? "?",
+                  }),
+                })}`}
             </p>
           </section>
         )}

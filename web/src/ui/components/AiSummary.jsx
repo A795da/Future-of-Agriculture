@@ -33,7 +33,9 @@ const TEXT = {
   },
 };
 
-export default function AiSummary({ kind, facts, lang = "en" }) {
+/** `auto`: ask on its own when nothing is saved for these facts (one request per
+ * distinct set of facts, see explain()); failures stay quiet, the template stays. */
+export default function AiSummary({ kind, facts, lang = "en", auto = false, fallback = null, label = null }) {
   const t = TEXT[lang] ?? TEXT.en;
   const key = useMemo(() => cacheKey(kind, lang, facts), [kind, lang, facts]);
   const [state, setState] = useState({ key: null, status: "idle" });
@@ -42,25 +44,36 @@ export default function AiSummary({ kind, facts, lang = "en" }) {
   useEffect(() => {
     let live = true;
     setState({ key, status: "idle" });
-    cachedExplanation(kind, lang, facts).then((hit) => live && hit && setState({ key, status: "done", ...hit }));
+    cachedExplanation(kind, lang, facts).then((hit) => {
+      if (!live) return;
+      if (hit) return setState({ key, status: "done", ...hit });
+      if (!auto) return;
+      setState({ key, status: "busy" });
+      explain(kind, lang, facts)
+        .then((r) => live && setState({ key, status: "done", ...r }))
+        .catch((e) => live && setState({ key, status: "error", error: e.message }));
+    });
     return () => (live = false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
   const ask = () => {
     setState({ key, status: "busy" });
-    explain(kind, lang, facts)
+    explain(kind, lang, facts, { retry: true })
       .then((r) => setState((s) => (s.key === key ? { key, status: "done", ...r } : s)))
       .catch((e) => setState((s) => (s.key === key ? { key, status: "error", error: e.message } : s)));
   };
 
   if (state.key !== key) return null;
+  if (auto && state.status !== "done") {
+    return state.status === "busy" ? <p className="ai-busy">{t.busy}</p> : state.status === "error" ? fallback : null;
+  }
   if (state.status === "done") {
     return (
       <div className="ai-summary" lang={lang}>
         <p>{state.text}</p>
         <span className="ai-label">
-          {t.label}
+          {label ?? t.label}
           {state.source === "cache" ? ` · ${t.cached}` : ""}
         </span>
       </div>

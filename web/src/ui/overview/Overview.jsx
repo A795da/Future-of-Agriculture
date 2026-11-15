@@ -1,13 +1,17 @@
 // Overview: the most important results on one screen. Every number here comes
 // from the engine output or a NASA data file; nothing is invented for the layout.
 
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLang } from "../../i18n/LangContext.jsx";
 import { cropLabel } from "../../i18n/strings.js";
 import Icon from "../components/Icon.jsx";
 import SeasonPlan, { CalendarStrip } from "./SeasonPlan.jsx";
-import { rotationCalendar } from "../../scoring/calendar.js";
+import { rotationCalendar, seasonDays, sensitiveMonths } from "../../scoring/calendar.js";
+import { shortName } from "../../scoring/names.js";
 import { partName, partRotation } from "../layout/PartSwitcher.jsx";
 import { formatArea } from "../../field/geometry.js";
+import AiSummary from "../components/AiSummary.jsx";
+import { seasonFacts } from "../../explain/payload.js";
 
 /** Rotation name with second crops: "Wheat + Maize › Cotton". */
 const rotName = (r, cropsById, lang) =>
@@ -123,9 +127,20 @@ function StatCard({ icon, tone, title, value, sub, source, level }) {
 /** Monthly water balance: evaporative demand (ET0) vs rain, 20-year NASA POWER means. */
 function SeasonChart({ et0, rain, lang }) {
   const { t } = useLang();
-  const W = 720;
-  const H = 200;
-  const pad = { l: 8, r: 8, t: 30, b: 26 };
+  // Drawn at its real on-screen width, so labels stay 12px and the height stays
+  // fixed instead of the whole picture (text included) growing with the card.
+  const box = useRef(null);
+  const [W, setW] = useState(720);
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setW(Math.max(280, Math.round(e.contentRect.width))));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  // Closer to square than a wide strip: height follows the width, within limits.
+  const H = Math.round(Math.min(Math.max(W * 0.75, 220), 460));
+  const pad = { l: 18, r: 18, t: 34, b: 26 };
   const max = Math.max(...et0, ...rain) * 1.1;
   const x = (i) => pad.l + (i * (W - pad.l - pad.r)) / 11;
   const y = (v) => pad.t + (1 - v / max) * (H - pad.t - pad.b);
@@ -137,7 +152,8 @@ function SeasonChart({ et0, rain, lang }) {
   const labelX = Math.min(Math.max(px, 70), W - 70);
   return (
     <div className="season-chart">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={t("ov_season_h")}>
+      <div ref={box} className="season-plot">
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="img" aria-label={t("ov_season_h")}>
         <defs>
           <linearGradient id="et0fill" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" className="et0-stop-a" />
@@ -164,13 +180,42 @@ function SeasonChart({ et0, rain, lang }) {
           </text>
         ))}
       </svg>
-      <p className="season-insight">
-        <Icon name="sun" />
-        <span>
-          {t("ov_insight", { m: MONTHS_LONG[lang][peak], et0: Math.round(et0[peak]), rain: Math.round(rain[peak]) })}
-        </span>
-      </p>
+      </div>
     </div>
+  );
+}
+
+/** Beside the chart: what it means, in plain words. The AI text is saved per set of
+ * chart numbers, so it is asked for once and only again when the chart changes;
+ * without AI (or if its text fails the number check) the template sentence stays. */
+/** The farmer's crops for the "So this means" part: when each is in the field and
+ * when it flowers (its most water-sensitive stage), from the same crop calendars
+ * the scoring uses. Months are 0-11 in season order. */
+function farmForSeason(baseline, cropsById, features, irrigation) {
+  if (!baseline || !cropsById || !features) return null;
+  const ids = [...new Set([...baseline.sequence, ...Object.values(baseline.second_crops ?? {})])].filter((id) => id !== "fallow" && cropsById[id]);
+  const crops = ids.map((id) => {
+    const crop = cropsById[id];
+    const months = [];
+    for (const d of seasonDays(crop, features)) if (!months.includes(d.month)) months.push(d.month);
+    return { name: shortName(crop), field_months: months, flowering_months: sensitiveMonths(crop, features) };
+  });
+  return { water: irrigation === "irrigated" ? "irrigated" : "rainfed", crops };
+}
+
+function SeasonAi({ et0, rain, lang, farm }) {
+  const { t } = useLang();
+  const gap = et0.map((v, i) => v - rain[i]);
+  const peak = gap.indexOf(Math.max(...gap));
+  const template = t("ov_insight", { m: MONTHS_LONG[lang][peak], et0: Math.round(et0[peak]), rain: Math.round(rain[peak]) });
+  const facts = useMemo(() => seasonFacts(et0, rain, template, farm), [et0, rain, template, farm]);
+  return (
+    <aside className="season-ai">
+      <p className="eyebrow">
+        <Icon name="sparkle" size="1em" /> {t("ov_ai_h")}
+      </p>
+      <AiSummary kind="season" facts={facts} lang={lang} auto label={t("ov_ai_label")} fallback={<p className="season-ai-text">{template}</p>} />
+    </aside>
   );
 }
 
@@ -237,6 +282,8 @@ export default function Overview({ outcome, status, features, shift, water, plac
   const m = shift?.measures;
   const et0 = features?.monthly_et0_mm?.value;
   const rain = features?.monthly_rain_mm?.value;
+  const activePart = farm?.parts?.find((p) => p.id === farm.activePart) ?? farm?.parts?.[0];
+  const seasonFarm = farmForSeason(baseline, cropsById, features, activePart?.irrigation);
 
   return (
     <div className="overview">
@@ -315,7 +362,10 @@ export default function Overview({ outcome, status, features, shift, water, plac
               </li>
             </ul>
           </header>
-          <SeasonChart et0={et0} rain={rain} lang={lang} />
+          <div className="season-body">
+            <SeasonChart et0={et0} rain={rain} lang={lang} />
+            <SeasonAi et0={et0} rain={rain} lang={lang} farm={seasonFarm} />
+          </div>
           <footer className="panel-foot">
             <span className="stat-src">NASA POWER · 2005-2024</span>
             <button className="link-arrow" onClick={() => onNavigate("climate")}>

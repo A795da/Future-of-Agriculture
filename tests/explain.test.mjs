@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { numbersIn, verifyNumbers } from "../web/src/explain/verify.js";
-import { cacheKey, checkFacts, rotationFacts, stableJson, todayFacts } from "../web/src/explain/payload.js";
+import { cacheKey, checkFacts, rotationFacts, seasonFacts, stableJson, todayFacts } from "../web/src/explain/payload.js";
 import { explainWith, providerName, systemPrompt } from "../web/api/explain.js";
 import { createClaude, CLAUDE_MODEL } from "../web/server/providers/claude.js";
 import { createGemini, GEMINI_DEFAULT_MODEL } from "../web/server/providers/gemini.js";
@@ -198,4 +198,46 @@ test("/api/explain handler answers 503 without a key, so the app keeps the templ
   for (const k of keys) if (saved[k] !== undefined) process.env[k] = saved[k];
   assert.equal(status, 503);
   assert.equal(body.error, "ai_unavailable");
+});
+
+test("season chart: whole-mm facts, same chart same cache key, and the API accepts the kind", async () => {
+  const et0 = [30.4, 38, 62, 85, 118, 150, 204.2, 190, 140, 90, 50, 33];
+  const rain = [60, 50, 40, 30.6, 32, 15, 3.4, 4, 10, 30, 45, 62];
+  const tpl = "July is the pivot point. On average the air can pull 204 mm of water that month while 3 mm of rain falls (20 years of NASA POWER).";
+  const f = seasonFacts(et0, rain, tpl);
+  assert.equal(f.biggest_gap_month, "July");
+  assert.equal(f.months[6].water_air_pulls_mm, 204);
+  assert.doesNotMatch(JSON.stringify(f), /et0/i, "no code names the AI could copy (ET0 reads as the number 0)");
+  assert.equal(f.months[6].rain_mm, 3);
+  assert.equal(f.dry_stretch_from, "March");
+  assert.equal(f.dry_stretch_to, "November");
+  assert.ok(f.months_rain_covers_demand.includes("January"));
+  assert.ok(verifyNumbers(tpl, f).ok, "the template passes the number check");
+  // tiny decimals that round the same do not make a new request
+  const again = seasonFacts(et0.map((v) => v + 0.01), rain, tpl);
+  assert.equal(cacheKey("season", "en", again), cacheKey("season", "en", f));
+  assert.notEqual(cacheKey("season", "en", seasonFacts(et0, rain.map((v) => v + 5), tpl)), cacheKey("season", "en", f));
+  const out = await explainWith(fakeProvider(ok("July has the biggest gap: the air can pull 204 mm while 3 mm of rain falls.")), { kind: "season", lang: "en", facts: f });
+  assert.equal(out.status, 200);
+});
+
+test("season chart: rule-based 'what it means' takeaways for the farmer's own crops", () => {
+  const et0 = [30, 38, 62, 85, 118, 150, 204, 190, 140, 90, 50, 33];
+  const rain = [60, 50, 40, 30, 32, 15, 3, 4, 10, 30, 45, 62];
+  const wheat = { name: "wheat", field_months: [9, 10, 11, 0, 1, 2, 3, 4, 5], flowering_months: [4] };
+  const maize = { name: "maize", field_months: [4, 5, 6, 7, 8], flowering_months: [6] };
+  const lentil = { name: "lentil", field_months: [11, 0, 1], flowering_months: [] };
+  const f = seasonFacts(et0, rain, "t", { water: "rainfed", crops: [wheat, maize, lentil] });
+  assert.equal(f.water_supply, "rain-fed");
+  assert.match(f.your_crops[0].takeaway, /^wheat flowers in May, inside the dry stretch/);
+  assert.match(f.your_crops[1].takeaway, /maize flowers in July/);
+  assert.match(f.your_crops[2].takeaway, /lives mostly on rain/);
+  assert.match(f.general_takeaway, /From March to November .* rain-fed field/);
+  const irrigated = seasonFacts(et0, rain, "t", { water: "irrigated", crops: [maize] });
+  assert.match(irrigated.your_crops[0].takeaway, /must not run short of water/);
+  assert.match(irrigated.general_takeaway, /irrigation water matters most/);
+  // takeaways carry no numbers of their own, so they can never trip the number check
+  for (const c of f.your_crops) assert.doesNotMatch(c.takeaway, /\d/);
+  // a different rotation is a different text
+  assert.notEqual(cacheKey("season", "en", f), cacheKey("season", "en", irrigated));
 });

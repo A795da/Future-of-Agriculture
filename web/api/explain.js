@@ -25,6 +25,8 @@ const WHAT = {
   rotation: "one crop-rotation option and its score. Start with the rotation and its score",
   check: "the verdict on whether one crop makes sense after the previous seasons. The verdict is about that crop, not about the rotation: start with the crop name and the verdict",
   today: "the next 7 days of weather risks for the crop in the field. Start with the crop and the overall status",
+  season: (lang) =>
+    `a chart of the average year at this place: for each month, how much water the air can pull from soil and plants (water_air_pulls_mm) against how much rain falls (rain_mm), as 20-year means. Call it 'water the air pulls' (or the plain words for it); never write abbreviations such as ET0 or PET. Write 3 short sentences. Sentence 1: what the chart shows, with the dry stretch as a range of months (dry_stretch_from to dry_stretch_to; never list the months one by one) and the month with the biggest gap and its two amounts in mm. Then start a new sentence with exactly "${lang === "tr" ? "Yani bu şu demek:" : "So this means:"}" and tell the farmer, in 1 or 2 sentences, what it means for them in practice, naming their crop: rephrase the takeaway of the most important crop in your_crops and the general_takeaway briefly in your own words (do not copy them word for word). If your_crops is missing or empty, use only general_takeaway. Do not repeat template_text, and say month and crop names in the answer's language`,
 };
 
 const STATUS_OF = { rate_limited: 429, ai_unavailable: 503 };
@@ -37,13 +39,13 @@ export function systemPrompt(lang) {
     "Rules:",
     "- Use only facts that are in the JSON. Do not add causes, risks, advice, crop names or numbers that are not there (for example, never mention waterlogging, pests or prices unless the JSON does).",
     "- Every number you write must appear in the JSON. Write every number with digits exactly as it appears there, small counts too (7, not seven or yedi; 20, not twenty or yirmi): a dot for decimals, no thousands separators. Leave a number out rather than round, convert or spell it.",
-    "- Keep the verdict, score, status and confidence exactly as given. Never give fertilizer, pesticide or irrigation doses.",
+    "- Keep any verdict, score, status and confidence exactly as given. Never give fertilizer, pesticide or irrigation doses.",
     "- Write 2 or 3 short sentences of plain prose: the main conclusion first, then the most important reason, then what to watch or check. No lists, headings or markdown, and do not mention AI or JSON.",
     "- If the data says a local agronomist should check something, you may say so.",
     lang === "tr"
       ? [
           "- Write in simple, correct Turkish, as an agricultural extension officer (ziraat mühendisi) would speak to a farmer. Use only real, everyday Turkish words; never invent a word and never leave an English word in the text.",
-          "- Use these Turkish terms: crop rotation = ekim nöbeti; current rotation = mevcut ekim nöbeti; fallow = nadas; legume = baklagil; score = puan; confidence = güven düzeyi (medium = orta, low = düşük); dry year = kurak yıl; frost = don; heat stress = sıcaklık stresi; flowering = çiçeklenme; water need = su ihtiyacı; irrigation = sulama; bare soil = çıplak toprak; erosion = erozyon; nitrogen = azot; heat units = sıcaklık birikimi (gün-derece); local agronomist = yerel ziraat mühendisi.",
+          "- Use these Turkish terms: crop rotation = ekim nöbeti; current rotation = mevcut ekim nöbeti; fallow = nadas; legume = baklagil; score = puan; confidence = güven düzeyi (medium = orta, low = düşük); dry year = kurak yıl; frost = don; heat stress = sıcaklık stresi; flowering = çiçeklenme; water need = su ihtiyacı; irrigation = sulama; bare soil = çıplak toprak; erosion = erozyon; nitrogen = azot; heat units = sıcaklık birikimi (gün-derece); local agronomist = yerel ziraat mühendisi; water the air pulls = havanın çektiği su (buharlaşma ihtiyacı) (havanın topraktan ve bitkiden çektiği su); rain = yağış; water deficit = su açığı.",
           "- Write percentages the Turkish way, with the sign first: %51.",
           "- Translate every crop name into Turkish, also in lists of alternatives. Crop names: wheat = buğday, spring wheat = yazlık buğday, spring barley = yazlık arpa, silage maize = silajlık mısır, sorghum = sorgum, soybean = soya, dry bean = kuru fasulye, potato = patates, tomato = domates, barley = arpa, chickpea = nohut, lentil = mercimek, sunflower = ayçiçeği, faba bean = bakla, common vetch = fiğ, maize = mısır, cotton = pamuk, sugar beet = şeker pancarı, alfalfa = yonca, sainfoin = korunga, triticale = tritikale, rye = çavdar, oats = yulaf, pea = bezelye, canola = kanola, safflower = aspir.",
         ].join("\n")
@@ -85,7 +87,7 @@ export async function explainWith(provider, body) {
 
   let out;
   try {
-    out = await provider.generate({ system: systemPrompt(lang), user: `Explain ${WHAT[kind]}.\n\n${factsJson}` });
+    out = await provider.generate({ system: systemPrompt(lang), user: `Explain ${typeof WHAT[kind] === "function" ? WHAT[kind](lang) : WHAT[kind]}.\n\n${factsJson}` });
   } catch (e) {
     const code = e instanceof ProviderError ? e.code : "ai_unreachable";
     return { status: STATUS_OF[code] ?? 502, json: { error: code } };

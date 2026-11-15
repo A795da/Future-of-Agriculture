@@ -19,10 +19,10 @@
 ![Claude](https://img.shields.io/badge/Claude-AI%20wording-D97757?logo=anthropic&logoColor=white)
 ![Rule engine](https://img.shields.io/badge/Rule%20engine-auditable-555555?logo=checkmarx&logoColor=white)
 
-![NASA](https://img.shields.io/badge/NASA-POWER%20%C2%B7%20GRACE-0B3D91?logo=nasa&logoColor=white)
+![Data](https://img.shields.io/badge/data-NASA%20POWER%20%C2%B7%20GRACE%20%C2%B7%20MODIS%20%C2%B7%20SMAP-2f5f43)
 ![i18n](https://img.shields.io/badge/i18n-TR%20%7C%20EN-c62828?logo=googletranslate&logoColor=white)
 ![status](https://img.shields.io/badge/status-hackathon%20demo-e0b43a?logo=github&logoColor=black)
-![NASA Space Apps](https://img.shields.io/badge/NASA%20Space%20Apps-2026-0B3D91?logo=nasa&logoColor=white)
+![Space Apps Challenge](https://img.shields.io/badge/Space%20Apps%20Challenge-2026-2f5f43)
 
 </div>
 
@@ -85,12 +85,12 @@ The app works for any point in Türkiye's 81 provinces, in **English and Turkish
 
 | Page | What the farmer gets |
 |---|---|
-| **Overview** | The field at a glance: hot days (35 °C+), yearly rain, the water-storage trend (NASA GRACE), the best rotation for your priorities, and a season plan of when to sow and harvest. |
+| **Overview** | The field at a glance: hot days (35 °C+), yearly rain, the water-storage trend (NASA GRACE), the best rotation for your priorities, and a season plan of when to sow and harvest. A water-balance chart ("Your driest window": water the air pulls vs rain, month by month) comes with a plain-words explanation ending in "So this means:" for the farmer's own crops and water supply. |
 | **Compare rotations** | The current rotation plus two alternatives, each scored 0-100 with bars for water, climate, soil, erosion, pests, income and simplicity. Each card lists evidence lines with their source, risks, information gaps, a confidence level, and how the score holds up at +2 °C and with 10% less rain. What-if sliders for rain (−30 to +20%) and temperature (0 to +3 °C), and one tap applies the province's measured 2020-24 climate shift. |
 | **Crop check** | Type a crop in Turkish or English ("nohut", "biber", "sunflower"). A rule-based verdict: *Reasonable*, *Possible with care* or *Not reasonable*, with every reason marked as a blocker, caution or information line. Includes how much irrigation water the crop needs (mm, m³ per dekar and per hectare, share covered by rain, and the months that need most of it), rotation rules, frost and heat history, nutrients removed at harvest, whether TÜİK statistics show the crop grown in the province, and up to three better crops. |
 | **Today** | A 7-day forecast with sky conditions (sunny, cloudy, rain…) against the limits of the crop in the field now. Frost, heat, heavy-rain and dry-week alerts say what to do (never fertilizer or spray doses) and how unusual the forecast is compared with 20 years of NASA POWER. Tap a day for an hour-by-hour strip (temperature, rain, wind) and good spray hours. |
-| **Climate & trends** | Six NASA POWER panels: was this year unusual, when frost is a risk, normal year vs dry year, hot spells and hard frosts, how wet the soil is, and how the climate here has changed (2020-24 vs 2005-19, with a noise test). |
-| **My field** | Draw the field (or drop a pin), set water (rain-fed or irrigated), soil type, the current rotation with optional second crops, priorities, income ratings and crops never to grow. Up to 4 field parts, each with its own rotation, water and soil. |
+| **Climate & trends** | Six NASA POWER panels: was this year unusual, when frost is a risk, normal year vs dry year, hot spells and hard frosts, how wet the soil is, and how the climate here has changed (2020-24 vs 2005-19, with a noise test). Plus a live NASA satellite map ("Field signals", via GIBS) of recent vegetation, soil wetness and ground heat; tap the map to read a value. |
+| **My field** | Draw the field (or drop a pin); the province switches to the nearest one, so climate zone, yields and water data follow the field. Set water (rain-fed or irrigated), soil type, the current rotation with optional second crops, priorities, income ratings and crops never to grow. Up to 4 field parts, each with its own rotation, water and soil. |
 
 **42 crops**: cereals, pulses, oilseeds, industrial crops, forages, rice (flooded paddy) and 9 vegetables (pepper, cucumber, eggplant, summer squash, green bean, white cabbage, carrot, garlic, lettuce).
 
@@ -121,10 +121,13 @@ Every data source, with access details, licenses and dates, is listed in **[kayn
 | Dataset | What it drives |
 |---|---|
 | **NASA POWER** (daily, 2005-2024, all 81 provinces; live API for drawn fields) | Temperature, rain, dry years, frost dates, heat and frost at the sensitive stage, winter lows, heavy-rain days, reference evapotranspiration, soil wetness, the climate-shift panel, and how unusual a forecast is |
-| **MODIS MOD13Q1 NDVI** via ORNL DAAC | Months when the field is bare or low-green |
+| **MODIS MOD13Q1 NDVI** via ORNL DAAC (Konya 2005-2026; Adana 2005-2014, partial; no other province yet) | Months when the field is bare or low-green (evidence only, not scored) |
 | **SRTM** elevation via OpenTopoData | Field slope for erosion risk |
 | **Harmonized World Soil Database v1.2** (regridded, ORNL DAAC) | Topsoil clay and sand, used for rice seepage |
 | **GRACE / GRACE-FO** JPL mascons (2002-2026) | Trend of water stored underground and on land; warns irrigated fields where the basin is losing water |
+| **NASA GIBS** live map tiles: VIIRS NDVI (500 m), SMAP L4 root-zone soil moisture (9 km), VIIRS land surface temperature (750 m), MODIS true colour | The "Field signals" satellite map in Climate & trends: recent vegetation, soil wetness and ground heat, with click-to-read values. Display only, never scored |
+
+**Planned but not used:** an AppEEARS point-sample request (MODIS and VIIRS NDVI, SMAP soil moisture and MODIS land cover for all 81 provinces) was prepared in `data/appeears/`, but the results could not be downloaded, so no AppEEARS data is in the app. The SMAP and VIIRS layers above come from GIBS map tiles, not from AppEEARS.
 
 ### Other data (labelled "not NASA" in the app)
 
@@ -141,7 +144,7 @@ Every data source, with access details, licenses and dates, is listed in **[kayn
 
 ### Resolution
 
-NASA POWER describes an area tens of kilometres wide, GRACE about 300 km, HWSD about 5 km, MODIS NDVI 250 m and SRTM 30 m. Nearby fields share climate values; the app says so in its information gaps.
+NASA POWER describes an area tens of kilometres wide, GRACE about 300 km, SMAP 9 km, HWSD about 5 km, VIIRS 500-750 m, MODIS NDVI 250 m and SRTM 30 m. Nearby fields share climate values; the app says so in its information gaps.
 
 ### Data pipeline and efficiency
 
@@ -185,7 +188,8 @@ flowchart LR
 | **Heavy rasters become province tables offline** | GRACE (about 300 km) and HWSD (about 5 km) NetCDF grids are read once with Python and reduced to one value or trend per province (`water_storage.json`, `soil_texture.json`). The browser never touches a NetCDF file. |
 | **Live APIs only where bundling is impossible** | Forecasts and arbitrary drawn fields need live data. Responses are cached in memory per session, and saved forecast snapshots are the fallback when Open-Meteo is unreachable. |
 | **One set of climate features feeds everything** | Frost dates, dry years, evapotranspiration, the climate-shift test and forecast "how unusual" all come from the same 20-year features, so results agree across pages. |
-| **Pre-written AI texts for the demo provinces** | `explain_cache.json` holds 70 texts, so the demo needs no key and no network. Re-run `build_explain_cache.mjs` after any scoring change. |
+| **Pre-written AI texts for the demo provinces** | `explain_cache.json` holds 197 texts, so the demo needs no key and no network. Re-run `build_explain_cache.mjs` after any scoring change. |
+| **One AI request per distinct result** | AI texts are saved in the browser under a fingerprint of the facts they explain. The same chart or card never triggers a second request; requests in flight are shared, and a failed one is not retried during the visit. |
 | **Rules decide, AI words** | Rules are auditable and every number traces to a source. AI text is rejected if it contains a number not in the result. |
 | **Observed data over models** | TÜİK statistics override failed model checks, and limits are calibrated on provinces that actually grow the crop (see "What makes Geleceğin Tarımı different"). |
 
@@ -203,7 +207,7 @@ npm --prefix web install
 npm --prefix web run dev
 ```
 
-Open the address Vite prints (usually http://localhost:5173). The app works without any key: province data is bundled in `web/public/data/`, and the AI explanations fall back to template text (the 70 texts for the demo provinces are pre-written in `web/public/data/explain_cache.json`).
+Open the address Vite prints (usually http://localhost:5173). The app works without any key: province data is bundled in `web/public/data/`, and the AI explanations fall back to template text (197 texts for the demo provinces are pre-written in `web/public/data/explain_cache.json`).
 
 **Optional, AI explanations:** copy `web/.env.example` to `web/.env.local`, put a Google Gemini key in `GEMINI_API_KEY` (free tier from Google AI Studio), and restart the dev server. `web/.env.local` is gitignored; keys are read only on the server and never reach the browser.
 
@@ -223,7 +227,7 @@ The output is in `web/dist/`.
 node --test tests/*.test.mjs
 ```
 
-108 unit tests in 15 files: scoring, crop check, Today alerts, hourly forecast and spray hours, irrigation amounts, AI layer (with fake providers), Turkish texts, added crops and vegetables, TÜİK, rice, climate, field parts and saved fields.
+110 unit tests in 15 files: scoring, crop check, Today alerts, hourly forecast and spray hours, irrigation amounts, AI layer (with fake providers, including the water-balance chart explanation), Turkish texts, added crops and vegetables, TÜİK, rice, climate, field parts and saved fields.
 
 ```bash
 node scripts/validate_data.mjs
@@ -243,6 +247,8 @@ On **Vercel**:
 2. Framework preset: Vite (build `npm run build`, output `dist`). Files in `web/api/` become serverless functions automatically.
 3. Environment variables: `GEMINI_API_KEY` (optional: `GEMINI_MODEL`, `AI_PROVIDER`, `ANTHROPIC_API_KEY`).
 4. After deploying, check the AI explanations, field slope (elevation), the 7-day and hourly forecast, the crop check, and the Turkish switch on the public URL.
+
+Every push to `main` redeploys automatically. After an **Instant Rollback** in Vercel, automatic updates of the live site pause: open the new deployment and choose **Promote** to make it live again.
 
 Netlify would need the two functions rewritten in its own format.
 
@@ -281,6 +287,7 @@ The app reads only `web/public/data/`. These scripts rebuild those files from th
 | Script | Builds |
 |---|---|
 | `scripts/fetch_power_all.mjs` | NASA POWER daily history for 81 provinces (into `data/power/`, not committed) and the per-province feature files |
+| `scripts/fetch_ndvi.mjs` | MODIS NDVI series per province from the ORNL DAAC web service (slow: about 10 s per date; so far Konya complete, Adana partial) |
 | `scripts/import_ecocrop.mjs` | Temperature, rain and pH limits in `crops.json` |
 | `scripts/build_tagem.mjs` | `tagem_calendar.json` and each province's climate zone |
 | `scripts/build_nutrients.mjs` | `nutrients.json` (FAOSTAT yields, Ludemann nutrients, Herridge fixation) |
@@ -299,8 +306,13 @@ Python scripts need `xlrd` (TÜİK) or `netCDF4` and `numpy` (HWSD, GRACE). NASA
 
 ## AI use
 
-- **In the app:** Google Gemini (default) or Anthropic Claude rewords results the engine has already computed into plain English or Turkish, on request ("Explain in plain words"). It never chooses crops, scores, verdicts or alert colours. It receives only the computed result (no coordinates, place names or farmer details). Every number in its text must appear in that result, checked on the server and in the browser; otherwise the template sentence is shown. AI text is labelled as such.
-- **In development:** the team used AI coding assistants to write and review code and documentation. Data values, rules and sources are recorded in `kaynakca.md`; crop values compiled this way are marked `verified: false`.
+- **In the app:** Google Gemini (default) or Anthropic Claude rewords results the engine has already computed into plain English or Turkish: on request ("Explain in plain words") for rotation cards and crop checks, and automatically beside the Overview water-balance chart. There, the "So this means:" part only rephrases takeaways the rules derive from the farmer's crop calendars (when each crop is in the field and flowers) and water supply. It never chooses crops, scores, verdicts or alert colours. It receives only the computed result (no coordinates, place names or farmer details). Every number in its text must appear in that result, checked on the server and in the browser; otherwise the template sentence is shown. AI text is labelled as such.
+- **In development (Super Intelligence use, as the NASA Space Apps rules ask us to state):** I built this project alone, with AI coding assistants. They were used to:
+  - write, debug and review the code in `web/`, `scripts/` and `tests/`;
+  - write and edit the documentation (this README, `kaynakca.md`) and translate the interface into Turkish;
+  - compile crop values and rotation rules from the published sources named in `kaynakca.md`. Every crop row compiled this way carries `verified: false` in `web/public/data/crops.json` until an agronomy-aware reviewer checks it, and each rule names its source.
+- **Data files:** the files in `web/public/data/` are produced by the scripts in `scripts/` (written with AI help) from the sources in `kaynakca.md`. The numbers come from those sources, not from an AI model. The only AI-written texts shipped with the app are the plain-language explanations in `explain_cache.json`; they are labelled "AI summary" in the app and have passed the number check.
+- **No NASA branding:** nothing in this project uses or modifies NASA logos, insignia or mission identifiers; NASA is named only as the source of the data.
 
 ---
 
@@ -308,6 +320,7 @@ Python scripts need `xlrd` (TÜİK) or `netCDF4` and `numpy` (HWSD, GRACE). NASA
 
 - **Crop values need an expert check.** Frost and heat limits, sensitive stages and some rotation rules are compiled by the team from FAO and published sources; every crop is marked `verified: false` until an agronomy-aware reviewer checks it.
 - **Coarse climate data.** NASA POWER cells are tens of kilometres wide; a valley or slope can differ from the cell.
+- **NDVI for two provinces only.** MODIS NDVI is cached for Konya (complete) and Adana (to 2014); other provinces have no bare-month evidence yet. The live GIBS map covers all of Türkiye but is display only.
 - **TÜİK is province-wide** and covers field crops only so far: vegetables, alfalfa and sainfoin use national FAOSTAT yields and have no "grown here" evidence.
 - **Water amounts are net crop needs.** The irrigation amounts are what the crop uses beyond rain and stored soil water; what a farmer pumps is higher and depends on the method (drip, sprinkler, furrow), which the app does not ask for.
 - **Forecasts are not NASA data.** The 7-day and hourly forecasts come from Open-Meteo, and are labelled so. Heat waves two months ahead cannot be forecast as events; seasonal outlooks are not included.
@@ -319,6 +332,6 @@ Python scripts need `xlrd` (TÜİK) or `netCDF4` and `numpy` (HWSD, GRACE). NASA
 
 ## Credits
 
-Data from NASA POWER (*"These data were obtained from the NASA Langley Research Center (LaRC) POWER Project funded through the NASA Earth Science/Applied Science Program."*), ORNL DAAC (MODIS NDVI; HWSD v1.2, Wieder et al. 2014), NASA JPL (GRACE/GRACE-FO mascons, Wiese et al. 2016; Watkins et al. 2015) and SRTM via OpenTopoData. Weather data by [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0). Satellite imagery © Esri, Maxar, Earthstar Geographics. Crop statistics: TÜİK. Calendars: TAGEM-DSİ 2017. FAO-56, FAO EcoCrop, FAOSTAT (© FAO, CC BY 4.0), Ludemann et al. 2023 (CC0), Herridge, Peoples & Boddey 2008, FAO AquaCrop parameters via AquaCrop-OSPy. Map library: Leaflet. The same credits appear at the bottom of every page of the app; the full list is in [kaynakca.md](kaynakca.md).
+Data from NASA POWER (*"These data were obtained from the NASA Langley Research Center (LaRC) POWER Project funded through the NASA Earth Science/Applied Science Program."*), ORNL DAAC (MODIS NDVI; HWSD v1.2, Wieder et al. 2014), NASA JPL (GRACE/GRACE-FO mascons, Wiese et al. 2016; Watkins et al. 2015), SRTM via OpenTopoData, and NASA GIBS / EOSDIS map layers (VIIRS NDVI, SMAP L4 soil moisture, VIIRS land temperature, MODIS true colour). Weather data by [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0). Satellite imagery © Esri, Maxar, Earthstar Geographics. Crop statistics: TÜİK. Calendars: TAGEM-DSİ 2017. FAO-56, FAO EcoCrop, FAOSTAT (© FAO, CC BY 4.0), Ludemann et al. 2023 (CC0), Herridge, Peoples & Boddey 2008, FAO AquaCrop parameters via AquaCrop-OSPy. Map library: Leaflet. The same credits appear at the bottom of every page of the app; the full list is in [kaynakca.md](kaynakca.md).
 
 Geleceğin Tarımı is a decision-support prototype. Check any change to your farming with a local agronomist or extension officer.

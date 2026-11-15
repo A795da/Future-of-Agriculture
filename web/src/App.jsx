@@ -22,6 +22,7 @@ import Icon from "./ui/components/Icon.jsx";
 import FieldSidebar from "./ui/layout/FieldSidebar.jsx";
 import Overview from "./ui/overview/Overview.jsx";
 import ClimateView from "./ui/climate/ClimateView.jsx";
+import WelcomePanel from "./ui/components/WelcomePanel.jsx";
 
 const VALID_TABS = ["overview", "today", "plan", "check", "field", "climate"];
 const DEFAULT_TAB = "overview";
@@ -419,6 +420,7 @@ export default function App() {
 
         <Credits />
       </main>
+      <WelcomePanel t={t} onSetup={() => setTab("field")} />
       </div>
     </div>
     </LangProvider>

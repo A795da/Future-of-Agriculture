@@ -16,6 +16,8 @@ const NASA = [
   ["GRACE / GRACE-FO JPL Mascon RL06.3 v04 CRI, NASA JPL", "https://doi.org/10.5067/TEMSC-3JC634", "trend of water stored underground and on land", "yer altı ve yüzeyde depolanan suyun eğilimi",
     "Wiese, Landerer & Watkins 2016; Watkins et al. 2015"],
   ["SRTM (NASA), via OpenTopoData", "https://www.opentopodata.org/", "field slope", "tarla eğimi", null],
+  ["NASA GIBS / EOSDIS: VIIRS NDVI, SMAP L4 soil moisture, VIIRS land temperature, MODIS true colour", "https://nasa-gibs.github.io/gibs-api-docs/",
+    "live satellite map in Climate & trends (display only)", "İklim ve eğilimler sayfasındaki canlı uydu haritası (yalnızca gösterim)", null],
 ];
 
 const OTHER = [

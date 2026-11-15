@@ -47,11 +47,31 @@ export async function cachedExplanation(kind, lang, facts) {
   return hit;
 }
 
-/** Cached text, or a new one from /api/explain. Throws with a short reason when there is none. */
-export async function explain(kind, lang, facts, { signal } = {}) {
+const inflight = new Map(); // key -> promise: the same facts asked twice at once share one request
+const failed = new Map(); // key -> reason: a failed key is not asked again during this visit
+
+/** Cached text, or a new one from /api/explain. Throws with a short reason when there is none.
+ * The same facts never cause a second request: answers are saved (memory + this browser),
+ * requests in flight are shared, and failures are remembered for the visit. */
+export function explain(kind, lang, facts, { signal, retry = false } = {}) {
+  const key = cacheKey(kind, lang, facts);
+  if (retry) failed.delete(key); // the farmer pressed the button again
+  if (failed.has(key)) return Promise.reject(new Error(failed.get(key)));
+  if (!inflight.has(key)) {
+    const p = request(kind, lang, facts, key, signal)
+      .catch((e) => {
+        if (e.name !== "AbortError") failed.set(key, e.message);
+        throw e;
+      })
+      .finally(() => inflight.delete(key));
+    inflight.set(key, p);
+  }
+  return inflight.get(key);
+}
+
+async function request(kind, lang, facts, key, signal) {
   const cached = await cachedExplanation(kind, lang, facts);
   if (cached) return cached;
-  const key = cacheKey(kind, lang, facts);
   const res = await fetch("/api/explain", {
     method: "POST",
     headers: { "content-type": "application/json" },

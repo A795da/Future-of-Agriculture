@@ -21,14 +21,14 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 
 ### MODIS MOD13Q1 v061 NDVI (16-day, 250 m) via ORNL DAAC MODIS Web Service
 - **Used for:** monthly NDVI pattern and low-green months (evidence only; not yet in scores).
-- **Files:** `scripts/fetch_ndvi.mjs`, `web/src/features/vegetation.js`; cache `web/public/data/cache/<province>/ndvi.json` (Konya, partial).
+- **Files:** `scripts/fetch_ndvi.mjs`, `web/src/features/vegetation.js`; cache `web/public/data/cache/<province>/ndvi.json`: Konya (2005-01 to 2026-10, complete) and Adana (2005-01 to 2014-02, partial). No other province has an NDVI file.
 - **Access:** `https://modis.ornl.gov/rst/api/v1/MOD13Q1/subset`, band `250m_16_days_NDVI`, scale 0.0001, fill −3000. Slow (~10 s per date).
 - **Kind:** NASA observation. **License:** NASA open data; cite ORNL DAAC.
 - **Caveat:** NDVI is low on bare soil and on dormant winter crops alike; 250 m pixels mix neighbouring land on small fields.
-- **Accessed:** 2026-11-14. **Status:** used (Konya only, download in progress).
+- **Accessed:** 2026-11-14. **Status:** used for Konya and Adana only (Adana partial); the download for the other provinces was not finished.
 
-### NASA AppEEARS point request: MODIS NDVI, VIIRS NDVI, SMAP soil moisture, MODIS land cover (planned)
-- **For:** one request for all 81 province points, 2015-01-01 to 2026-11-14:
+### NASA AppEEARS point request: MODIS NDVI, VIIRS NDVI, SMAP soil moisture, MODIS land cover (not used: data never downloaded)
+- **Planned for:** one request for all 81 province points, 2015-01-01 to 2026-11-14:
   - `MOD13Q1.061` NDVI + pixel reliability (250 m, 16-day): vegetation pattern, low-green months. NASA observation.
   - `VNP13A1.002` VIIRS NDVI + pixel reliability (500 m, 16-day): continuity for MODIS. NASA observation.
   - `SPL3SMP_E.006` SMAP enhanced L3 surface soil moisture AM/PM + quality flags (9 km, daily, from 2015-03-31): observed soil moisture for drought stress. NASA observation.
@@ -36,7 +36,7 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 - **Files:** upload `data/appeears/fieldshift_81_provinces.csv`; step-by-step guide `data/appeears/README.md`.
 - **Access:** https://appeears.earthdatacloud.nasa.gov (Earthdata login). Product and layer names checked against the AppEEARS catalog API on 2026-11-15.
 - **License:** NASA open data; cite each product (LP DAAC for MODIS/VIIRS, NSIDC DAAC for SMAP) and AppEEARS.
-- **Status:** planned (request to be submitted by the team).
+- **Status:** not used. The request file and guide were prepared, but the results could not be downloaded, so no AppEEARS data is in the app. The SMAP and VIIRS layers the app does show come from the NASA GIBS map tiles below (display only), not from AppEEARS.
 
 ### NASA GIBS: MODIS_Terra_NDVI_8Day tiles (tested, not used)
 - Tested 2026-11-14. The layer only has data from 2025-02 onwards, and tiles are images, not numbers, so they cannot drive scoring. Possible later use: map overlay only.
@@ -73,7 +73,7 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 
 ## Credits shown in the app
 
-`web/src/ui/layout/Credits.jsx` (bottom of every page, English and Turkish, added 2026-11-15) names every data source the app uses with a link: NASA POWER (with its acknowledgement sentence), MODIS NDVI (ORNL DAAC), HWSD (ORNL DAAC, Wieder et al. 2014), GRACE/GRACE-FO (JPL, Wiese et al. 2016; Watkins et al. 2015), SRTM via OpenTopoData; Open-Meteo (CC BY 4.0), Esri imagery, TÜİK ("Kaynak: TÜİK"), TAGEM-DSİ 2017, FAO-56, FAO EcoCrop, FAOSTAT (CC BY 4.0), Ludemann et al. 2023 (CC0), Herridge et al. 2008, FAO AquaCrop parameters (AquaCrop-OSPy), Tebliğ 2024/39; plus the AI-use note and a link to this file. Not listed there: SoilGrids (not called by the app) and AppEEARS/GIBS (not used).
+`web/src/ui/layout/Credits.jsx` (bottom of every page, English and Turkish, added 2026-11-15) names every data source the app uses with a link: NASA POWER (with its acknowledgement sentence), MODIS NDVI (ORNL DAAC), HWSD (ORNL DAAC, Wieder et al. 2014), GRACE/GRACE-FO (JPL, Wiese et al. 2016; Watkins et al. 2015), SRTM via OpenTopoData, NASA GIBS map layers (VIIRS NDVI, SMAP L4, VIIRS land temperature, MODIS true colour; added to the credits 2026-11-15); Open-Meteo (CC BY 4.0), Esri imagery, TÜİK ("Kaynak: TÜİK"), TAGEM-DSİ 2017, FAO-56, FAO EcoCrop, FAOSTAT (CC BY 4.0), Ludemann et al. 2023 (CC0), Herridge et al. 2008, FAO AquaCrop parameters (AquaCrop-OSPy), Tebliğ 2024/39; plus the AI-use note and a link to this file. Not listed there: SoilGrids (not called by the app) and AppEEARS/GIBS (not used).
 
 ## Non-NASA data (labelled as such in the app)
 
@@ -176,7 +176,7 @@ Kind values match the labels shown in the app: NASA observation · NASA reanalys
 
 ### Province coordinates and regions (`web/public/data/provinces.json`)
 - 81 province centre coordinates (approximate, written from general knowledge; city centres, not farmland) and the official 7 geographic regions of Turkey.
-- **Status:** compiled, unverified. Planned check: land cover from AppEEARS; consider an official or OpenStreetMap source.
+- **Status:** compiled, unverified. Not checked against land cover yet (the AppEEARS land-cover request was never downloaded); an official or OpenStreetMap source could be used.
 
 ---
 
@@ -301,9 +301,9 @@ Compiled by the team on 2026-11-15 from the sources below (found by web search; 
 
 | Resource | Decision | Why |
 |---|---|---|
-| SMAP soil moisture | **added** to the AppEEARS request (SPL3SMP_E.006); GIBS map layer later | real NASA soil-moisture observation; complements POWER's modeled root-zone wetness |
-| VIIRS vegetation indices | **added** to the AppEEARS request (VNP13A1.002) | continuity for MODIS as Terra nears end of mission |
-| Landsat / HLS (Harmonized Landsat Sentinel-2, 30 m) | **candidate (stretch)**: one AppEEARS area request for the demo field with `HLSL30_VI.020` / `HLSS30_VI.020` (ready-made NDVI) | field-scale NDVI and bare-period detection; MODIS 250 m is coarse |
+| SMAP soil moisture | **used** as a live GIBS map layer (`SMAP_L4_Analyzed_Root_Zone_Soil_Moisture`, display only); the AppEEARS point request (SPL3SMP_E.006) was never downloaded | real NASA soil-moisture observation; complements POWER's modeled root-zone wetness |
+| VIIRS vegetation indices | **used** as live GIBS map layers (`VIIRS_NOAA21_NDVI_8Day`, `VIIRS_NOAA21_Land_Surface_Temp_Day`, display only); the AppEEARS point request (VNP13A1.002) was never downloaded | continuity for MODIS as Terra nears end of mission |
+| Landsat / HLS (Harmonized Landsat Sentinel-2, 30 m) | **candidate (stretch, not done)**: one AppEEARS area request for the demo field with `HLSL30_VI.020` / `HLSS30_VI.020` (ready-made NDVI) | field-scale NDVI and bare-period detection; MODIS 250 m is coarse |
 | GPM IMERG | **candidate (should)**: daily series for cached points | rainfall reliability and extreme-storm frequency for erosion |
 | FAO GAEZ v4 | **candidate**: suitability cross-check; official EcoCrop access; HWSD v2 soil database as SoilGrids fallback | soil properties and suitability without depending on SoilGrids |
 | ECOSTRESS | roadmap | irregular revisits; heavy processing |

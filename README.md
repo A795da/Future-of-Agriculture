@@ -1,8 +1,8 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="web/public/brand/logo-paper.png">
-  <img src="web/public/brand/logo-ink.png" alt="Geleceğin Tarımı" height="110">
+  <source media="(prefers-color-scheme: dark)" srcset="web/public/brand/logo-stacked-paper.png">
+  <img src="web/public/brand/logo-stacked-ink.png" alt="Geleceğin Tarımı" height="160">
 </picture>
 
 *Crop rotation decisions for Turkish farmers, built on NASA Earth data.*

@@ -1,0 +1,11 @@
+
+# raw NASA POWER history (re-fetch with scripts/fetch_power_all.mjs)
+data/power/
+
+# copyrighted source PDFs and large raw files (cite them; do not redistribute)
+data/sources/raw/
+
+# local secrets (API keys); web/.env.example is the committed template
+.env
+.env*.local
+FieldShift Master Plan (NASA Space Apps 2026).md

@@ -1,0 +1,10 @@
+[
+  { "id": "konya", "name": "Konya", "region": "central-anatolia", "lat": 37.87, "lon": 32.49 },
+  { "id": "adana", "name": "Adana", "region": "mediterranean", "lat": 37.0, "lon": 35.32 },
+  { "id": "sanliurfa", "name": "Şanlıurfa", "region": "southeast-anatolia", "lat": 37.16, "lon": 38.79 },
+  { "id": "manisa", "name": "Manisa", "region": "aegean", "lat": 38.61, "lon": 27.43 },
+  { "id": "samsun", "name": "Samsun", "region": "black-sea", "lat": 41.29, "lon": 36.33 },
+  { "id": "erzurum", "name": "Erzurum", "region": "east-anatolia", "lat": 39.9, "lon": 41.27 },
+  { "id": "edirne", "name": "Edirne", "region": "marmara", "lat": 41.68, "lon": 26.56 },
+  { "id": "ankara", "name": "Ankara", "region": "central-anatolia", "lat": 39.93, "lon": 32.86 }
+]

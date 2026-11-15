@@ -1,0 +1,26 @@
+crop_id,ecocrop_name,note
+wheat,Triticum aestivum,
+spring_wheat,Triticum aestivum,EcoCrop does not separate spring and winter wheat
+barley,Hordeum vulgare,
+spring_barley,Hordeum vulgare,EcoCrop does not separate spring and winter barley
+maize,Zea mays,
+chickpea,Cicer arietinum,
+lentil,Lens culinaris,
+dry_bean,Phaseolus vulgaris,
+sunflower,Helianthus annuus,
+safflower,Carthamus tinctorius,
+canola,Brassica napus,
+sugar_beet,Beta vulgaris var. saccharifera,sugar beet variety row
+cotton,Gossypium hirsutum,
+potato,Solanum tuberosum,
+tomato,Lycopersicon esculentum,EcoCrop uses the older name for Solanum lycopersicum
+alfalfa,Medicago sativa,
+vetch,Vicia sativa ssp. sativa,common vetch
+oats,Avena sativa,
+rye,Secale cereale,
+pea,Pisum sativum,
+faba_bean,Vicia faba,
+soybean,Glycine max,
+sainfoin,Onobrychis viciifolia,
+silage_maize,Zea mays,same EcoCrop row as grain maize
+sorghum,Sorghum bicolor,

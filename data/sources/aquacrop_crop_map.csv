@@ -1,0 +1,15 @@
+crop_id,aquacrop_name,use,note
+maize,MaizeGDD,heat_check,warm-season crop
+sunflower,SunflowerGDD,heat_check,warm-season crop
+cotton,CottonGDD,heat_check,warm-season crop
+potato,PotatoGDD,heat_check,cool-season tuber but frost-sensitive; summer crop on the plateaus
+sugar_beet,SugarBeetGDD,heat_check,long-season root crop
+tomato,TomatoGDD,heat_check,warm-season crop
+dry_bean,DryBeanGDD,heat_check,warm-season legume
+wheat,WheatGDD,none,AquaCrop default is a long-season variety (2400 GDD); winter wheat uses thermal time from crops.json and TAGEM sowing dates
+spring_wheat,WheatGDD,none,AquaCrop default too long for spring wheat on the plateaus (TAGEM: about 115 days in Erzurum)
+barley,BarleyGDD,none,winter barley uses thermal time from crops.json
+spring_barley,BarleyGDD,none,TAGEM calendar used instead
+alfalfa,AlfalfaGDD,none,perennial; cutting cycles not modelled
+sorghum,SorghumGDD,heat_check,warm-season cereal
+soybean,SoybeanGDD,heat_check,warm-season legume

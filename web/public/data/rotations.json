@@ -1,0 +1,176 @@
+{
+  "_meta": {
+    "status": "compiled, needs expert validation",
+    "how_to_read": "sequence lists one main crop per year, repeating after the last year. 'fallow' means the field is left unsown for that season. second_crops are optional summer crops sown right after a winter crop in the same year (only where the season is long enough and water is available). regions use the 7 geographic regions of Turkey; irrigation is rainfed, irrigated or either.",
+    "source": "Common rotation patterns in Turkish agriculture compiled by the team from general agronomy references; not yet validated by a local expert."
+  },
+  "rotations": [
+    {
+      "id": "wheat-fallow",
+      "sequence": ["wheat", "fallow"],
+      "regions": ["central-anatolia", "east-anatolia"],
+      "irrigation": "rainfed",
+      "notes": "Traditional dryland system: the fallow year stores rain in the soil, but leaves it bare and open to erosion."
+    },
+    {
+      "id": "spring_wheat-fallow",
+      "sequence": ["spring_wheat", "fallow"],
+      "regions": ["east-anatolia"],
+      "irrigation": "rainfed",
+      "notes": "Cold high plateaus (Erzurum, Kars, Ağrı, Ardahan): wheat is sown in spring because winters are too harsh; fallow stores water."
+    },
+    {
+      "id": "wheat-chickpea-barley",
+      "sequence": ["wheat", "chickpea", "barley"],
+      "regions": ["central-anatolia", "aegean", "east-anatolia"],
+      "irrigation": "rainfed",
+      "notes": "A legume in the middle year breaks the cereal run and adds nitrogen."
+    },
+    {
+      "id": "wheat-vetch",
+      "sequence": ["wheat", "vetch"],
+      "regions": ["central-anatolia", "east-anatolia", "black-sea"],
+      "irrigation": "rainfed",
+      "notes": "Vetch replaces fallow: soil stays covered in winter and the legume adds nitrogen, at the cost of some stored water."
+    },
+    {
+      "id": "wheat-safflower-barley",
+      "sequence": ["wheat", "safflower", "barley"],
+      "regions": ["central-anatolia"],
+      "irrigation": "rainfed",
+      "notes": "Drought-tolerant oilseed as a non-cereal break crop."
+    },
+    {
+      "id": "wheat-lentil",
+      "sequence": ["wheat", "lentil"],
+      "regions": ["southeast-anatolia"],
+      "irrigation": "rainfed",
+      "notes": "Classic Southeastern Anatolia system with winter-sown red lentil."
+    },
+    {
+      "id": "wheat-sunflower",
+      "sequence": ["wheat", "sunflower"],
+      "regions": ["marmara"],
+      "irrigation": "rainfed",
+      "notes": "Dominant rotation in Thrace."
+    },
+    {
+      "id": "wheat-canola-sunflower",
+      "sequence": ["wheat", "canola", "sunflower"],
+      "regions": ["marmara"],
+      "irrigation": "rainfed",
+      "notes": "Adds a winter brassica break crop to the Thrace system."
+    },
+    {
+      "id": "wheat-maize2-cotton",
+      "sequence": ["wheat", "cotton"],
+      "second_crops": {
+        "0": "maize"
+      },
+      "regions": ["mediterranean", "southeast-anatolia"],
+      "irrigation": "irrigated",
+      "notes": "Çukurova and Harran pattern: wheat, then second-crop maize in summer, then cotton."
+    },
+    {
+      "id": "cotton-wheat-chickpea",
+      "sequence": ["cotton", "wheat", "chickpea"],
+      "regions": ["southeast-anatolia", "aegean", "mediterranean"],
+      "irrigation": "irrigated",
+      "notes": "Breaks continuous cotton with a cereal and a legume."
+    },
+    {
+      "id": "sugarbeet-wheat-chickpea-barley",
+      "sequence": ["sugar_beet", "wheat", "chickpea", "barley"],
+      "regions": ["central-anatolia"],
+      "irrigation": "irrigated",
+      "notes": "Four-year gap between beet crops limits beet nematode; legume year rebuilds nitrogen."
+    },
+    {
+      "id": "potato-wheat-dry_bean",
+      "sequence": ["potato", "wheat", "dry_bean"],
+      "regions": ["central-anatolia"],
+      "irrigation": "irrigated",
+      "notes": "Niğde-Nevşehir style: potato, a cereal break, then a legume."
+    },
+    {
+      "id": "tomato-wheat-maize",
+      "sequence": ["tomato", "wheat", "maize"],
+      "regions": ["marmara", "aegean"],
+      "irrigation": "irrigated",
+      "notes": "Field tomato followed by a cereal; avoids nightshade back to back."
+    },
+    {
+      "id": "alfalfa-wheat",
+      "sequence": ["alfalfa", "alfalfa", "alfalfa", "wheat", "barley"],
+      "regions": ["east-anatolia", "central-anatolia"],
+      "irrigation": "irrigated",
+      "notes": "Three alfalfa years build soil and nitrogen for the cereals that follow."
+    },
+    {
+      "id": "wheat-dry_bean-maize",
+      "sequence": ["wheat", "dry_bean", "maize"],
+      "regions": ["black-sea"],
+      "irrigation": "either",
+      "notes": "Wetter Black Sea climate allows summer crops with little irrigation."
+    },
+    {
+      "id": "sainfoin-spring_wheat",
+      "sequence": ["sainfoin", "sainfoin", "sainfoin", "spring_wheat"],
+      "regions": ["east-anatolia"],
+      "irrigation": "rainfed",
+      "notes": "Rain-fed sainfoin (korunga) kept three years for hay, then spring wheat uses the nitrogen and the improved soil; common on the eastern plateaus with livestock."
+    },
+    {
+      "id": "rye-fallow",
+      "sequence": ["rye", "fallow"],
+      "regions": ["east-anatolia"],
+      "irrigation": "rainfed",
+      "notes": "Rye survives the coldest winters and poor soils; an option where winter wheat fails."
+    },
+    {
+      "id": "spring_wheat-pea",
+      "sequence": ["spring_wheat", "pea"],
+      "regions": ["east-anatolia"],
+      "irrigation": "rainfed",
+      "notes": "A short-season pea replaces fallow on the cold plateaus and adds nitrogen."
+    },
+    {
+      "id": "wheat-pea",
+      "sequence": ["wheat", "pea"],
+      "regions": ["central-anatolia", "aegean", "marmara"],
+      "irrigation": "rainfed",
+      "notes": "Dry pea as a legume break crop between wheat crops."
+    },
+    {
+      "id": "wheat-faba_bean",
+      "sequence": ["wheat", "faba_bean"],
+      "regions": ["mediterranean", "aegean"],
+      "irrigation": "either",
+      "notes": "Winter-sown faba bean, the strongest nitrogen fixer of the pulses, between wheat crops."
+    },
+    {
+      "id": "wheat-soybean2-maize",
+      "sequence": ["wheat", "maize"],
+      "second_crops": {
+        "0": "soybean"
+      },
+      "regions": ["mediterranean", "black-sea"],
+      "irrigation": "irrigated",
+      "notes": "Wheat, then second-crop soybean in summer, then maize; the legume second crop replaces second-crop maize."
+    },
+    {
+      "id": "silage_maize-wheat-vetch",
+      "sequence": ["silage_maize", "wheat", "vetch"],
+      "regions": ["east-anatolia", "central-anatolia", "black-sea"],
+      "irrigation": "irrigated",
+      "notes": "Livestock farms: silage maize, wheat, then vetch for forage and nitrogen."
+    },
+    {
+      "id": "alfalfa-spring_wheat",
+      "sequence": ["alfalfa", "alfalfa", "alfalfa", "spring_wheat"],
+      "regions": ["east-anatolia"],
+      "irrigation": "irrigated",
+      "notes": "Irrigated cold plateaus with livestock: three years of alfalfa for hay, then spring wheat on the improved soil."
+    }
+  ]
+}

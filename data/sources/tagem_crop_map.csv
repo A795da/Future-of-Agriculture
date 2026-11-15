@@ -1,0 +1,30 @@
+crop_id,tagem_crop,use_calendar,note
+wheat,buğday (kışlık),sowing_only,winter wheat; sowing date from TAGEM; flowering and harvest from thermal time
+barley,arpa (kışlık),sowing_only,winter barley; sowing date from TAGEM; flowering and harvest from thermal time
+spring_wheat,buğday (yazlık),full,spring wheat; full TAGEM calendar
+spring_barley,arpa (yazlık),full,spring barley; full TAGEM calendar
+maize,mısır (dane),full,grain maize (main crop)
+maize_second,"mısır (dane, 2. ürün)",full,grain maize as a second crop after a winter cereal
+chickpea,nohut (yazlık),full,spring-sown chickpea
+lentil,"mercimek (kırmızı, kışlık)|mercimek (yeşil, kışlık)",sowing_only,winter red lentil; sowing date from TAGEM; flowering and harvest from thermal time
+dry_bean,fasülye (kuru),full,dry bean
+sunflower,ayçiçeği,full,sunflower (main crop)
+safflower,aspir (yazlık),full,spring safflower
+canola,kanola,sowing_only,winter canola; sowing date from TAGEM; flowering and harvest from thermal time
+sugar_beet,şekerpancarı,full,sugar beet
+cotton,pamuk,full,cotton
+potato,patates,full,potato (main crop)
+tomato,domates (salçalık)|domates (yer),full,processing tomato
+vetch,fiğ (adi),none,TAGEM lists irrigated spring-sown common vetch (about 90 days); our vetch is winter-sown forage or cover crop; calendar not used
+alfalfa,,none,TAGEM lists alfalfa per cutting (yonca_1 to yonca_10); perennial; not used
+oats,yulaf (kışlık),sowing_only,winter oats; sowing date from TAGEM; flowering and harvest from thermal time
+rye,çavdar (kışlık),sowing_only,winter rye; sowing date from TAGEM; flowering and harvest from thermal time
+triticale,tritikale,sowing_only,winter triticale; sowing date from TAGEM; flowering and harvest from thermal time
+pea,bezelye (taze),sowing_only,guide lists only fresh pea; its sowing date is used for dry pea; season from FAO-56
+faba_bean,"bakla (taze)",sowing_only,guide lists only fresh faba bean (4 zones); its sowing date is used for dry faba bean
+soybean,soya fasülyesi,full,soybean (main crop)
+soybean_second,"soya fasülyesi (2. ürün)",full,soybean as a second crop after a winter cereal
+silage_maize,mısır (silajlık),full,silage maize (main crop)
+silage_maize_second,"mısır (silajlık, 2. ürün)",full,silage maize as a second crop after a winter cereal
+sorghum,sorgum (dane),full,grain sorghum
+sainfoin,korunga,none,perennial forage; calendar not used

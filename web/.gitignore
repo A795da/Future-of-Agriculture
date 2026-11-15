@@ -1,0 +1,6 @@
+node_modules/
+dist/
+
+# server-only secrets (ANTHROPIC_API_KEY for /api/explain)
+.env*.local
+.env

@@ -1,0 +1,101 @@
+crop_id,field,old,new,source
+wheat,temp_opt_c,"[15,23]","[15,23]","FAO EcoCrop (Triticum aestivum): TOPMN-TOPMX, mean temperature"
+wheat,temp_abs_c,"[5,27]","[5,27]","FAO EcoCrop (Triticum aestivum): TMIN-TMAX, mean temperature"
+wheat,soil_ph,"[5.5,8.5]","[5.5,8.5]",FAO EcoCrop (Triticum aestivum): PHMIN-PHMAX (absolute range)
+wheat,rain_abs_mm,"[300,1600]","[300,1600]","FAO EcoCrop (Triticum aestivum): RMIN-RMAX, annual rainfall"
+spring_wheat,temp_opt_c,"[15,23]","[15,23]","FAO EcoCrop (Triticum aestivum): TOPMN-TOPMX, mean temperature"
+spring_wheat,temp_abs_c,"[5,27]","[5,27]","FAO EcoCrop (Triticum aestivum): TMIN-TMAX, mean temperature"
+spring_wheat,soil_ph,"[5.5,8.5]","[5.5,8.5]",FAO EcoCrop (Triticum aestivum): PHMIN-PHMAX (absolute range)
+spring_wheat,rain_abs_mm,"[300,1600]","[300,1600]","FAO EcoCrop (Triticum aestivum): RMIN-RMAX, annual rainfall"
+barley,temp_opt_c,"[15,20]","[15,20]","FAO EcoCrop (Hordeum vulgare): TOPMN-TOPMX, mean temperature"
+barley,temp_abs_c,"[2,40]","[2,40]","FAO EcoCrop (Hordeum vulgare): TMIN-TMAX, mean temperature"
+barley,soil_ph,"[6,8]","[6,8]",FAO EcoCrop (Hordeum vulgare): PHMIN-PHMAX (absolute range)
+barley,rain_abs_mm,"[200,2000]","[200,2000]","FAO EcoCrop (Hordeum vulgare): RMIN-RMAX, annual rainfall"
+spring_barley,temp_opt_c,"[15,20]","[15,20]","FAO EcoCrop (Hordeum vulgare): TOPMN-TOPMX, mean temperature"
+spring_barley,temp_abs_c,"[2,40]","[2,40]","FAO EcoCrop (Hordeum vulgare): TMIN-TMAX, mean temperature"
+spring_barley,soil_ph,"[6,8]","[6,8]",FAO EcoCrop (Hordeum vulgare): PHMIN-PHMAX (absolute range)
+spring_barley,rain_abs_mm,"[200,2000]","[200,2000]","FAO EcoCrop (Hordeum vulgare): RMIN-RMAX, annual rainfall"
+maize,temp_opt_c,"[18,33]","[18,33]","FAO EcoCrop (Zea mays): TOPMN-TOPMX, mean temperature"
+maize,temp_abs_c,"[10,47]","[10,47]","FAO EcoCrop (Zea mays): TMIN-TMAX, mean temperature"
+maize,soil_ph,"[4.5,8.5]","[4.5,8.5]",FAO EcoCrop (Zea mays): PHMIN-PHMAX (absolute range)
+maize,rain_abs_mm,"[400,1800]","[400,1800]","FAO EcoCrop (Zea mays): RMIN-RMAX, annual rainfall"
+chickpea,temp_opt_c,"[15,29]","[15,29]","FAO EcoCrop (Cicer arietinum): TOPMN-TOPMX, mean temperature"
+chickpea,temp_abs_c,"[7,35]","[7,35]","FAO EcoCrop (Cicer arietinum): TMIN-TMAX, mean temperature"
+chickpea,soil_ph,"[4.7,9.5]","[4.7,9.5]",FAO EcoCrop (Cicer arietinum): PHMIN-PHMAX (absolute range)
+chickpea,rain_abs_mm,"[300,1800]","[300,1800]","FAO EcoCrop (Cicer arietinum): RMIN-RMAX, annual rainfall"
+lentil,temp_opt_c,"[15,29]","[15,29]","FAO EcoCrop (Lens culinaris): TOPMN-TOPMX, mean temperature"
+lentil,temp_abs_c,"[5,32]","[5,32]","FAO EcoCrop (Lens culinaris): TMIN-TMAX, mean temperature"
+lentil,soil_ph,"[4.5,8.2]","[4.5,8.2]",FAO EcoCrop (Lens culinaris): PHMIN-PHMAX (absolute range)
+lentil,rain_abs_mm,"[250,2500]","[250,2500]","FAO EcoCrop (Lens culinaris): RMIN-RMAX, annual rainfall"
+dry_bean,temp_opt_c,"[16,25]","[16,25]","FAO EcoCrop (Phaseolus vulgaris): TOPMN-TOPMX, mean temperature"
+dry_bean,temp_abs_c,"[7,32]","[7,32]","FAO EcoCrop (Phaseolus vulgaris): TMIN-TMAX, mean temperature"
+dry_bean,soil_ph,"[4,9]","[4,9]",FAO EcoCrop (Phaseolus vulgaris): PHMIN-PHMAX (absolute range)
+dry_bean,rain_abs_mm,"[300,4300]","[300,4300]","FAO EcoCrop (Phaseolus vulgaris): RMIN-RMAX, annual rainfall"
+sunflower,temp_opt_c,"[17,34]","[17,34]","FAO EcoCrop (Helianthus annuus): TOPMN-TOPMX, mean temperature"
+sunflower,temp_abs_c,"[5,45]","[5,45]","FAO EcoCrop (Helianthus annuus): TMIN-TMAX, mean temperature"
+sunflower,soil_ph,"[5.5,8]","[5.5,8]",FAO EcoCrop (Helianthus annuus): PHMIN-PHMAX (absolute range)
+sunflower,rain_abs_mm,"[300,1600]","[300,1600]","FAO EcoCrop (Helianthus annuus): RMIN-RMAX, annual rainfall"
+safflower,temp_opt_c,"[20,32]","[20,32]","FAO EcoCrop (Carthamus tinctorius): TOPMN-TOPMX, mean temperature"
+safflower,temp_abs_c,"[5,45]","[5,45]","FAO EcoCrop (Carthamus tinctorius): TMIN-TMAX, mean temperature"
+safflower,soil_ph,"[5,8]","[5,8]",FAO EcoCrop (Carthamus tinctorius): PHMIN-PHMAX (absolute range)
+safflower,rain_abs_mm,"[300,1400]","[300,1400]","FAO EcoCrop (Carthamus tinctorius): RMIN-RMAX, annual rainfall"
+canola,temp_opt_c,"[15,25]","[15,25]","FAO EcoCrop (Brassica napus): TOPMN-TOPMX, mean temperature"
+canola,temp_abs_c,"[5,41]","[5,41]","FAO EcoCrop (Brassica napus): TMIN-TMAX, mean temperature"
+canola,soil_ph,"[5.5,8]","[5.5,8]",FAO EcoCrop (Brassica napus): PHMIN-PHMAX (absolute range)
+canola,rain_abs_mm,"[400,2800]","[400,2800]","FAO EcoCrop (Brassica napus): RMIN-RMAX, annual rainfall"
+sugar_beet,temp_opt_c,"[15,25]","[15,25]","FAO EcoCrop (Beta vulgaris var. saccharifera): TOPMN-TOPMX, mean temperature"
+sugar_beet,temp_abs_c,"[7,30]","[7,30]","FAO EcoCrop (Beta vulgaris var. saccharifera): TMIN-TMAX, mean temperature"
+sugar_beet,soil_ph,"[5.5,8.5]","[5.5,8.5]",FAO EcoCrop (Beta vulgaris var. saccharifera): PHMIN-PHMAX (absolute range)
+sugar_beet,rain_abs_mm,"[250,1000]","[250,1000]","FAO EcoCrop (Beta vulgaris var. saccharifera): RMIN-RMAX, annual rainfall"
+cotton,temp_opt_c,"[22,36]","[22,36]","FAO EcoCrop (Gossypium hirsutum): TOPMN-TOPMX, mean temperature"
+cotton,temp_abs_c,"[15,42]","[15,42]","FAO EcoCrop (Gossypium hirsutum): TMIN-TMAX, mean temperature"
+cotton,soil_ph,"[5,9.5]","[5,9.5]",FAO EcoCrop (Gossypium hirsutum): PHMIN-PHMAX (absolute range)
+cotton,rain_abs_mm,"[450,1500]","[450,1500]","FAO EcoCrop (Gossypium hirsutum): RMIN-RMAX, annual rainfall"
+potato,temp_opt_c,"[15,25]","[15,25]","FAO EcoCrop (Solanum tuberosum): TOPMN-TOPMX, mean temperature"
+potato,temp_abs_c,"[7,30]","[7,30]","FAO EcoCrop (Solanum tuberosum): TMIN-TMAX, mean temperature"
+potato,soil_ph,"[4.2,8.5]","[4.2,8.5]",FAO EcoCrop (Solanum tuberosum): PHMIN-PHMAX (absolute range)
+potato,rain_abs_mm,"[250,2000]","[250,2000]","FAO EcoCrop (Solanum tuberosum): RMIN-RMAX, annual rainfall"
+tomato,temp_opt_c,"[20,27]","[20,27]","FAO EcoCrop (Lycopersicon esculentum): TOPMN-TOPMX, mean temperature"
+tomato,temp_abs_c,"[7,35]","[7,35]","FAO EcoCrop (Lycopersicon esculentum): TMIN-TMAX, mean temperature"
+tomato,soil_ph,"[5,7.5]","[5,7.5]",FAO EcoCrop (Lycopersicon esculentum): PHMIN-PHMAX (absolute range)
+tomato,rain_abs_mm,"[400,1800]","[400,1800]","FAO EcoCrop (Lycopersicon esculentum): RMIN-RMAX, annual rainfall"
+alfalfa,temp_opt_c,"[21,27]","[21,27]","FAO EcoCrop (Medicago sativa): TOPMN-TOPMX, mean temperature"
+alfalfa,temp_abs_c,"[5,45]","[5,45]","FAO EcoCrop (Medicago sativa): TMIN-TMAX, mean temperature"
+alfalfa,soil_ph,"[4.3,8.7]","[4.3,8.7]",FAO EcoCrop (Medicago sativa): PHMIN-PHMAX (absolute range)
+alfalfa,rain_abs_mm,"[350,2700]","[350,2700]","FAO EcoCrop (Medicago sativa): RMIN-RMAX, annual rainfall"
+vetch,temp_opt_c,"[14,23]","[14,23]","FAO EcoCrop (Vicia sativa ssp. sativa): TOPMN-TOPMX, mean temperature"
+vetch,temp_abs_c,"[3,28]","[3,28]","FAO EcoCrop (Vicia sativa ssp. sativa): TMIN-TMAX, mean temperature"
+vetch,soil_ph,"[4.5,8.2]","[4.5,8.2]",FAO EcoCrop (Vicia sativa ssp. sativa): PHMIN-PHMAX (absolute range)
+vetch,rain_abs_mm,"[350,1600]","[350,1600]","FAO EcoCrop (Vicia sativa ssp. sativa): RMIN-RMAX, annual rainfall"
+oats,temp_opt_c,"[15,20]","[16,20]","FAO EcoCrop (Avena sativa): TOPMN-TOPMX, mean temperature"
+oats,temp_abs_c,"[5,30]","[5,30]","FAO EcoCrop (Avena sativa): TMIN-TMAX, mean temperature"
+oats,soil_ph,"[5.5,8]","[4.5,7.5]",FAO EcoCrop (Avena sativa): PHMIN-PHMAX (absolute range)
+oats,rain_abs_mm,null,"[250,1500]","FAO EcoCrop (Avena sativa): RMIN-RMAX, annual rainfall"
+rye,temp_opt_c,"[12,20]","[15,20]","FAO EcoCrop (Secale cereale): TOPMN-TOPMX, mean temperature"
+rye,temp_abs_c,"[3,30]","[3,31]","FAO EcoCrop (Secale cereale): TMIN-TMAX, mean temperature"
+rye,soil_ph,"[5,8]","[4.5,8.2]",FAO EcoCrop (Secale cereale): PHMIN-PHMAX (absolute range)
+rye,rain_abs_mm,null,"[400,2000]","FAO EcoCrop (Secale cereale): RMIN-RMAX, annual rainfall"
+pea,temp_opt_c,"[10,24]","[10,24]","FAO EcoCrop (Pisum sativum): TOPMN-TOPMX, mean temperature"
+pea,temp_abs_c,"[4,30]","[4,30]","FAO EcoCrop (Pisum sativum): TMIN-TMAX, mean temperature"
+pea,soil_ph,"[5.5,8]","[4.5,8.3]",FAO EcoCrop (Pisum sativum): PHMIN-PHMAX (absolute range)
+pea,rain_abs_mm,null,"[350,2500]","FAO EcoCrop (Pisum sativum): RMIN-RMAX, annual rainfall"
+faba_bean,temp_opt_c,"[15,22]","[18,28]","FAO EcoCrop (Vicia faba): TOPMN-TOPMX, mean temperature"
+faba_bean,temp_abs_c,"[5,30]","[5,32]","FAO EcoCrop (Vicia faba): TMIN-TMAX, mean temperature"
+faba_bean,soil_ph,"[6,8]","[4.5,8.6]",FAO EcoCrop (Vicia faba): PHMIN-PHMAX (absolute range)
+faba_bean,rain_abs_mm,null,"[250,2600]","FAO EcoCrop (Vicia faba): RMIN-RMAX, annual rainfall"
+soybean,temp_opt_c,"[20,30]","[20,33]","FAO EcoCrop (Glycine max): TOPMN-TOPMX, mean temperature"
+soybean,temp_abs_c,"[10,38]","[10,38]","FAO EcoCrop (Glycine max): TMIN-TMAX, mean temperature"
+soybean,soil_ph,"[5.5,8]","[4.5,8.4]",FAO EcoCrop (Glycine max): PHMIN-PHMAX (absolute range)
+soybean,rain_abs_mm,null,"[450,1800]","FAO EcoCrop (Glycine max): RMIN-RMAX, annual rainfall"
+sainfoin,temp_opt_c,"[10,25]","[18,27]","FAO EcoCrop (Onobrychis viciifolia): TOPMN-TOPMX, mean temperature"
+sainfoin,temp_abs_c,"[2,35]","[4,34]","FAO EcoCrop (Onobrychis viciifolia): TMIN-TMAX, mean temperature"
+sainfoin,soil_ph,"[6,8.5]","[4.9,8.2]",FAO EcoCrop (Onobrychis viciifolia): PHMIN-PHMAX (absolute range)
+sainfoin,rain_abs_mm,null,"[250,1100]","FAO EcoCrop (Onobrychis viciifolia): RMIN-RMAX, annual rainfall"
+silage_maize,temp_opt_c,"[18,33]","[18,33]","FAO EcoCrop (Zea mays): TOPMN-TOPMX, mean temperature"
+silage_maize,temp_abs_c,"[10,47]","[10,47]","FAO EcoCrop (Zea mays): TMIN-TMAX, mean temperature"
+silage_maize,soil_ph,"[4.5,8.5]","[4.5,8.5]",FAO EcoCrop (Zea mays): PHMIN-PHMAX (absolute range)
+silage_maize,rain_abs_mm,null,"[400,1800]","FAO EcoCrop (Zea mays): RMIN-RMAX, annual rainfall"
+sorghum,temp_opt_c,"[25,31]","[22,35]","FAO EcoCrop (Sorghum bicolor): TOPMN-TOPMX, mean temperature"
+sorghum,temp_abs_c,"[8,40]","[8,40]","FAO EcoCrop (Sorghum bicolor): TMIN-TMAX, mean temperature"
+sorghum,soil_ph,"[5,8.5]","[5,8]",FAO EcoCrop (Sorghum bicolor): PHMIN-PHMAX (absolute range)
+sorghum,rain_abs_mm,null,"[300,700]","FAO EcoCrop (Sorghum bicolor): RMIN-RMAX, annual rainfall"

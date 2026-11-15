@@ -1,0 +1,10 @@
+crop_id,method,ndfa,harvest_index,shoot_n_pct,belowground_factor,fixed_kg_n_ha_yr,source,note
+chickpea,grain_legume,0.63,0.35,2.0,2.0,,"Herridge, Peoples & Boddey 2008, Plant Soil 311:1-18: Table 2 p.7 (%Ndfa 63% for chickpea, lentil, pea etc.); Table 4 footnotes p.9 (harvest index 0.35, shoot N 2.0%, below-ground factor 2.0 for chickpea)",fixed N = yield / HI x shoot N x below-ground factor x Ndfa
+lentil,grain_legume,0.63,0.35,2.0,1.4,,"Herridge et al. 2008: Table 2 p.7; Table 4 footnotes p.9 (below-ground factor 1.4 for pulses other than chickpea and soybean)",
+dry_bean,grain_legume,0.40,0.35,2.0,1.4,,"Herridge et al. 2008: Table 2 p.7 (common bean %Ndfa 40%, lowest group); Table 4 footnotes p.9",common bean fixes the least of the grain legumes
+vetch,grain_legume,0.63,0.35,2.0,1.4,,"Herridge et al. 2008: Table 2 p.7 group 'chickpea, lentil, pea ... etc.' applied to common vetch; Table 4 footnotes p.9","vetch (Vicia sativa) is not named in the paper; the pulse group is used as an approximation; when vetch is grown for forage or green manure, more N stays in the field than this grain-based estimate"
+alfalfa,per_year,,,,,200,"Herridge et al. 2008 p.10, citing Smil (1999): average 200 kg N/ha/yr fixed by alfalfa","perennial forage; per year of stand"
+pea,grain_legume,0.63,0.35,2.0,1.4,,"Herridge et al. 2008: Table 2 p.7 (pea in the 63% group); Table 4 footnotes p.9",
+faba_bean,grain_legume,0.75,0.35,2.2,1.4,,"Herridge et al. 2008: Table 2 p.7 (faba bean and lupin, 75%); Table 4 footnotes p.9 (shoot N 2.2% for faba bean)",
+soybean,grain_legume,0.68,0.40,3.0,1.5,,"Herridge et al. 2008: Table 2 p.7 (soybean 68%); Table 3 footnotes p.8 (harvest index 0.4, shoot N 3.0%, below-ground factor 1.5)",average %Ndfa; Türkiye soybean is irrigated and often fertilized with N which lowers fixation
+sainfoin,per_year,,,,,100,"Herridge et al. 2008 p.10, citing Smil (1999): 100 kg N/ha/yr for other forage legumes","perennial forage; per year of stand; sainfoin is not named, the 'other forages' value is used"

@@ -1,0 +1,30 @@
+code,name,stations,pdf_page
+BLG_01,İlkbaharı Fazla Yağışlı Akdeniz,1,24
+BLG_02,Akdeniz,37,24
+BLG_03,Akdeniz Ardı -1,2,24
+BLG_04,Marmara,21,24
+BLG_05,Marmara -Geçit,5,24
+BLG_06,Serin Karadeniz -1,3,24
+BLG_07,Serin Karadeniz -2,6,24
+BLG_08,Ilık Karadeniz,9,24
+BLG_09,Doğu Karadeniz -1,1,24
+BLG_10,Doğu Karadeniz -2,3,24
+BLG_11,Yusufeli,1,24
+BLG_12,Doğu -1,1,24
+BLG_13,Doğu -2,10,24
+BLG_14,Iğdır Mikroklima,1,24
+BLG_15,Erzurum -Kars Yaylası,11,24
+BLG_16,Van,6,24
+BLG_17,Hakkari,3,24
+BLG_18,Güneydoğu -1,6,24
+BLG_19,Güneydoğu -2,10,24
+BLG_20,Güneydoğu -Geçit,8,24
+BLG_21,Yukarı Fırat -Murat,11,24
+BLG_22,Akdeniz -Güneydoğu Geçit,4,24
+BLG_23,Dağ Yamacı -Doğu,12,24
+BLG_24,İç Anadolu -İç Geçit -Serin Karadeniz,11,24
+BLG_25,Dağ Yamacı -Dağ,3,24
+BLG_26,Geçit,13,24
+BLG_27,Dağ Yamaç,13,24
+BLG_28,Akdeniz Ardı -2,12,24
+BLG_29,İç Anadolu,35,24

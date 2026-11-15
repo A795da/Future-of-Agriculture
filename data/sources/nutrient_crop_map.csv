@@ -1,0 +1,27 @@
+crop_id,ludemann_item,faostat_item,note
+wheat,Wheat,Wheat,
+spring_wheat,Wheat,Wheat,FAOSTAT does not separate spring wheat; national wheat yield used
+barley,Barley,Barley,
+spring_barley,Barley,Barley,FAOSTAT does not separate spring barley; national barley yield used
+maize,Maize,Maize (corn),national yield is mostly irrigated maize
+chickpea,Chick peas,"Chick peas, dry",
+lentil,Lentils,"Lentils, dry",
+dry_bean,"Beans, dry","Beans, dry",
+sunflower,Sunflower seed,Sunflower seed,
+safflower,Safflower seed,Safflower seed,
+canola,Rapeseed,Rape or colza seed,
+sugar_beet,Sugar beet,Sugar beet,
+cotton,Seed cotton,"Seed cotton, unginned",
+potato,Potatoes,Potatoes,
+tomato,Tomatoes,Tomatoes,
+vetch,Vetches,Vetches,"grain (seed) basis; forage vetch removes more N, P and K in the hay"
+alfalfa,,,no Ludemann Tier 1 row and no FAOSTAT yield; removal not estimated
+oats,Oats,Oats,
+rye,Rye,Rye,
+triticale,Triticale,Triticale,
+pea,"Peas, dry","Peas, dry",
+faba_bean,"Broad beans, horse beans, dry","Broad beans and horse beans, dry",
+soybean,Soybeans,Soya beans,national yield includes second-crop soybean
+sorghum,Sorghum,Sorghum,
+silage_maize,,,no Ludemann or FAOSTAT row for silage maize; removal not estimated
+sainfoin,,,no Ludemann or FAOSTAT row for sainfoin; removal not estimated

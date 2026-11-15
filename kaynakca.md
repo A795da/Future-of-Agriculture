@@ -1,0 +1,213 @@
+# Kaynakça (data sources)
+
+Every dataset, API, table or compiled value used by FieldShift is listed here. **Add an entry in the same change whenever new data is added.**
+
+Status values: **used** (in the app or scoring now) · **planned** (not yet integrated) · **compiled, unverified** (values written by the team without a line-by-line source check).
+Kind values match the labels shown in the app: NASA observation · NASA reanalysis · NASA model estimate · model estimate · farmer input · compiled rule.
+
+---
+
+## NASA data
+
+### NASA POWER daily point API (AG community)
+- **Used for:** monthly temperature and rainfall, dry-year rainfall, frost dates and frost-free season, winter lows, heavy-rain days, 10-day temperature extremes, root-zone soil wetness; 12-month chart in the app.
+- **Files:** `web/src/data/power.js`, `web/src/features/climate.js`, `scripts/fetch_power_all.mjs`. Raw daily history for all 81 provinces in `data/power/<id>.json` (not committed; re-fetchable); computed features per province in `web/public/data/cache/<id>/features.json` (read by the app, works offline).
+- **Parameters:** T2M, T2M_MAX, T2M_MIN, PRECTOTCORR, RH2M, ALLSKY_SFC_SW_DWN, WS2M, GWETTOP, GWETROOT.
+- **Access:** live API `https://power.larc.nasa.gov/api/temporal/daily/point`; history 2005-01-01 to 2024-12-31.
+- **Kind:** NASA reanalysis (MERRA-2 based, with observation corrections); GWETTOP/GWETROOT = NASA model estimate; solar radiation from satellites.
+- **Resolution:** about 0.5° × 0.625° (tens of km); nearby fields share values.
+- **License / terms:** NASA open data; cite NASA POWER as the source.
+- **Accessed:** 2026-11-14. **Status:** used.
+
+### MODIS MOD13Q1 v061 NDVI (16-day, 250 m) via ORNL DAAC MODIS Web Service
+- **Used for:** monthly NDVI pattern and low-green months (evidence only; not yet in scores).
+- **Files:** `scripts/fetch_ndvi.mjs`, `web/src/features/vegetation.js`; cache `web/public/data/cache/<province>/ndvi.json` (Konya, partial).
+- **Access:** `https://modis.ornl.gov/rst/api/v1/MOD13Q1/subset`, band `250m_16_days_NDVI`, scale 0.0001, fill −3000. Slow (~10 s per date).
+- **Kind:** NASA observation. **License:** NASA open data; cite ORNL DAAC.
+- **Caveat:** NDVI is low on bare soil and on dormant winter crops alike; 250 m pixels mix neighbouring land on small fields.
+- **Accessed:** 2026-11-14. **Status:** used (Konya only, download in progress).
+
+### NASA AppEEARS point request: MODIS NDVI, VIIRS NDVI, SMAP soil moisture, MODIS land cover (planned)
+- **For:** one request for all 81 province points, 2015-01-01 to 2026-11-14:
+  - `MOD13Q1.061` NDVI + pixel reliability (250 m, 16-day): vegetation pattern, low-green months. NASA observation.
+  - `VNP13A1.002` VIIRS NDVI + pixel reliability (500 m, 16-day): continuity for MODIS. NASA observation.
+  - `SPL3SMP_E.006` SMAP enhanced L3 surface soil moisture AM/PM + quality flags (9 km, daily, from 2015-03-31): observed soil moisture for drought stress. NASA observation.
+  - `MCD12Q1.061` `LC_Type1` land cover (500 m, yearly): finds points that fall on cities.
+- **Files:** upload `data/appeears/fieldshift_81_provinces.csv`; step-by-step guide `data/appeears/README.md`.
+- **Access:** https://appeears.earthdatacloud.nasa.gov (Earthdata login). Product and layer names checked against the AppEEARS catalog API on 2026-11-15.
+- **License:** NASA open data; cite each product (LP DAAC for MODIS/VIIRS, NSIDC DAAC for SMAP) and AppEEARS.
+- **Status:** planned (request to be submitted by the team).
+
+### NASA GIBS: MODIS_Terra_NDVI_8Day tiles (tested, not used)
+- Tested 2026-11-14. The layer only has data from 2025-02 onwards, and tiles are images, not numbers, so they cannot drive scoring. Possible later use: map overlay only.
+
+### SRTM elevation (NASA) via OpenTopoData
+- **For:** field slope (plane fitted to elevation samples inside the field) for erosion risk.
+- **Files:** `web/src/features/terrain.js` (plane fit), `web/src/data/loader.js` (fetch), `web/api/elevation.js` (serverless proxy), proxy rule in `web/vite.config.js`.
+- **Access:** `https://api.opentopodata.org/v1/srtm30m` (public API: max 100 points per request, 1 request/s, 1000/day). The API sends no CORS headers, so the app calls its own `/api/elevation` endpoint, which forwards the request.
+- **Kind:** NASA observation (30 m). **License:** SRTM is public domain; OpenTopoData public API terms apply.
+- **Accessed:** 2026-11-15. **Status:** used (slope for drawn fields and pins; feeds erosion score).
+
+---
+
+## Non-NASA data (labelled as such in the app)
+
+### Open-Meteo forecast
+- **For:** Today tab: 7-day daily max/min temperature, rain, rain probability and FAO-56 reference evapotranspiration, compared with the crop's limits. **Not NASA**; labelled "Open-Meteo · not NASA data" in the app.
+- **Files:** `web/src/data/forecast.js` (live call, falls back to the saved snapshot), `web/src/scoring/today.js` (alerts), `scripts/fetch_forecast_snapshot.mjs`; demo snapshots `web/public/data/cache/<id>/forecast_snapshot.json` for Konya, Edirne, Adana, Şanlıurfa, Erzurum (saved 2026-11-15; shown with their save date, never as current).
+- **Access:** `https://api.open-meteo.com/v1/forecast` (`daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,et0_fao_evapotranspiration`, `timezone=Europe/Istanbul`, `forecast_days=7`). Browser calls allowed (CORS).
+- **Kind:** model estimate (weather forecast models, a few km). **License:** free for non-commercial use; data CC BY 4.0, attribution "Weather data by Open-Meteo.com".
+- **Accessed:** 2026-11-15. **Status:** used.
+
+### Fertilizer timing before heavy rain (Today tab reminder)
+- **For:** the reminder "do not spread nitrogen fertilizer in the 2-3 days before heavy rain" (no doses). **Files:** `web/src/scoring/today.js`.
+- **Sources:** University of Kentucky Grain Crops, "After a big rain: N loss, erosion and other things" (surface-applied N can be eroded off the field by heavy rain), https://graincrops.mgcafe.uky.edu/articles/after-big-rain-n-loss-erosion-and-other-things ; UNL CropWatch, "With heavy rains, how likely is N leaching?" (urea needs 2-4 days to hydrolyze; leaching rain before that can move it), https://cropwatch.unl.edu/heavy-rains-how-likely-n-leaching-unl-cropwatch-may-31-2013 .
+- **Kind:** compiled rule. **Accessed:** 2026-11-15. **Status:** used. US extension sources; the 20 mm heavy-rain threshold is the app's own (same as the heavy-rain days feature) and needs a local check.
+
+### Today tab thresholds (compiled, unverified)
+- Yellow within 2 °C of a crop's frost-damage limit, red below it; winter crops in Oct-Feb use winter hardiness (3 °C snow margin); heat watch 2 °C below the flowering heat limit; heavy rain ≥ 20 mm/day (≥ 40 red); dry week < 5 mm rain while the crop uses ≥ 15 mm (FAO-56 kc × forecast ET0). Crop limits come from `crops.json`. Erosion, sowing-on-wet-soil and harvest-before-rain notes are team rules. **Files:** `web/src/scoring/today.js` (named constants). **Status:** compiled, unverified.
+
+### SoilGrids (ISRIC)
+- **For:** topsoil clay, organic carbon, pH (modeled). Tested 2026-11-14: **timed out** (30 s and 90 s).
+- **Access:** `https://rest.isric.org/soilgrids/v2.0/properties/query`. **Kind:** model estimate. **License:** CC BY 4.0. **Status:** planned; unavailable at test time.
+
+### AI wording providers: Google Gemini API (default) and Anthropic Claude API (not data sources)
+- **For:** optional plain-language rewording (English or Turkish) of results the rule-based engine already computed: rotation cards, crop check verdicts, Today summaries. They never pick crops, scores, verdicts or colours, and add no data.
+- **Files:** `web/api/explain.js` (serverless endpoint, provider choice, number check), `web/server/providers/gemini.js`, `web/server/providers/claude.js`, `web/src/explain/payload.js` (what the model sees), `web/src/explain/verify.js`, `web/src/explain/ai.js`, `web/src/ui/components/AiSummary.jsx`, `scripts/build_explain_cache.mjs`; cached demo texts in `web/public/data/explain_cache.json`; settings template `web/.env.example`.
+- **Gemini:** Google Gen AI SDK `@google/genai`, model `gemini-3.5-flash-lite` by default (stable; the model list is at https://aistudio.google.com/docs/models), set with `GEMINI_MODEL`. Key `GEMINI_API_KEY` from Google AI Studio (free tier). Free-tier limits are set per project and shown in AI Studio; free-tier prompts may be used by Google to improve its products, so only the trimmed result JSON is sent.
+- **Claude:** `@anthropic-ai/sdk`, model `claude-opus-5-5`, server-side refusal fallback on; key `ANTHROPIC_API_KEY`. Used when `AI_PROVIDER=claude` or when only that key is set.
+- **Guardrails:** sends only the computed result JSON (no coordinates, place names or farmer identity); every number in the AI text must appear in that JSON, checked on the server and again in the browser, otherwise the template sentence stays; labelled "AI summary of the data above" in the app. Keys live in `web/.env.local` (gitignored) or the host's environment variables, never in the browser bundle.
+- **Kind:** not data (text generation). **Accessed:** 2026-11-15. **Status:** integrated; Gemini key being set up by the team.
+
+### Esri World Imagery (satellite basemap)
+- **For:** map background so farmers can see field edges. **Files:** `web/src/field/FieldMap.jsx`.
+- **Access:** ArcGIS tile service. **Attribution:** "Imagery © Esri, Maxar, Earthstar Geographics" (shown on the map). Check Esri terms before any production use. **Status:** used.
+
+### FAO-56 (Allen et al. 1998, FAO Irrigation and Drainage Paper 56)
+- **For:** crop coefficients (kc ini/mid/end), crop stage lengths, rooting depth (Tables 11, 12, 22); Hargreaves reference evapotranspiration (eq. 52) and extraterrestrial radiation (eq. 21).
+- **Files:** `web/public/data/crops.json` (kc, stages, root depth), `web/src/features/climate.js` (equations).
+- **Access:** http://www.fao.org/4/x0490e/x0490e0b.htm (Tables 11-12; some cells are images).
+- **Status:** equations used; **crop values compiled, unverified** (written from general knowledge of the tables, not yet checked row by row).
+
+### FAO EcoCrop database
+- **For:** temperature, rainfall and pH ranges, killing temperatures (KTMPR = during rest, KTMP = early growth), crop cycle length.
+- **Access found:** full database as CSV (2,568 species) in the OpenCLIM repository: https://github.com/openclim/ecocrop (`EcoCrop_DB.csv`, column meanings in `Ecocrop_variable_lookup.csv`). Official access now via FAO GAEZ: https://gaez.fao.org/pages/ecocrop. The GitHub copy is a third-party redistribution and the repository has no license file.
+- **Local copy:** `data/sources/EcoCrop_DB.csv` (2,568 species, 1.6 MB) and `data/sources/EcoCrop_variable_lookup.csv`, downloaded 2026-11-15 from `https://raw.githubusercontent.com/openclim/ecocrop/main/`.
+- **Caveat:** EcoCrop temperature limits refer to mean temperature ranges, not daily maxima.
+- **Imported (2026-11-15, `scripts/import_ecocrop.mjs`, mapping in `data/sources/ecocrop_crop_map.csv`):** for all 17 crops, `temp_opt_c` (TOPMN-TOPMX), `temp_abs_c` (TMIN-TMAX), `soil_ph` (PHMIN-PHMAX) and the new `rain_abs_mm` (RMIN-RMAX, annual rainfall). Each crop records the source of each imported field in `field_sources`; 59 values changed, listed old vs new in `data/sources/ecocrop_import_report.csv`. Variety rows used where EcoCrop has several: sugar beet *Beta vulgaris* var. *saccharifera*, common vetch *Vicia sativa* ssp. *sativa*, tomato *Lycopersicon esculentum*. Spring and winter wheat/barley share one EcoCrop row.
+- **Used for:** the flowering-month mean-temperature limit (hard filter), soil pH when known, and a new rain-fed risk when dry-year annual rainfall (NASA POWER) is below RMIN.
+- **Not imported:** KTMP/KTMPR killing temperatures (EcoCrop gives barley −4 °C during rest, while winter barley survives about −15 °C); winter hardiness and frost-damage values stay team-compiled.
+- **Status:** used.
+
+### Crop table (`web/public/data/crops.json`)
+- **26 crops** (2026-11-15: added oats, rye, triticale, pea, faba bean, soybean, sainfoin, silage maize, sorghum). For the new crops: kc and stage lengths transcribed from FAO-56 Tables 11-12 (http://www.fao.org/4/x0490e/x0490e0b.htm, checked 2026-11-15; Kc_ini cells that are images on that page use the table's group values, cereals 0.3 and legumes 0.4); rye uses the wheat/small-grain rows and sainfoin the alfalfa-hay row as proxies (neither is in FAO-56); triticale is not in EcoCrop, so its temperature ranges are compiled from wheat and rye. Sowing dates from TAGEM-DSİ (pea and faba bean from the guide's fresh pea and fresh faba bean rows); EcoCrop, AquaCrop (soybean, sorghum), FAOSTAT, Ludemann and Herridge via the same scripts and mapping files. Frost, hardiness and flowering values compiled by the team (`verified: false`).
+- Sourced fields: temperature ranges, pH and annual rainfall from FAO EcoCrop; heat units from FAO AquaCrop; sowing dates and stages from TAGEM-DSİ per zone (see `field_sources` in each row). The remaining fields below are team-compiled.
+- 17 crops (spring wheat and spring barley added 2026-11-15 for cold plateaus; their default calendars are overridden by TAGEM-DSİ per zone); fields combine FAO-56, EcoCrop and general agronomy. Sowing months, Turkey notes, frost/heat thresholds at the sensitive stage, `sensitive_das` and thermal-time (`phenology`) parameters were set by the team (Claude), some adjusted after testing against NASA POWER data (barley and vetch hardiness −12 → −15 °C; cotton heat limit 38 → 40 °C; winter crop seasons lengthened).
+- **Status:** compiled, unverified; every row has `verified: false` until an agronomy-aware reviewer checks it.
+
+### Rotation templates (`web/public/data/rotations.json`)
+- 23 common Turkish rotation patterns by region, compiled by the team from general agronomy knowledge (2026-11-15 additions: spring wheat-fallow, sainfoin x3-spring wheat, rye-fallow, spring wheat-pea, alfalfa x3-spring wheat for the eastern plateaus; wheat-pea; wheat-faba bean; wheat + second-crop soybean-maize; silage maize-wheat-vetch). **Status:** compiled, unverified.
+
+### Province coordinates and regions (`web/public/data/provinces.json`)
+- 81 province centre coordinates (approximate, written from general knowledge; city centres, not farmland) and the official 7 geographic regions of Turkey.
+- **Status:** compiled, unverified. Planned check: land cover from AppEEARS; consider an official or OpenStreetMap source.
+
+---
+
+## Downloaded sources (in `data/sources/`, not yet integrated)
+
+### TAGEM-DSİ 2017, *Türkiye'de Sulanan Bitkilerin Bitki Su Tüketimleri* (Ankara, 600 pages)
+- **Publisher:** T.C. Tarım ve Orman Bakanlığı, Tarımsal Araştırmalar ve Politikalar Genel Müdürlüğü (TAGEM) and Devlet Su İşleri Genel Müdürlüğü (DSİ), 2017.
+- **Contents used:** 259 climate stations with coordinates and 29 agro-climate zones (Section 7); for each zone and crop, the sowing dekad and the four FAO-56 stage lengths (Section 8, pp. 39-79); kc per station and dekad (Section 9, from p. 81); station ETo (Section 10) and long-term rainfall (Section 11); crop water use (Section 12).
+- **For:** official Turkish sowing calendars and stage lengths per climate zone, replacing the team-compiled sowing months; kc cross-check against FAO-56.
+- **Caveat:** written for **irrigated** crops; rain-fed sowing dates can differ.
+- **File:** `data/sources/raw/TAGEM-DSI_2017_Bitki_Su_Tuketimleri.pdf` (not committed; government publication, cite it).
+- **Extracted (2026-11-15, `scripts/extract_tagem.py`, PyMuPDF text extraction; every row keeps its PDF page):**
+  - `data/sources/tagem_zones.csv`: 29 climate zones (BLG_01-29) with station counts (Section 6).
+  - `data/sources/tagem_stations.csv`: 259 stations with WMO id, province, coordinates, elevation, zone (Section 7).
+  - `data/sources/tagem_calendar.csv`: 1,922 rows: zone, crop (Turkish), sowing month and dekad, four FAO-56 stage lengths, season (Section 8). In 204 rows the printed season differs from the sum of the stages by 1-2 days (rounding in the guide); both are kept as printed.
+  - Checks built into the script: 29 zones, 259 stations with no gaps, row numbers 1-1922 continuous, every row's zone matches the zone label printed on its page.
+- **Mapping (team, compiled):** `data/sources/tagem_crop_map.csv` links our crop ids to guide names and says how each is used (`full` calendar, `sowing_only` for winter crops whose flowering and harvest come from thermal time, or `none`).
+- **Built for the app (`scripts/build_tagem.mjs`):** `web/public/data/tagem_calendar.json` (298 zone-crop calendars for our crops); `web/public/data/provinces.json` gains `tagem_zone` and `tagem_station` (nearest TAGEM station inside the same province; all 81 provinces have one).
+- **How the app uses it:** sowing dates (and full stage lengths for `full` crops) per zone; on rain-fed fields only winter-crop sowing dates and spring cereals are used, because the guide is for irrigated crops; crops the guide does not list for a zone get a risk note and low confidence, and generated rotations only use listed crops.
+- **Status:** used.
+
+### Ludemann et al. 2023, *Global data on crop nutrient concentration and harvest indices* (Dryad, doi:10.5061/dryad.n2z34tn0x)
+- **For:** N, P, K, S in harvested product and residues (kg per tonne fresh weight) and harvest index → nutrient removal per rotation.
+- **Files:** `data/sources/ludemann2023_Tier_1_and_2_crop_coefficients.csv` (2,244 rows), `ludemann2023_Meta_data_Tier_1_and_2_crop_coefficients.csv`, `ludemann2023_README.md`, from the dataset version dated 2026-11-10.
+- **Coverage note:** Tier 1 (world) values exist for all our crops except alfalfa; there are no Tier 2 values for Türkiye, so world values are used.
+- **License:** CC0. **Obtained:** by the team (web download), 2026-11-15.
+- **Used (2026-11-15):** product and residue N, P, K per tonne (Tier 1 world rows) for 16 crops via `data/sources/nutrient_crop_map.csv` and `scripts/build_nutrients.mjs` → `web/public/data/nutrients.json`. Vetch uses the "Vetches" grain row (forage vetch removes more). No row for alfalfa. **Status:** used.
+
+### FAOSTAT QCL, crop yields for Türkiye
+- **For:** average Turkish yields to turn nutrient concentrations into kg/ha removed; default yields the farmer can change.
+- **File:** `data/sources/faostat_turkey_yields.csv`: element Yield (kg/ha), all primary crops (94 items), 2006-2024, with flags. Covers 14 of our 15 crops (no alfalfa).
+- **License:** CC BY 4.0 (cite FAO). **Obtained:** by the team (FAOSTAT web export), 2026-11-15.
+- **Used (2026-11-15):** mean yield 2020-2024 per crop in `web/public/data/nutrients.json` (e.g. wheat 2.97, chickpea 1.20, maize 9.46, sugar beet 66.5 t/ha). National averages mix irrigated and rain-fed fields; spring wheat and barley use the national wheat and barley yields. **Status:** used.
+
+### Herridge, Peoples & Boddey 2008, *Global inputs of biological nitrogen fixation in agricultural systems*, Plant and Soil 311:1-18, doi:10.1007/s11104-008-9668-3
+- **Used values:** Table 2 (%Ndfa: common bean 40%; chickpea, lentil, pea etc. 63%; faba bean 75%); Table 4 method (shoot DM = grain yield / harvest index 0.35; shoot N 2.0%; below-ground factor 2.0 for chickpea, 1.4 for other pulses); Table 5 (kg N/ha/yr: chickpea 58, lentil 51, common bean 23, pea 86); forage legumes ~50 kg N fixed per tonne shoot dry matter, alfalfa ~200 kg N/ha/yr (citing Smil 1999).
+- **File:** `data/sources/raw/HerridgePeoplesBoddey2008.pdf` (not committed; journal copyright).
+- **Added later the same day:** pea (63% group), faba bean (75%, shoot N 2.2%), soybean (68%, harvest index 0.4, shoot N 3.0%, below-ground factor 1.5; gives 321 kg N/ha at the Türkiye yield of 4.2 t/ha, within the paper's range for high-yielding soybean, but irrigated Turkish soybean often receives N fertilizer, which lowers fixation), sainfoin (100 kg N/ha/yr, "other forages" value from Smil 1999 as cited).
+- **Transcribed (2026-11-15):** `data/sources/fixation.csv` with page and table references: fixed N = Türkiye yield / 0.35 × 2.0% shoot N × below-ground factor (2.0 chickpea, 1.4 others) × %Ndfa (63% chickpea, lentil, vetch; 40% common bean); alfalfa 200 kg N/ha/yr. Results with FAOSTAT yields: chickpea 86, lentil 69, dry bean 90, vetch 72 kg N/ha. Vetch is not named in the paper; the pulse group is an approximation (noted in the file).
+- **Obtained:** by the team, 2026-11-15. **Status:** used.
+
+### Nutrient balance (derived, `web/src/scoring/nutrients.js`)
+- Per rotation, average per hectare and year: N, P2O5 (P × 2.291) and K2O (K × 1.205) removed by harvests (FAOSTAT yield × Ludemann per tonne) and N fixed by legumes (Herridge method). Residues are assumed to stay in the field. Shown on each rotation card with the note that only legumes add nitrogen and that P and K come back only through fertilizer or manure; no doses. Information only; it does not change the score yet. **Kind:** compiled rule.
+
+### FAO AquaCrop default crop files (via AquaCrop-OSPy), crop heat-unit requirements
+- **For:** checking that the summer is warm enough for warm-season crops: base temperature, upper temperature, growing degree days to flowering and to maturity.
+- **Source:** AquaCrop-OSPy, `aquacrop/entities/crops/crop_params.py`, https://github.com/aquacropos/aquacrop, commit `256cac4c2c` (2024-05-31); the parameters reproduce FAO AquaCrop's default crop files. **License:** Apache-2.0.
+- **Files:** `scripts/extract_aquacrop.py` downloads the file (kept in `data/sources/raw/`, not committed) and reads it with `ast.literal_eval` (no code is executed); `data/sources/aquacrop_gdd.csv` (11 GDD crop versions); `data/sources/aquacrop_crop_map.csv` (which of our crops use it); `scripts/build_heat_units.mjs` writes `heat_units` into `web/public/data/crops.json`.
+- **Used for:** maize, sunflower, cotton, potato, sugar beet, tomato, dry bean. Heat units are summed from sowing to the median first autumn frost using NASA POWER monthly median temperatures (AquaCrop method: daily max and min clipped to [base, upper]). Below 85% of the need → crop ruled out; 85-100% → risk note and lower climate score. Not used for cereals (AquaCrop's wheat default is a 2,400 GDD long-season variety) or for season length (default varieties are long-season and inflated water need). When an official TAGEM-DSİ calendar exists for the crop in that zone, the official calendar wins (risk note only).
+- **Caveat:** AquaCrop defaults describe typical varieties calibrated elsewhere; local short-season varieties may need less, hence the 15% margin. No AquaCrop parameters for chickpea, lentil, safflower, canola or vetch; the cards say so.
+- **Accessed:** 2026-11-15. **Status:** used.
+
+### Rotation rules (`data/sources/rotation_rules.csv`, built into `web/public/data/rotation_rules.json`)
+Compiled by the team on 2026-11-15 from the sources below (found by web search; intervals are the common recommendations reported there, local extension advice takes precedence). Each rule changes the rotation score and appears on the card with its source.
+
+| Rule | Effect | Source |
+|---|---|---|
+| Sunflower at most every 4 years (broomrape, Orobanche cumana) | −8 | Shevchenko 2024, Sunflower broomrape, Dnipro State Agrarian and Economic University ([PDF](https://dspace.dsau.dp.ua/bitstream/123456789/9912/1/2024%20Sergey%20Shevchenko%20-%20Sunflower%20Broomrape%20Orobanche%20cumana%20Wallr%20and%20Wee%20%5bretrieved_2024-07-08%5d.pdf)): seed viability 7-9 years; highest damage in 2-year wheat-sunflower. The 4-year interval is our choice within that evidence. |
+| Sugar beet at most every 4 years (beet cyst nematode) | −8 | Journal of Nematology 2024 ([PMC11550871](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11550871/)): 3-4 years of non-host crops; Nebraska bulletin cited there: 3-5 years in heavily infested soil |
+| Chickpea at most every 3 years (Ascochyta) | −6 | NDSU Extension ([PDF](https://www.ag.ndsu.edu/carringtonrec/archive/documents/plantpathologyrd/noyeardocs/CHICKPEAAscochytamgmt.pdf)): minimum 3-year rotation; Agriculture and Agri-Food Canada: 3-4 years |
+| Lentil at most every 3 years | −6 | USDA ARS, General principles for managing chickpea and lentil diseases ([DOC](https://www.ars.usda.gov/ARSUserFiles/20902000/compendium/part5-management.doc)): at least two non-host crops between crops |
+| Potato at most every 3 years | −6 | Potato soilborne disease and rotation review ([PMC2586465](https://pmc.ncbi.nlm.nih.gov/articles/PMC2586465)): 3-4 years; 2-year rotations did not prevent increases |
+| Canola at most every 4 years (blackleg) | −6 | Canadian Journal of Plant Pathology 2013 ([link](https://informahealthcare.com/doi/full/10.1080/07060661.2013.775600)): one canola crop in 4 years |
+| Cereal after cereal (take-all) | −5 per pair | Rothamsted Research, Annals of Applied Biology aab.12139 ([PDF](https://repository.rothamsted.ac.uk/download/93e60e634a4bfe79ba755240905f6dc611d15f7a79c8ce8b3cbf0396c3027330/591309/aab.12139.pdf)); Oregon State Extension EC 1423 |
+| Potato and tomato back to back | −6 | compiled rule (shared soilborne hosts), **needs expert check** |
+| Legume before a cereal | +5 | Zhao et al. 2022, Nature Communications 13:4926 ([link](https://link.springer.com/10.1038/s41467-022-32464-0)): about +20% yield on average, 462 studies |
+| Brassica (canola) before potato | +3 | AAFC research (R. Peters) reported by Top Crop Manager ([link](https://www.topcropmanager.com/rotational-options-being-studied-5060/)) |
+
+- **Point values** (−8, −6, −5, +5, +3) are the team's weighting, not from the sources. Two legumes or other same-family pairs without a specific rule keep a generic −5.
+- **Status:** used (rotation cards); planned for the crop check tab.
+
+## Planned data (found, not yet integrated)
+
+| Source | For | Access | License | Status |
+|---|---|---|---|---|
+| Peoples et al. 2009 | legume nitrogen fixation (regional table) | paper | journal copyright; cite | optional (Herridge 2008 covers the need) |
+| Beillouin et al. 2019, *A dataset of meta-analyses on crop diversification at the global scale* | general effect sizes of rotation and diversification | https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6465772/ (data on figshare) | check | planned |
+| Zhao et al. 2022, *Nature Communications* (legume pre-crop meta-analysis) | legume pre-crop raises next crop yield ~20% on average | https://link.springer.com/10.1038/s41467-022-32464-0 | open access | planned |
+| TÜİK province crop statistics | province-level yields and areas | TÜİK tables | check | optional |
+
+## Reviewed from the challenge's NASA and partner resource list (2026-11-15)
+
+| Resource | Decision | Why |
+|---|---|---|
+| SMAP soil moisture | **added** to the AppEEARS request (SPL3SMP_E.006); GIBS map layer later | real NASA soil-moisture observation; complements POWER's modeled root-zone wetness |
+| VIIRS vegetation indices | **added** to the AppEEARS request (VNP13A1.002) | continuity for MODIS as Terra nears end of mission |
+| Landsat / HLS (Harmonized Landsat Sentinel-2, 30 m) | **candidate (stretch)**: one AppEEARS area request for the demo field with `HLSL30_VI.020` / `HLSS30_VI.020` (ready-made NDVI) | field-scale NDVI and bare-period detection; MODIS 250 m is coarse |
+| GPM IMERG | **candidate (should)**: daily series for cached points | rainfall reliability and extreme-storm frequency for erosion |
+| FAO GAEZ v4 | **candidate**: suitability cross-check; official EcoCrop access; HWSD v2 soil database as SoilGrids fallback | soil properties and suitability without depending on SoilGrids |
+| ECOSTRESS | roadmap | irregular revisits; heavy processing |
+| GLDAS | not planned | POWER already supplies the climate and modeled soil-wetness features |
+| ERA5 (ESA/ECMWF) | not planned | NASA POWER covers the same need |
+| Sentinel-2 (ESA) | via HLS if used | one pipeline for Landsat and Sentinel-2 |
+| GEDI | excluded | forest structure; little value for cropland |
+| NASA Worldview | pitch visuals only | IMERG/SMAP images for the video |
+| USDA Ag Data Commons, Web Soil Survey, CDL, PRISM, SSURGO/STATSGO2, NAIP, NLCD, NLDAS, CoCoRaHS, NWIS, AMS Market News, NASS QuickStats, OpenET, LANDFIRE | excluded | U.S.-only coverage; a U.S. version could plug them in through the same data interface |
+
+## Methods (not data, but cited)
+- Hargreaves reference evapotranspiration: FAO-56 eq. 52.
+- Growing degree days with base temperature for winter crop calendars; earliest flowering date as a day-length limit (team rule, parameters unverified).

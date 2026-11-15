@@ -1,0 +1,115 @@
+{
+ "source_file": "data/sources/rotation_rules.csv",
+ "rules": [
+  {
+   "id": "sunflower_gap",
+   "type": "min_gap",
+   "target": "sunflower",
+   "previous": null,
+   "min_gap_years": 4,
+   "points": -8,
+   "reason": "broomrape (canavar otu, Orobanche cumana) seeds stay viable for years; damage was highest in the 2-year wheat-sunflower rotation",
+   "source": "Shevchenko 2024, Sunflower broomrape (Orobanche cumana Wallr.), Dnipro State Agrarian and Economic University",
+   "url": "https://dspace.dsau.dp.ua/bitstream/123456789/9912/1/2024%20Sergey%20Shevchenko%20-%20Sunflower%20Broomrape%20Orobanche%20cumana%20Wallr%20and%20Wee%20%5bretrieved_2024-07-08%5d.pdf"
+  },
+  {
+   "id": "sugar_beet_gap",
+   "type": "min_gap",
+   "target": "sugar_beet",
+   "previous": null,
+   "min_gap_years": 4,
+   "points": -8,
+   "reason": "beet cyst nematode (Heterodera schachtii) needs 3-4 years of non-host crops to decline, more in heavily infested fields",
+   "source": "Journal of Nematology 2024, rate of decline of sugarbeet cyst nematode under nonhost crops; University of Nebraska bulletin as cited there",
+   "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11550871/"
+  },
+  {
+   "id": "chickpea_gap",
+   "type": "min_gap",
+   "target": "chickpea",
+   "previous": null,
+   "min_gap_years": 3,
+   "points": -6,
+   "reason": "Ascochyta blight (antraknoz) survives on chickpea residue for several years",
+   "source": "NDSU Extension, Ascochyta blight of chickpea: fundamentals of management (minimum 3-year rotation); Agriculture and Agri-Food Canada (3-4 years)",
+   "url": "https://www.ag.ndsu.edu/carringtonrec/archive/documents/plantpathologyrd/noyeardocs/CHICKPEAAscochytamgmt.pdf"
+  },
+  {
+   "id": "lentil_gap",
+   "type": "min_gap",
+   "target": "lentil",
+   "previous": null,
+   "min_gap_years": 3,
+   "points": -6,
+   "reason": "Ascochyta and other residue-borne diseases of lentil: at least two non-host crops between lentil crops",
+   "source": "USDA ARS, General principles for managing chickpea and lentil diseases (compendium part 5)",
+   "url": "https://www.ars.usda.gov/ARSUserFiles/20902000/compendium/part5-management.doc"
+  },
+  {
+   "id": "potato_gap",
+   "type": "min_gap",
+   "target": "potato",
+   "previous": null,
+   "min_gap_years": 3,
+   "points": -6,
+   "reason": "soilborne diseases (black scurf, common scab, Verticillium) build up; 2-year rotations did not prevent increases",
+   "source": "Larkin et al. review of potato soilborne disease and rotation (PMC); Idaho potato advice cited by Bayer Crop Science (minimum 3 years)",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2586465"
+  },
+  {
+   "id": "canola_gap",
+   "type": "min_gap",
+   "target": "canola",
+   "previous": null,
+   "min_gap_years": 4,
+   "points": -6,
+   "reason": "blackleg increased when canola was grown more than once in four years",
+   "source": "Canadian Journal of Plant Pathology 2013, effects of canola rotation frequency on blackleg (one canola crop in 4 years)",
+   "url": "https://informahealthcare.com/doi/full/10.1080/07060661.2013.775600"
+  },
+  {
+   "id": "cereal_repeat",
+   "type": "family_repeat",
+   "target": "poaceae",
+   "previous": "poaceae",
+   "min_gap_years": null,
+   "points": -5,
+   "reason": "take-all and other cereal root diseases are worst in second and later wheats; a one-year non-cereal break mostly prevents it",
+   "source": "Rothamsted Research (Annals of Applied Biology, aab.12139); Oregon State University Extension EC 1423",
+   "url": "https://repository.rothamsted.ac.uk/download/93e60e634a4bfe79ba755240905f6dc611d15f7a79c8ce8b3cbf0396c3027330/591309/aab.12139.pdf"
+  },
+  {
+   "id": "nightshade_repeat",
+   "type": "family_repeat",
+   "target": "solanaceae",
+   "previous": "solanaceae",
+   "min_gap_years": null,
+   "points": -6,
+   "reason": "potato and tomato share soilborne diseases and pests; growing one after the other gives them no break",
+   "source": "compiled rule (shared hosts of soilborne potato diseases; see the potato review above); needs expert check",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2586465"
+  },
+  {
+   "id": "legume_before_cereal",
+   "type": "after",
+   "target": "poaceae",
+   "previous": "fabaceae",
+   "min_gap_years": null,
+   "points": 5,
+   "reason": "a legume before a cereal raised the next crop's yield by about 20% on average (462 studies, 53 countries)",
+   "source": "Zhao et al. 2022, Nature Communications 13:4926, yield advantage of legume-based rotations",
+   "url": "https://link.springer.com/10.1038/s41467-022-32464-0"
+  },
+  {
+   "id": "brassica_before_potato",
+   "type": "after",
+   "target": "potato",
+   "previous": "brassicaceae",
+   "min_gap_years": null,
+   "points": 3,
+   "reason": "brassicas such as canola before potato reduced Rhizoctonia disease in Canadian research",
+   "source": "Agriculture and Agri-Food Canada research (R. Peters) reported by Top Crop Manager, rotational options being studied",
+   "url": "https://www.topcropmanager.com/rotational-options-being-studied-5060/"
+  }
+ ]
+}

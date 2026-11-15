@@ -89,7 +89,7 @@ export function CalendarStrip({ cal, cropsById, compact = false }) {
             })}
       </div>
       {!compact && (
-        <div className="cal-months" style={{ gridTemplateColumns: `repeat(${cal.years * 12}, 1fr)` }}>
+        <div className="cal-months" style={{ gridTemplateColumns: `repeat(${cal.years * 12}, minmax(0, 1fr))` }}>
           {Array.from({ length: cal.years * 12 }, (_, i) => (
             <span key={i}>{MONTHS[lang][ROT_MONTHS[i % 12]]}</span>
           ))}
